@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
+<odoo>
+<record id="analytic_budget_type_view_search" model="ir.ui.view">
+    <field name="name">analytic_budget.type - search</field>
+    <field name="model">analytic_budget.type</field>
+    <field
+            name="inherit_id"
+            ref="ssi_master_data_mixin.mixin_master_data_view_search"
+        />
+    <field name="mode">primary</field>
+    <field name="arch" type="xml">
+        <data />
+    </field>
+</record>
+
+<record id="analytic_budget_type_view_tree" model="ir.ui.view">
+    <field name="name">analytic_budget.type - tree</field>
+    <field name="model">analytic_budget.type</field>
+    <field name="inherit_id" ref="ssi_master_data_mixin.mixin_master_data_view_tree" />
+    <field name="mode">primary</field>
+    <field name="arch" type="xml">
+        <data />
+    </field>
+</record>
+
+<record id="analytic_budget_type_view_form" model="ir.ui.view">
+    <field name="name">analytic_budget.type - form</field>
+    <field name="model">analytic_budget.type</field>
+    <field name="inherit_id" ref="ssi_master_data_mixin.mixin_master_data_view_form" />
+    <field name="mode">primary</field>
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//notebook/page[1]" position="before">
+                <page name="revenue" string="Revenue Settings">
+                    <group name="revenue_1" colspan="4" col="2">
+                        <field
+                                name="allowed_revenue_account_ids"
+                                widget="many2many_tags"
+                            />
+                        <field name="revenue_account_ids" nolabel="1" colspan="2">
+                            <tree editable="top">
+                                <field name="account_id" />
+                                <field
+                                        name="allowed_product_categ_ids"
+                                        widget="many2many_tags"
+                                    />
+                                <field
+                                        name="allowed_product_categ_ids"
+                                        widget="many2many_tags"
+                                    />
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+                <page name="cost" string="Cost Settings">
+                    <group name="cost_1" colspan="4" col="2">
+                        <field
+                                name="allowed_cost_account_ids"
+                                widget="many2many_tags"
+                            />
+                        <field name="cost_account_ids" nolabel="1" colspan="2">
+                            <tree editable="top">
+                                <field name="account_id" />
+                                <field
+                                        name="allowed_product_categ_ids"
+                                        widget="many2many_tags"
+                                    />
+                                <field
+                                        name="allowed_product_categ_ids"
+                                        widget="many2many_tags"
+                                    />
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </data>
+    </field>
+</record>
+
+<record id="analytic_budget_type_action" model="ir.actions.act_window">
+    <field name="name">Analytic Budget Types</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">analytic_budget.type</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+<menuitem
+        id="analytic_budget_type_menu"
+        name="Analytic Budget Types"
+        parent="ssi_cost_accounting.menu_budget_configuration"
+        sequence="1"
+        action="analytic_budget_type_action"
+        groups="analytic_budget_type_configuration_group"
+    />
+
+</odoo>

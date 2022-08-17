@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
+<odoo>
+<record id="demo_analytic_budget_type1" model="analytic_budget.type">
+    <field name="name">Project - (test)</field>
+    <field name="code">T001</field>
+    <field
+            name="allowed_revenue_account_ids"
+            eval="[(6, 0, [ref('l10n_generic_coa.1_income')])]"
+        />
+</record>
+
+<record id="demo_analytic_budget_cost" model="analytic_budget.type_account">
+    <field name="type_id" ref="ssi_analytic_budget.demo_analytic_budget_type1" />
+    <field name="direction">cost</field>
+    <field name="account_id" ref="l10n_generic_coa.1_cost_of_goods_sold" />
+    <field
+            name="allowed_product_categ_ids"
+            eval="[(6, 0, [ref('product.product_category_5')])]"
+        />
+</record>
+</odoo>
