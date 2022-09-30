@@ -354,3 +354,13 @@ class AnalyticBudgetBudget(models.Model):
         ]
         res += policy_field
         return res
+
+    @api.model
+    def create(self, values):
+        _super = super(AnalyticBudgetBudget, self)
+        result = _super.create(values)
+        if not result.policy_template_id:
+            template_id = result._get_template_policy()
+            if template_id:
+                result.write({"policy_template_id": template_id})
+        return result

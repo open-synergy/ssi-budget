@@ -3,7 +3,7 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class AnalyticBudgetType(models.Model):
@@ -15,6 +15,7 @@ class AnalyticBudgetType(models.Model):
         string="Analytic Budget Type",
     )
 
+    @api.multi
     def _compute_allowed_revenue_account(self):
         for record in self:
             result = []
@@ -23,6 +24,7 @@ class AnalyticBudgetType(models.Model):
                 result.append(product.account_id.id)
             record.all_allowed_revenue_account_ids = result
 
+    @api.multi
     def _compute_allowed_cost_account(self):
         for record in self:
             result = []

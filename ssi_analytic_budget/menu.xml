@@ -3,10 +3,18 @@
      Copyright 2022 PT. Simetri Sinergi Indonesia
      License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
 <odoo>
-<menuitem
-        id="menu_analytic_budget_configuration"
-        name="Analytic Budget"
-        parent="ssi_cost_accounting.menu_cost_accounting_configuration"
-        sequence="11"
+    <menuitem
+        id="menu_analytic_budget_root"
+        name="Analytic Budgets"
+        parent="account.menu_finance"
+        sequence="5"
+        groups="account.group_account_user"
+    />
+
+    <menuitem
+        id="menu_analytic_budget_config"
+        name="Configuration"
+        parent="menu_analytic_budget_root"
+        sequence="100"
     />
 </odoo>
