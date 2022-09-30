@@ -8,14 +8,14 @@
     <field name="code">T001</field>
     <field
             name="allowed_revenue_account_ids"
-            eval="[(6, 0, [ref('l10n_generic_coa.1_income')])]"
+            eval="[(6, 0, [ref('l10n_generic_coa.1_conf_a_sale')])]"
         />
 </record>
 
 <record id="demo_analytic_budget_cost" model="analytic_budget.type_account">
     <field name="type_id" ref="ssi_analytic_budget.demo_analytic_budget_type1" />
     <field name="direction">cost</field>
-    <field name="account_id" ref="l10n_generic_coa.1_cost_of_goods_sold" />
+    <field name="account_id" ref="l10n_generic_coa.1_conf_cog" />
     <field
             name="allowed_product_categ_ids"
             eval="[(6, 0, [ref('product.product_category_5')])]"

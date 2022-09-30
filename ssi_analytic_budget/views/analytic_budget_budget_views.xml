@@ -30,49 +30,32 @@
                 <field name="company_currency_id" invisible="1" />
                 <field name="analytic_account_id" />
                 <field name="period_id" />
-                <field name="date_start" optional="hide" />
-                <field name="date_end" optional="hide" />
-                <field
-                        name="amount_planned_revenue"
-                        optional="hide"
-                        sum="Total Planned Revenue"
-                    />
-                <field
-                        name="amount_planned_cost"
-                        optional="hide"
-                        sum="Total Planned Cost"
-                    />
+                <field name="date_start" />
+                <field name="date_end" />
+                <field name="amount_planned_revenue" sum="Total Planned Revenue" />
+                <field name="amount_planned_cost" sum="Total Planned Cost" />
                 <field name="amount_planned_pl" sum="Total Planned P/L" />
                 <field
                         name="amount_unbudgeted_revenue_realization"
-                        optional="hide"
                         sum="Total Unbudgeted Revenue Realization"
                     />
                 <field
                         name="amount_budgeted_revenue_realization"
-                        optional="hide"
                         sum="Total Budgeted Revenue Realization"
                     />
                 <field
                         name="amount_revenue_realization"
-                        optional="hide"
                         sum="Total Revenue Realization"
                     />
                 <field
                         name="amount_unbudgeted_cost_realization"
-                        optional="hide"
                         sum="Total Unbudgeted Cost Realization"
                     />
                 <field
                         name="amount_budgeted_cost_realization"
-                        optional="hide"
                         sum="Total Budgeted Cost Realization"
                     />
-                <field
-                        name="amount_cost_realization"
-                        optional="hide"
-                        sum="Total Cost Realization"
-                    />
+                <field name="amount_cost_realization" sum="Total Cost Realization" />
                 <field name="amount_profit_realization" sum="Total P/L Realization" />
             </xpath>
         </data>
@@ -341,8 +324,7 @@
         id="analytic_budget_budget_menu"
         name="Analytic Budgets"
         sequence="1"
-        parent="ssi_cost_accounting.menu_root_budget"
-        groups="analytic_budget_viewer_group"
+        parent="menu_analytic_budget_root"
         action="analytic_budget_budget_action"
     />
 </odoo>

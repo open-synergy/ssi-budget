@@ -40,15 +40,21 @@
                                 name="allowed_revenue_account_ids"
                                 widget="many2many_tags"
                             />
-                        <field name="revenue_account_ids" nolabel="1" colspan="2">
+                        <field
+                                name="revenue_account_ids"
+                                nolabel="1"
+                                colspan="2"
+                                context="{'default_direction': 'revenue'}"
+                            >
                             <tree editable="top">
+                                <field name="direction" invisible="1" />
                                 <field name="account_id" />
                                 <field
                                         name="allowed_product_categ_ids"
                                         widget="many2many_tags"
                                     />
                                 <field
-                                        name="allowed_product_categ_ids"
+                                        name="allowed_product_ids"
                                         widget="many2many_tags"
                                     />
                             </tree>
@@ -61,15 +67,21 @@
                                 name="allowed_cost_account_ids"
                                 widget="many2many_tags"
                             />
-                        <field name="cost_account_ids" nolabel="1" colspan="2">
+                        <field
+                                name="cost_account_ids"
+                                nolabel="1"
+                                colspan="2"
+                                context="{'default_direction': 'cost'}"
+                            >
                             <tree editable="top">
+                                <field name="direction" invisible="1" />
                                 <field name="account_id" />
                                 <field
                                         name="allowed_product_categ_ids"
                                         widget="many2many_tags"
                                     />
                                 <field
-                                        name="allowed_product_categ_ids"
+                                        name="allowed_product_ids"
                                         widget="many2many_tags"
                                     />
                             </tree>
@@ -82,7 +94,7 @@
 </record>
 
 <record id="analytic_budget_type_action" model="ir.actions.act_window">
-    <field name="name">Analytic Budget Types</field>
+    <field name="name">Types</field>
     <field name="type">ir.actions.act_window</field>
     <field name="res_model">analytic_budget.type</field>
     <field name="view_mode">tree,form</field>
@@ -90,11 +102,10 @@
 
 <menuitem
         id="analytic_budget_type_menu"
-        name="Analytic Budget Types"
-        parent="ssi_cost_accounting.menu_budget_configuration"
+        name="Types"
+        parent="menu_analytic_budget_config"
         sequence="1"
         action="analytic_budget_type_action"
-        groups="analytic_budget_type_configuration_group"
     />
 
 </odoo>
