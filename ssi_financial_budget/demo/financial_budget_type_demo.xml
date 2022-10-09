@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
+<odoo>
+<record id="demo_financial_budget_type1" model="financial_budget.type">
+    <field name="name">Revenue - (test)</field>
+    <field name="code">T001</field>
+    <field
+            name="allowed_account_ids"
+            eval="[(6, 0, [ref('l10n_generic_coa.1_income')])]"
+        />
+</record>
+
+<record id="demo_financial_budget_type2" model="financial_budget.type">
+    <field name="name">COGS - (test)</field>
+    <field name="code">T002</field>
+    <field
+            name="allowed_account_ids"
+            eval="[(6, 0, [ref('l10n_generic_coa.1_cost_of_goods_sold')])]"
+        />
+</record>
+
+<record id="demo_financial_budget_type3" model="financial_budget.type">
+    <field name="name">Expense - (test)</field>
+    <field name="code">T003</field>
+    <field
+            name="allowed_account_ids"
+            eval="[(6, 0, [ref('l10n_generic_coa.1_expense'),ref('l10n_generic_coa.1_expense_invest'),ref('l10n_generic_coa.1_expense_rent'),ref('l10n_generic_coa.1_expense_rent')])]"
+        />
+</record>
+</odoo>
