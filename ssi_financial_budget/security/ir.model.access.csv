@@ -1,0 +1,14 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_financial_budget_type_configurator,financial_budget.type - configurator,model_financial_budget_type,financial_budget_type_configuration_group,1,1,1,1
+access_financial_budget_type_all,financial_budget.type - all user,model_financial_budget_type,,1,0,0,0
+access_financial_budget_all,financial_budget.budget - all user,model_financial_budget_budget,,1,0,0,0
+access_financial_budget_viewer,financial_budget.budget - viewer,model_financial_budget_budget,financial_budget_viewer_group,1,0,0,0
+access_financial_budget_user,financial_budget.budget - user,model_financial_budget_budget,financial_budget_user_group,1,1,1,1
+access_financial_budget_detail_all,financial_budget.detail - all user,model_financial_budget_detail,,1,0,0,0
+access_financial_budget_detail_viewer,financial_budget.detail - viewer,model_financial_budget_detail,financial_budget_viewer_group,1,0,0,0
+access_financial_budget_detail_user,financial_budget.detail - user,model_financial_budget_detail,financial_budget_user_group,1,1,1,1
+access_financial_budget_detail_summary_all,financial_budget.detail_summary - all user,model_financial_budget_detail_summary,,1,0,0,0
+access_financial_budget_move_line_all,financial_budget.move_line - all user,model_financial_budget_move_line,,1,0,0,0
+access_financial_budget_move_line_summary_all,financial_budget.move_line_summary - all user,model_financial_budget_move_line_summary,,1,0,0,0
+access_financial_budget_summary_all,financial_budget.summary - all user,model_financial_budget_summary,,1,0,0,0
+access_financial_budget_account_all,financial_budget.account - all user,model_financial_budget_account,,1,0,0,0
