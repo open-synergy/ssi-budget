@@ -4,7 +4,7 @@
 
 {
     "name": "Financial Budget",
-    "version": "14.0.1.0.0",
+    "version": "14.0.1.1.0",
     "category": "Accounting",
     "website": "https://simetri-sinergi.id",
     "author": "OpenSynergy Indonesia, PT. Simetri Sinergi Indonesia",
@@ -35,6 +35,7 @@
         "menu.xml",
         "views/financial_budget_type_views.xml",
         "views/financial_budget_budget_views.xml",
+        "views/res_config_settings_views.xml",
     ],
     "demo": [
         "demo/financial_budget_type_demo.xml",

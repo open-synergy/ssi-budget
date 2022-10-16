@@ -3,6 +3,7 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl-3.0-standalone.html).
 
 from . import (
+    res_config_settings,
     financial_budget_type,
     financial_budget_budget,
     financial_budget_detail,
