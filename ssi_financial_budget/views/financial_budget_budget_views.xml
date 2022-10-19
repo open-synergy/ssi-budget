@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
+<odoo>
+  <record id="financial_budget_budget_view_search" model="ir.ui.view">
+    <field name="name">financial_budget.budget - search</field>
+    <field name="model">financial_budget.budget</field>
+    <field
+            name="inherit_id"
+            ref="ssi_transaction_mixin.mixin_transaction_view_search"
+        />
+    <field name="mode">primary</field>
+    <field name="arch" type="xml">
+        <data>
+
+        </data>
+    </field>
+</record>
+
+<record id="financial_budget_budget_view_tree" model="ir.ui.view">
+    <field name="name">financial_budget.budget -tree</field>
+    <field name="model">financial_budget.budget</field>
+    <field name="mode">primary</field>
+    <field name="inherit_id" ref="ssi_transaction_mixin.mixin_transaction_view_tree" />
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="type_id" />
+                <field name="company_currency_id" invisible="1" />
+                <field name="period_id" />
+                <field name="date_start" />
+                <field name="date_end" />
+            </xpath>
+        </data>
+    </field>
+</record>
+
+<record id="financial_budget_budget_view_form" model="ir.ui.view">
+    <field name="name">financial_budget.budget - form</field>
+    <field name="model">financial_budget.budget</field>
+    <field name="mode">primary</field>
+    <field name="inherit_id" ref="ssi_transaction_mixin.mixin_transaction_view_form" />
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="company_currency_id" />
+            </xpath>
+            <xpath expr="//group[@name='header_right']" position="inside">
+                <field name="type_id" />
+                <field
+                        name="allowed_account_ids"
+                        widget="many2many_tags"
+                        invisible="1"
+                    />
+                <field name="period_id" />
+                <field name="date_start" />
+                <field name="date_end" />
+            </xpath>
+            <xpath expr="//page[1]" position="before">
+                <page name="detail" string="Budget Details">
+                    <group name="detail" colspan="4" col="2">
+                        <field
+                                name="detail_ids"
+                                colspan="2"
+                                nolabel="1"
+                                context="{'default_type_id': type_id, 'default_currency_id': company_currency_id}"
+                            >
+                            <tree>
+                                <field name="name" />
+                                <field name="direction" invisible="1" />
+                                <field name="currency_id" invisible="1" />
+                                <field name="account_id" />
+                                <field name="product_id" />
+                                <field name="price_unit" />
+                                <field name="uom_quantity" />
+                                <field name="uom_id" />
+                                <field name="price_subtotal" />
+                            </tree>
+                            <form>
+                                <group name="detail_form" colspan="4" col="2">
+                                    <group name="detail_form_1" colspan="1" col="2">
+                                        <field name="type_id" invisible="1" />
+                                        <field
+                                                name="account_id"
+                                                domain="[('id','in',parent.allowed_account_ids)]"
+                                            />
+                                        <field name="product_id" />
+                                        <field name="name" />
+                                    </group>
+                                    <group
+                                            name="detail_form_form_2"
+                                            colspan="1"
+                                            col="2"
+                                        >
+                                        <field name="currency_id" invisible="1" />
+                                        <field name="pricelist_id" />
+                                        <field name="price_unit" />
+                                        <field name="uom_quantity" />
+                                        <field
+                                                name="allowed_uom_ids"
+                                                widget="many2many_tags"
+                                                invisible="1"
+                                            />
+                                        <field
+                                                name="uom_id"
+                                                domain="[('id','in',allowed_uom_ids)]"
+                                            />
+                                        <field name="price_subtotal" />
+                                    </group>
+                                </group>
+                            </form>
+                        </field>
+                    </group>
+                    <group name="detail_1" colspan="4" col="2" string="Summary">
+                        <field name="detail_summary_ids" colspan="2" nolabel="1">
+                            <tree>
+                                <field name="account_id" />
+                                <field name="amount" />
+                            </tree>
+                        </field>
+                    </group>
+                    <group name="detail_3" colspan="4" col="2">
+                        <group name="detail_3_1" colspan="1" col="2">
+                            <field name="amount_planned" />
+                            <field name="amount_realized" />
+                            <field name="amount_diff" />
+                        </group>
+                        <group name="detail_3_1" colspan="1" col="2">
+                        </group>
+                    </group>
+                </page>
+                <page name="account" string="Accounts">
+                    <field name="detail_account_ids">
+                        <tree>
+                            <field name="account_id" />
+                        </tree>
+                    </field>
+                </page>
+                <page name="move_line" string="Realization">
+                    <group name="move_line_1" colspan="4" col="2" string="Items">
+                        <field name="move_line_ids" nolabel="1">
+                            <tree>
+                                <field name="move_id" />
+                                <field name="account_id" />
+                                <field name="journal_id" />
+                                <field name="amount" />
+                            </tree>
+                        </field>
+                    </group>
+                    <group name="move_line_2" colspan="4" col="2" string="Summary">
+                        <field name="move_line_summary_ids" nolabel="1">
+                            <tree>
+                                <field name="account_id" />
+                                <field name="amount" />
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+                <page name="summary" string="Summary">
+                    <group name="summary_1" colspan="4" col="2">
+                        <field name="summary_ids" nolabel="1">
+                            <tree>
+                                <field name="currency_id" invisible="1" />
+                                <field name="account_id" />
+                                <field name="amount_planned" />
+                                <field name="amount_realized" />
+                                <field name="amount_diff" />
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </data>
+    </field>
+</record>
+
+<record id="financial_budget_budget_action" model="ir.actions.act_window">
+    <field name="name">Financial Budgets</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">financial_budget.budget</field>
+    <field name="view_mode">tree,form</field>
+    <field name="search_view_id" ref="financial_budget_budget_view_search" />
+</record>
+
+<menuitem
+        id="financial_budget_budget_menu"
+        name="Financial Budgets"
+        sequence="1"
+        parent="menu_budget_root"
+        action="financial_budget_budget_action"
+    />
+</odoo>
