@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2022 OpenSynergy Indonesia
+     Copyright 2022 PT. Simetri Sinergi Indonesia
+     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
+<odoo>
+    <menuitem
+        id="menu_budget_root"
+        name="Financial Budgets"
+        parent="account.menu_finance"
+        sequence="5"
+        groups="account.group_account_user"
+    />
+
+    <menuitem
+        id="menu_budget_config"
+        name="Configuration"
+        parent="menu_budget_root"
+        sequence="100"
+    />
+</odoo>
