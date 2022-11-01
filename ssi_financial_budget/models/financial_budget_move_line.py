@@ -72,8 +72,8 @@ class FinancialBudgetMoveLine(models.Model):
         JOIN financial_budget_type AS b ON a.type_id = b.id
         JOIN rel_financial_budget_type_2_account AS c ON b.id = c.type_id
         JOIN date_range AS d ON a.period_id = d.id
-        JOIN account_move_line AS e ON  d.date_start >= e.date AND
-                                        d.date_end <= e.date AND
+        JOIN account_move_line AS e ON  e.date >= d.date_start AND
+                                        e.date <= d.date_end AND
                                         c.account_id = e.account_id
         JOIN account_move AS f ON e.move_id = f.id
         JOIN account_account AS g ON e.account_id = g.id
