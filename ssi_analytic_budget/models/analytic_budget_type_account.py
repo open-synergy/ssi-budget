@@ -12,6 +12,7 @@ class AnalyticBudgetTypeAccount(models.Model):
     type_id = fields.Many2one(
         string="Analytic Budget Type",
         comodel_name="analytic_budget.type",
+        required=True,
     )
     direction = fields.Selection(
         string="Direction",
@@ -19,6 +20,7 @@ class AnalyticBudgetTypeAccount(models.Model):
             ("revenue", "Revenue"),
             ("cost", "Cost"),
         ],
+        required=True,
     )
     account_id = fields.Many2one(
         string="Account",

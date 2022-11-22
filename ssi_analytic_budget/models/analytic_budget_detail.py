@@ -40,6 +40,7 @@ class AnalyticBudgetDetail(models.Model):
                 criteria = [
                     ("type_id", "=", record.type_id.id),
                     ("account_id", "=", record.account_id.id),
+                    ("direction", "=", record.direction),
                 ]
                 alloweds = obj_allowed.search(criteria)
                 if len(alloweds) > 0:
