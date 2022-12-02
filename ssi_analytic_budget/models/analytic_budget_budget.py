@@ -80,14 +80,29 @@ class AnalyticBudgetBudget(models.Model):
             ],
         },
     )
+
+    @api.depends(
+        "type_id",
+    )
+    def _compute_allowed_period_ids(self):
+        obj_date_range = self.env["date.range"]
+        for record in self:
+            allowed_date_range_type_ids = record.type_id.allowed_date_range_type_ids.ids
+            criteria = [("type_id", "in", allowed_date_range_type_ids)]
+            date_range_ids = obj_date_range.search(criteria)
+            record.allowed_period_ids = date_range_ids.ids
+
+    allowed_period_ids = fields.Many2many(
+        string="Allowed Periods",
+        comodel_name="date.range",
+        compute="_compute_allowed_period_ids",
+        store=False,
+    )
     period_id = fields.Many2one(
         string="Period",
         comodel_name="date.range",
         required=True,
         readonly=True,
-        domain=[
-            ("type_id.fiscal_month", "=", True),
-        ],
         states={
             "draft": [
                 ("readonly", False),

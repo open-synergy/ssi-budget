@@ -47,6 +47,13 @@ class AnalyticBudgetType(models.Model):
         column1="type_id",
         column2="account_id",
     )
+    allowed_date_range_type_ids = fields.Many2many(
+        string="Allowed Date Range Types",
+        comodel_name="date.range.type",
+        relation="rel_budget_analytic_type_2_date_range_type",
+        column1="type_id",
+        column2="date_range_type_id",
+    )
     account_ids = fields.One2many(
         string="Allowed Account",
         comodel_name="analytic_budget.type_account",
