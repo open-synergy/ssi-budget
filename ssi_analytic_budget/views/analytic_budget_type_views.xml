@@ -33,6 +33,11 @@
     <field name="mode">primary</field>
     <field name="arch" type="xml">
         <data>
+            <xpath expr="//group[@name='group_1']" position="inside">
+                <group name="grp_date_range_type">
+                    <field name="allowed_date_range_type_ids" widget="many2many_tags" />
+                </group>
+            </xpath>
             <xpath expr="//notebook/page[1]" position="before">
                 <page name="revenue" string="Revenue Settings">
                     <group name="revenue_1" colspan="4" col="2">

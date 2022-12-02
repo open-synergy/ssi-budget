@@ -75,7 +75,12 @@
             <xpath expr="//group[@name='header_right']" position="inside">
                 <field name="type_id" />
                 <field name="analytic_account_id" />
-                <field name="period_id" />
+                <field
+                        name="allowed_period_ids"
+                        invisible="1"
+                        widget="many2many_tags"
+                    />
+                <field name="period_id" domain="[('id','in',allowed_period_ids)]" />
                 <field name="date_start" />
                 <field name="date_end" />
             </xpath>
