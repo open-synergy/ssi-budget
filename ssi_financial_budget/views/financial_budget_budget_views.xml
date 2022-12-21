@@ -143,6 +143,8 @@
                             <tree>
                                 <field name="move_id" />
                                 <field name="account_id" />
+                                <field name="date" />
+                                <field name="label" />
                                 <field name="journal_id" />
                                 <field name="amount" />
                             </tree>

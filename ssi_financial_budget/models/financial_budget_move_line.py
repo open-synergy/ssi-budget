@@ -22,6 +22,12 @@ class FinancialBudgetMoveLine(models.Model):
         string="# Move",
         comodel_name="account.move",
     )
+    date = fields.Date(
+        string="Date",
+    )
+    label = fields.Char(
+        string="String",
+    )
     period_id = fields.Many2one(
         string="Period",
         comodel_name="date.range",
@@ -41,6 +47,8 @@ class FinancialBudgetMoveLine(models.Model):
             a.id AS budget_id,
             e.account_id AS account_id,
             e.move_id AS move_id,
+            e.date AS date,
+            e.name AS label,
             a.period_id AS period_id,
             e.journal_id AS journal_id,
             CASE
