@@ -59,7 +59,7 @@ class AnalyticBudgetType(models.Model):
         ],
         context={
             "default_direction": "revenue",
-        }        
+        },
     )
     cost_account_ids = fields.One2many(
         string="Cost Accounts",
@@ -70,7 +70,7 @@ class AnalyticBudgetType(models.Model):
         ],
         context={
             "default_direction": "cost",
-        }
+        },
     )
     all_allowed_revenue_account_ids = fields.Many2many(
         string="All Allowed Revenue Account",
