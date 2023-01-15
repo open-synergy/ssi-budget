@@ -44,7 +44,7 @@
                             <tree editable="top">
                                 <field name="account_id" />
                                 <field
-                                        name="allowed_product_categ_ids"
+                                        name="allowed_product_ids"
                                         widget="many2many_tags"
                                     />
                                 <field
@@ -65,7 +65,7 @@
                             <tree editable="top">
                                 <field name="account_id" />
                                 <field
-                                        name="allowed_product_categ_ids"
+                                        name="allowed_product_ids"
                                         widget="many2many_tags"
                                     />
                                 <field
