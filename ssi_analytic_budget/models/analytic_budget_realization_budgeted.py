@@ -78,7 +78,7 @@ class AnalyticBudgetRealizationBudgeted(models.Model):
     def _join(self):
         join_str = """
         JOIN analytic_budget_budget AS b ON a.budget_id = b.id
-        RIGHT JOIN analytic_budget_realization AS c ON
+        JOIN analytic_budget_realization AS c ON
             b.analytic_account_id = c.analytic_account_id AND
             a.account_id = c.account_id AND
             COALESCE(a.product_id, 0) = COALESCE(c.product_id, 0)
