@@ -94,10 +94,16 @@
                                 context="{'default_direction':'revenue', 'default_type_id': type_id, 'default_currency_id': company_currency_id}"
                             >
                             <tree>
-                                <field name="name" />
+                                <field
+                                        name="name"
+                                        invisible="1"
+                                    /> <!-- Todo: Will Be Deleted-->
                                 <field name="direction" invisible="1" />
                                 <field name="currency_id" invisible="1" />
-                                <field name="account_id" />
+                                <field
+                                        name="account_id"
+                                        invisible="1"
+                                    /> <!-- Todo: Will Be Deleted-->
                                 <field name="product_id" />
                                 <field name="price_unit" />
                                 <field name="uom_quantity" />
@@ -117,11 +123,12 @@
                                                 name="allowed_account_ids"
                                                 widget="many2many_tags"
                                                 invisible="1"
-                                            />
+                                            /> <!-- Todo: Will Be Deleted-->
                                         <field
                                                 name="account_id"
                                                 domain="[('id','in',allowed_account_ids)]"
-                                            />
+                                                invisible="1"
+                                            /> <!-- Todo: Will Be Deleted-->
                                         <field
                                                 name="allowed_product_ids"
                                                 widget="many2many_tags"
@@ -131,14 +138,17 @@
                                                 name="allowed_product_categ_ids"
                                                 widget="many2many_tags"
                                                 invisible="1"
-                                            />
+                                            /> <!-- Todo: Will Be Deleted-->
                                         <field name="product_required" invisible="1" />
                                         <field
                                                 name="product_id"
                                                 domain="['|',('id','in',allowed_product_ids),('categ_id','=',allowed_product_categ_ids)]"
-                                                attrs="{'required':[('product_required','=',True)]}"
+                                                required="1"
                                             />
-                                        <field name="name" />
+                                        <field
+                                                name="name"
+                                                invisible="1"
+                                            /> <!-- Todo: Will Be Deleted-->
                                     </group>
                                     <group
                                             name="revenue_item_form_2"
@@ -172,10 +182,16 @@
                                 context="{'default_direction':'cost', 'default_type_id': type_id, 'default_currency_id': company_currency_id}"
                             >
                             <tree>
-                                <field name="name" />
+                                <field
+                                        name="name"
+                                        invisible="1"
+                                    /><!-- Todo: Will Be Deleted-->
                                 <field name="direction" invisible="1" />
                                 <field name="currency_id" invisible="1" />
-                                <field name="account_id" />
+                                <field
+                                        name="account_id"
+                                        invisible="1"
+                                    /> <!-- Todo: Will Be Deleted-->
                                 <field name="product_id" />
                                 <field name="price_unit" />
                                 <field name="uom_quantity" />
@@ -191,11 +207,12 @@
                                                 name="allowed_account_ids"
                                                 widget="many2many_tags"
                                                 invisible="1"
-                                            />
+                                            /> <!-- Todo: Will Be Deleted-->
                                         <field
                                                 name="account_id"
                                                 domain="[('id','in',allowed_account_ids)]"
-                                            />
+                                                invisible="1"
+                                            /> <!-- Todo: Will Be Deleted-->
                                         <field
                                                 name="allowed_product_ids"
                                                 widget="many2many_tags"
@@ -205,14 +222,17 @@
                                                 name="allowed_product_categ_ids"
                                                 widget="many2many_tags"
                                                 invisible="1"
-                                            />
-                                        <field name="product_required" invisible="1" />
+                                            /> <!-- Todo: Will Be Deleted-->
+                                        <field
+                                                name="product_required"
+                                                invisible="1"
+                                            /> <!-- Todo: Will Be Deleted-->
                                         <field
                                                 name="product_id"
                                                 domain="['|',('id','in',allowed_product_ids),('categ_id','=',allowed_product_categ_ids)]"
-                                                attrs="{'required':[('product_required','=',True)]}"
+                                                required="1"
                                             />
-                                        <field name="name" />
+                                        <field name="name" invisible="1" />
                                     </group>
                                     <group name="cost_item_form_2" colspan="1" col="2">
                                         <field name="currency_id" invisible="1" />
@@ -236,50 +256,91 @@
                     </group>
                 </page>
                 <page name="realization" string="Realization">
-                    <group name="realization_1" string="Realization">
+                    <group
+                            name="realization_1"
+                            colspan="4"
+                            col="2"
+                            string="Realization"
+                        >
                         <field name="realization_ids" nolabel="1">
                             <tree>
+                                <field name="move_id" />
                                 <field name="date" />
-                                <field name="company_currency_id" invisible="1" />
-                                <field name="account_id" />
                                 <field name="product_id" />
-                                <field
-                                        name="amount_realized"
-                                        sum="Total Amount Realized"
-                                    />
+                                <field name="name" />
+                                <field name="amount" />
                             </tree>
+                            <form>
+                                <group colspan="4" col="2">
+                                    <group colspan="1" col="2">
+                                        <field name="move_id" />
+                                        <field name="date" />
+                                        <field name="product_id" />
+                                        <field name="name" />
+                                    </group>
+                                    <group colspan="1" col="2">
+                                        <field name="amount" />
+                                    </group>
+                                </group>
+                            </form>
                         </field>
                     </group>
-                    <group name="realization_2" string="Budgeted Realization">
+                    <group
+                            name="realization_2"
+                            colspan="4"
+                            col="2"
+                            string="Budgeted Realization"
+                        >
                         <field name="budgeted_realization_ids" nolabel="1">
                             <tree>
+                                <field name="move_id" />
                                 <field name="date" />
-                                <field name="company_currency_id" invisible="1" />
-                                <field name="account_id" />
                                 <field name="product_id" />
-                                <field
-                                        name="amount_budgeted"
-                                        sum="Total Amount Planned"
-                                    />
-                                <field
-                                        name="amount_realized"
-                                        sum="Total Amount Realized"
-                                    />
+                                <field name="name" />
+                                <field name="amount" />
                             </tree>
+                            <form>
+                                <group colspan="4" col="2">
+                                    <group colspan="1" col="2">
+                                        <field name="move_id" />
+                                        <field name="date" />
+                                        <field name="product_id" />
+                                        <field name="name" />
+                                    </group>
+                                    <group colspan="1" col="2">
+                                        <field name="amount" />
+                                    </group>
+                                </group>
+                            </form>
                         </field>
                     </group>
-                    <group name="realization_3" string="Unbudgeted Realization">
+                    <group
+                            name="realization_3"
+                            colspan="4"
+                            col="2"
+                            string="Unbudgeted Realization"
+                        >
                         <field name="unbudgeted_realization_ids" nolabel="1">
                             <tree>
+                                <field name="move_id" />
                                 <field name="date" />
-                                <field name="company_currency_id" invisible="1" />
-                                <field name="account_id" />
                                 <field name="product_id" />
-                                <field
-                                        name="amount_realized"
-                                        sum="Total Amount Realized"
-                                    />
+                                <field name="name" />
+                                <field name="amount" />
                             </tree>
+                            <form>
+                                <group colspan="4" col="2">
+                                    <group colspan="1" col="2">
+                                        <field name="move_id" />
+                                        <field name="date" />
+                                        <field name="product_id" />
+                                        <field name="name" />
+                                    </group>
+                                    <group colspan="1" col="2">
+                                        <field name="amount" />
+                                    </group>
+                                </group>
+                            </form>
                         </field>
                     </group>
                 </page>

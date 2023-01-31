@@ -169,35 +169,79 @@ class AnalyticBudgetBudget(models.Model):
             ],
         },
     )
-    realization_ids = fields.One2many(
+
+    all_realization_ids = fields.One2many(
+        string="All Realization Lines",
+        comodel_name="account.analytic.line",
+        inverse_name="account_id",
+    )
+
+    @api.depends(
+        "all_realization_ids",
+        "all_realization_ids.account_id",
+        "all_realization_ids.product_id",
+        "all_realization_ids.amount",
+        "all_realization_ids.date",
+        "date_start",
+        "date_end",
+        "type_id",
+        "analytic_account_id",
+    )
+    def _compute_realization(self):
+        AL = self.env["account.analytic.line"]
+        for record in self:
+            criteria = [
+                ("account_id", "=", record.analytic_account_id.id),
+                ("date", ">=", record.date_start),
+                ("date", "<=", record.date_end),
+            ]
+            realizations = AL.search(criteria)
+
+            product_ids = (
+                record.type_id.allowed_revenue_product_ids.ids
+                + record.type_id.allowed_cost_product_ids.ids
+            )
+
+            criteria_budgeted = criteria + [("product_id", "in", product_ids)]
+            budgeted_realizations = AL.search(criteria_budgeted)
+
+            criteria_budgeted = criteria + [("product_id", "not in", product_ids)]
+            unbudgeted_realizations = AL.search(criteria_budgeted)
+
+            record.realization_ids = realizations.ids
+            record.budgeted_realization_ids = budgeted_realizations.ids
+            record.unbudgeted_realization_ids = unbudgeted_realizations.ids
+
+    realization_ids = fields.Many2many(
         string="Realization Lines",
-        comodel_name="analytic_budget.realization",
-        inverse_name="budget_id",
-        readonly=True,
+        comodel_name="account.analytic.line",
+        compute="_compute_realization",
+        store=True,
+        relation="rel_budget_2_realization",
+        column1="budget_id",
+        column2="analytic_line_id",
     )
-    budgeted_realization_ids = fields.One2many(
+    budgeted_realization_ids = fields.Many2many(
         string="Budgeted Realization",
-        comodel_name="analytic_budget.realization_budgeted",
-        inverse_name="budget_id",
-        readonly=True,
+        comodel_name="account.analytic.line",
+        compute="_compute_realization",
+        store=False,
     )
-    unbudgeted_realization_ids = fields.One2many(
+    unbudgeted_realization_ids = fields.Many2many(
         string="Unbudgeted Realization",
-        comodel_name="analytic_budget.realization_unbudgeted",
-        inverse_name="budget_id",
-        readonly=True,
+        comodel_name="account.analytic.line",
+        compute="_compute_realization",
+        store=False,
     )
 
     @api.depends(
         "detail_ids",
+        "detail_ids.product_id",
         "detail_ids.price_subtotal",
-        "analytic_account_id.line_ids",
-        "analytic_account_id.line_ids.amount",
-        "analytic_account_id.line_ids.unit_amount",
-        "analytic_account_id.line_ids.account_id",
-        "analytic_account_id.line_ids.product_uom_id",
-        "analytic_account_id.line_ids.general_account_id",
-        "analytic_account_id.line_ids.move_id",
+        "realization_ids",
+        "realization_ids.amount",
+        "realization_ids.unit_amount",
+        "realization_ids.product_id",
     )
     def _compute_amount(self):
         for document in self:
@@ -217,47 +261,35 @@ class AnalyticBudgetBudget(models.Model):
                 amount_budgeted_cost_realization
             ) = amount_cost_realization = amount_profit_realization = 0.0
 
-            # Planned Computation
-            for detail in document.detail_revenue_ids:
-                amount_planned_revenue += detail.price_subtotal
+            for detail in self.detail_ids:
+                if detail.direction == "revenue":
+                    amount_planned_revenue += detail.price_subtotal
+                else:
+                    amount_planned_cost -= detail.price_subtotal
 
-            for detail in document.detail_cost_ids:
-                amount_planned_cost += detail.price_subtotal
+            amount_planned_pl = amount_planned_revenue + amount_planned_cost
 
-            amount_planned_pl = amount_planned_revenue - amount_planned_cost
+            for budgeted in document.budgeted_realization_ids:
+                if budgeted.amount > 0:
+                    amount_budgeted_revenue_realization += budgeted.amount
+                elif budgeted.amount < 0:
+                    amount_budgeted_cost_realization += budgeted.amount
 
-            # Realization Computation
-            for detail in document.budgeted_realization_ids.filtered(
-                lambda r: r.amount_realized > 0.0
-            ):
-                amount_budgeted_revenue_realization += detail.amount_realized
-
-            for detail in document.unbudgeted_realization_ids.filtered(
-                lambda r: r.amount_realized > 0.0
-            ):
-                amount_unbudgeted_revenue_realization += detail.amount_realized
+            for unbudgeted in document.unbudgeted_realization_ids:
+                if unbudgeted.amount > 0:
+                    amount_unbudgeted_revenue_realization += unbudgeted.amount
+                elif unbudgeted.amount < 0:
+                    amount_unbudgeted_cost_realization += unbudgeted.amount
 
             amount_revenue_realization = (
                 amount_unbudgeted_revenue_realization
                 + amount_budgeted_revenue_realization
             )
-
-            for detail in document.budgeted_realization_ids.filtered(
-                lambda r: r.amount_realized < 0.0
-            ):
-                amount_budgeted_cost_realization += abs(detail.amount_realized)
-
-            for detail in document.unbudgeted_realization_ids.filtered(
-                lambda r: r.amount_realized < 0.0
-            ):
-                amount_unbudgeted_cost_realization += abs(detail.amount_realized)
-
             amount_cost_realization = (
                 amount_unbudgeted_cost_realization + amount_budgeted_cost_realization
             )
-
             amount_profit_realization = (
-                amount_revenue_realization - amount_cost_realization
+                amount_revenue_realization + amount_cost_realization
             )
 
             document.amount_planned_revenue = amount_planned_revenue

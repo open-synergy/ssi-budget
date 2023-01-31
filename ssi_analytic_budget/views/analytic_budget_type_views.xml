@@ -42,55 +42,17 @@
                 <page name="revenue" string="Revenue Settings">
                     <group name="revenue_1" colspan="4" col="2">
                         <field
-                                name="allowed_revenue_account_ids"
+                                name="allowed_revenue_product_ids"
                                 widget="many2many_tags"
                             />
-                        <field
-                                name="revenue_account_ids"
-                                nolabel="1"
-                                colspan="2"
-                                context="{'default_direction': 'revenue'}"
-                            >
-                            <tree editable="top">
-                                <field name="direction" invisible="1" />
-                                <field name="account_id" />
-                                <field
-                                        name="allowed_product_categ_ids"
-                                        widget="many2many_tags"
-                                    />
-                                <field
-                                        name="allowed_product_ids"
-                                        widget="many2many_tags"
-                                    />
-                            </tree>
-                        </field>
                     </group>
                 </page>
                 <page name="cost" string="Cost Settings">
                     <group name="cost_1" colspan="4" col="2">
                         <field
-                                name="allowed_cost_account_ids"
+                                name="allowed_cost_product_ids"
                                 widget="many2many_tags"
                             />
-                        <field
-                                name="cost_account_ids"
-                                nolabel="1"
-                                colspan="2"
-                                context="{'default_direction': 'cost'}"
-                            >
-                            <tree editable="top">
-                                <field name="direction" invisible="1" />
-                                <field name="account_id" />
-                                <field
-                                        name="allowed_product_categ_ids"
-                                        widget="many2many_tags"
-                                    />
-                                <field
-                                        name="allowed_product_ids"
-                                        widget="many2many_tags"
-                                    />
-                            </tree>
-                        </field>
                     </group>
                 </page>
             </xpath>

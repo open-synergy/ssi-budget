@@ -33,6 +33,22 @@ class AnalyticBudgetType(models.Model):
                 result.append(product.account_id.id)
             record.all_allowed_cost_account_ids = result
 
+    allowed_revenue_product_ids = fields.Many2many(
+        string="Allowed Revenue Product",
+        comodel_name="product.product",
+        relation="rel_budget_analytic_type_2_revenue_product",
+        column1="type_id",
+        column2="product_id",
+    )
+    allowed_cost_product_ids = fields.Many2many(
+        string="Allowed Revenue Product",
+        comodel_name="product.product",
+        relation="rel_budget_analytic_type_2_cost_product",
+        column1="type_id",
+        column2="product_id",
+    )
+
+    # To Be Deleted
     allowed_revenue_account_ids = fields.Many2many(
         string="Allowed Revenue Accounts Without Product",
         comodel_name="account.account",

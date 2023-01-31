@@ -31,26 +31,13 @@ class AnalyticBudgetDetail(models.Model):
         "account_id",
     )
     def _compute_allowed_product(self):
-        obj_allowed = self.env["analytic_budget.type_account"]
         for record in self:
             result_product = []
-            result_categ = []
-            product_required = False
-            if record.account_id and record.type_id:
-                criteria = [
-                    ("type_id", "=", record.type_id.id),
-                    ("account_id", "=", record.account_id.id),
-                    ("direction", "=", record.direction),
-                ]
-                alloweds = obj_allowed.search(criteria)
-                if len(alloweds) > 0:
-                    allowed = alloweds[0]
-                    product_required = True
-                    result_product = allowed.allowed_product_ids.ids
-                    result_categ = allowed.allowed_product_categ_ids.ids
+            if record.direction == "revenue":
+                result_product = record.type_id.allowed_revenue_product_ids.ids
+            else:
+                result_product = record.type_id.allowed_cost_product_ids.ids
             record.allowed_product_ids = result_product
-            record.allowed_product_categ_ids = result_categ
-            record.product_required = product_required
 
     budget_id = fields.Many2one(
         string="# Budget",
@@ -112,7 +99,7 @@ class AnalyticBudgetDetail(models.Model):
     account_id = fields.Many2one(
         string="Account",
         comodel_name="account.account",
-        required=True,
+        required=False,
     )
     direction = fields.Selection(
         string="Direction",
