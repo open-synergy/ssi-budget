@@ -177,11 +177,6 @@ class AnalyticBudgetBudget(models.Model):
     )
 
     @api.depends(
-        "all_realization_ids",
-        "all_realization_ids.account_id",
-        "all_realization_ids.product_id",
-        "all_realization_ids.amount",
-        "all_realization_ids.date",
         "date_start",
         "date_end",
         "type_id",
@@ -270,16 +265,36 @@ class AnalyticBudgetBudget(models.Model):
             amount_planned_pl = amount_planned_revenue + amount_planned_cost
 
             for budgeted in document.budgeted_realization_ids:
-                if budgeted.amount > 0:
+                if budgeted.product_id.sale_ok and not budgeted.product_id.purchase_ok:
                     amount_budgeted_revenue_realization += budgeted.amount
-                elif budgeted.amount < 0:
+                elif (
+                    not budgeted.product_id.sale_ok and budgeted.product_id.purchase_ok
+                ):
                     amount_budgeted_cost_realization += budgeted.amount
+                elif budgeted.product_id.sale_ok and budgeted.product_id.purchase_ok:
+                    if budgeted.amount > 0.0:
+                        amount_budgeted_revenue_realization += budgeted.amount
+                    elif budgeted.amount > 0.0:
+                        amount_budgeted_cost_realization += budgeted.amount
 
             for unbudgeted in document.unbudgeted_realization_ids:
-                if unbudgeted.amount > 0:
+                if (
+                    unbudgeted.product_id.sale_ok
+                    and not unbudgeted.product_id.purchase_ok
+                ):
                     amount_unbudgeted_revenue_realization += unbudgeted.amount
-                elif unbudgeted.amount < 0:
+                elif (
+                    not unbudgeted.product_id.sale_ok
+                    and unbudgeted.product_id.purchase_ok
+                ):
                     amount_unbudgeted_cost_realization += unbudgeted.amount
+                elif (
+                    unbudgeted.product_id.sale_ok and unbudgeted.product_id.purchase_ok
+                ):
+                    if unbudgeted.amount > 0.0:
+                        amount_unbudgeted_revenue_realization += unbudgeted.amount
+                    elif budgeted.amount > 0.0:
+                        amount_unbudgeted_cost_realization += unbudgeted.amount
 
             amount_revenue_realization = (
                 amount_unbudgeted_revenue_realization
@@ -411,3 +426,7 @@ class AnalyticBudgetBudget(models.Model):
             if template_id:
                 result.write({"policy_template_id": template_id})
         return result
+
+    def action_compute_realization(self):
+        for record in self:
+            record._compute_realization()

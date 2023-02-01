@@ -69,6 +69,13 @@
     <field name="inherit_id" ref="ssi_transaction_mixin.mixin_transaction_view_form" />
     <field name="arch" type="xml">
         <data>
+            <xpath expr="//field[@name='state']" position="before">
+                <button
+                        name="action_compute_realization"
+                        string="Compute Realization"
+                        type="object"
+                    />
+            </xpath>
             <xpath expr="//field[@name='company_id']" position="after">
                 <field name="company_currency_id" />
             </xpath>
@@ -266,6 +273,7 @@
                             <tree>
                                 <field name="move_id" />
                                 <field name="date" />
+                                <field name="general_account_id" />
                                 <field name="product_id" />
                                 <field name="name" />
                                 <field name="amount" />
@@ -275,6 +283,7 @@
                                     <group colspan="1" col="2">
                                         <field name="move_id" />
                                         <field name="date" />
+                                        <field name="general_account_id" />
                                         <field name="product_id" />
                                         <field name="name" />
                                     </group>
@@ -295,6 +304,7 @@
                             <tree>
                                 <field name="move_id" />
                                 <field name="date" />
+                                <field name="general_account_id" />
                                 <field name="product_id" />
                                 <field name="name" />
                                 <field name="amount" />
@@ -304,6 +314,7 @@
                                     <group colspan="1" col="2">
                                         <field name="move_id" />
                                         <field name="date" />
+                                        <field name="general_account_id" />
                                         <field name="product_id" />
                                         <field name="name" />
                                     </group>
@@ -324,6 +335,7 @@
                             <tree>
                                 <field name="move_id" />
                                 <field name="date" />
+                                <field name="general_account_id" />
                                 <field name="product_id" />
                                 <field name="name" />
                                 <field name="amount" />
@@ -333,6 +345,7 @@
                                     <group colspan="1" col="2">
                                         <field name="move_id" />
                                         <field name="date" />
+                                        <field name="general_account_id" />
                                         <field name="product_id" />
                                         <field name="name" />
                                     </group>
