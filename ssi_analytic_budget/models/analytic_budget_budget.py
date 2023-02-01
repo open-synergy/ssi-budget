@@ -256,7 +256,7 @@ class AnalyticBudgetBudget(models.Model):
                 amount_budgeted_cost_realization
             ) = amount_cost_realization = amount_profit_realization = 0.0
 
-            for detail in self.detail_ids:
+            for detail in document.detail_ids:
                 if detail.direction == "revenue":
                     amount_planned_revenue += detail.price_subtotal
                 else:
