@@ -189,6 +189,7 @@ class AnalyticBudgetBudget(models.Model):
                 ("account_id", "=", record.analytic_account_id.id),
                 ("date", ">=", record.date_start),
                 ("date", "<=", record.date_end),
+                ("product_id", "!=", False),
             ]
             realizations = AL.search(criteria)
 

@@ -4,7 +4,7 @@
 
 {
     "name": "Analytic Budget",
-    "version": "11.0.1.4.0",
+    "version": "11.0.1.4.1",
     "category": "Accounting",
     "website": "https://simetri-sinergi.id",
     "author": "OpenSynergy Indonesia, PT. Simetri Sinergi Indonesia",
