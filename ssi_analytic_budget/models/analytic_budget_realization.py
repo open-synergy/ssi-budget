@@ -79,9 +79,7 @@ class AnalyticBudgetRealization(models.Model):
                         b1.product_id,
                         b1.date
 
-        ) AS b ON   a.analytic_account_id = b.account_id AND
-                    b.date >= a.date_start AND
-                    b.date <= a.date_end
+        ) AS b ON   a.analytic_account_id = b.account_id
 
         """
         return join_str

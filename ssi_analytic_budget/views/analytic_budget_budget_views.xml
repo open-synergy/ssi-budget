@@ -29,9 +29,6 @@
                 <field name="type_id" />
                 <field name="company_currency_id" invisible="1" />
                 <field name="analytic_account_id" />
-                <field name="period_id" />
-                <field name="date_start" optional="hide" />
-                <field name="date_end" optional="hide" />
                 <field
                         name="amount_planned_revenue"
                         optional="hide"
@@ -92,9 +89,6 @@
             <xpath expr="//group[@name='header_right']" position="inside">
                 <field name="type_id" />
                 <field name="analytic_account_id" />
-                <field name="period_id" />
-                <field name="date_start" />
-                <field name="date_end" />
             </xpath>
             <xpath expr="//page[1]" position="before">
                 <page name="detail" string="Budget Details">
@@ -158,8 +152,7 @@
                                             col="2"
                                         >
                                         <field name="currency_id" invisible="1" />
-                                        <field name="pricelist_id" />
-                                        <field name="price_unit" />
+
                                         <field name="uom_quantity" />
                                         <field
                                                 name="allowed_uom_ids"
@@ -170,9 +163,12 @@
                                                 name="uom_id"
                                                 domain="[('id','in',allowed_uom_ids)]"
                                             />
+                                        <field name="pricelist_id" />
+                                        <field name="price_unit" />
                                         <field name="price_subtotal" />
                                     </group>
                                 </group>
+                                <notebook />
                             </form>
                         </field>
                     </group>

@@ -57,22 +57,6 @@ class AnalyticBudgetDetail(models.Model):
         required=True,
         ondelete="cascade",
     )
-    period_id = fields.Many2one(
-        string="Period",
-        comodel_name="date.range",
-        related="budget_id.period_id",
-        store=True,
-    )
-    date_start = fields.Date(
-        string="Date Start",
-        related="budget_id.period_id.date_start",
-        store=True,
-    )
-    date_end = fields.Date(
-        string="Date End",
-        related="budget_id.period_id.date_end",
-        store=True,
-    )
     analytic_account_id = fields.Many2one(
         string="Analytic Account",
         comodel_name="account.analytic.account",

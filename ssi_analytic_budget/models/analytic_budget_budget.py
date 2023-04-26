@@ -80,30 +80,6 @@ class AnalyticBudgetBudget(models.Model):
             ],
         },
     )
-    period_id = fields.Many2one(
-        string="Period",
-        comodel_name="date.range",
-        required=True,
-        readonly=True,
-        domain=[
-            ("type_id.fiscal_month", "=", True),
-        ],
-        states={
-            "draft": [
-                ("readonly", False),
-            ],
-        },
-    )
-    date_start = fields.Date(
-        string="Date Start",
-        related="period_id.date_start",
-        store=True,
-    )
-    date_end = fields.Date(
-        string="Date End",
-        related="period_id.date_end",
-        store=True,
-    )
     analytic_account_id = fields.Many2one(
         string="Analytic Account",
         comodel_name="account.analytic.account",
