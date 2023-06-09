@@ -36,7 +36,7 @@ class FinancialBudgetDetail(models.Model):
     )
     type_id = fields.Many2one(
         string="Type",
-        comodel_name="analytic_budget.type",
+        comodel_name="financial_budget.type",
         related="budget_id.type_id",
         store=False,
     )
