@@ -11,5 +11,6 @@ from . import (
     analytic_budget_realization_budgeted,
     analytic_budget_realization_unbudgeted_helper,
     analytic_budget_realization_unbudgeted,
+    analytic_budget_summary_account,
     res_config_settings,
 )

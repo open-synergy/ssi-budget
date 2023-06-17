@@ -130,6 +130,11 @@ class AnalyticBudgetBudget(models.Model):
             ],
         },
     )
+    summary_cost_ids = fields.One2many(
+        string="Cost Summary",
+        comodel_name="analytic_budget.cost_summary_account",
+        inverse_name="budget_id",
+    )
     realization_ids = fields.One2many(
         string="Realization Lines",
         comodel_name="analytic_budget.realization",

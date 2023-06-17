@@ -21,3 +21,4 @@ access_analytic_budget_realization_unbudgeted_user,analytic_budget.realization_u
 access_analytic_budget_realization_all,analytic_budget.realization - all user,model_analytic_budget_realization,,1,0,0,0
 access_analytic_budget_realization_viewer,analytic_budget.realization - viewer,model_analytic_budget_realization,analytic_budget_viewer_group,1,0,0,0
 access_analytic_budget_realization_user,analytic_budget.realization - user,model_analytic_budget_realization,analytic_budget_user_group,1,1,1,1
+access_analytic_budget_cost_summary_account_all,analytic_budget.cost_summary_account - all user,model_analytic_budget_cost_summary_account,,1,0,0,0
