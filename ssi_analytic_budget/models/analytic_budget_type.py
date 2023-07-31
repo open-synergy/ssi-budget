@@ -1,6 +1,6 @@
 # Copyright 2022 OpenSynergy Indonesia
 # Copyright 2022 PT. Simetri Sinergi Indonesia
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
 from odoo import fields, models
@@ -42,6 +42,13 @@ class AnalyticBudgetType(models.Model):
         string="Allowed Cost Accounts Without Product",
         comodel_name="account.account",
         relation="rel_budget_analytic_type_2_cost_account",
+        column1="type_id",
+        column2="account_id",
+    )
+    exclude_account_ids = fields.Many2many(
+        string="Exclude Accounts",
+        comodel_name="account.account",
+        relation="rel_budget_analytic_type_2_exclude_account",
         column1="type_id",
         column2="account_id",
     )

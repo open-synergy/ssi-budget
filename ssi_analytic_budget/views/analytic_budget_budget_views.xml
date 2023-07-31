@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2022 OpenSynergy Indonesia
      Copyright 2022 PT. Simetri Sinergi Indonesia
-     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
   <record id="analytic_budget_budget_view_search" model="ir.ui.view">
     <field name="name">analytic_budget.budget - search</field>
@@ -263,53 +263,21 @@
                         </form>
                     </field>
                 </page>
-                <page name="realization" string="Realization">
-                    <group name="realization_1" string="Realization">
-                        <field name="realization_ids" nolabel="1">
-                            <tree>
-                                <field name="date" />
-                                <field name="company_currency_id" invisible="1" />
-                                <field name="account_id" />
-                                <field name="product_id" />
-                                <field
-                                        name="amount_realized"
-                                        sum="Total Amount Realized"
-                                    />
-                            </tree>
-                        </field>
-                    </group>
-                    <group name="realization_2" string="Budgeted Realization">
-                        <field name="budgeted_realization_ids" nolabel="1">
-                            <tree>
-                                <field name="date" />
-                                <field name="company_currency_id" invisible="1" />
-                                <field name="account_id" />
-                                <field name="product_id" />
-                                <field
-                                        name="amount_budgeted"
-                                        sum="Total Amount Planned"
-                                    />
-                                <field
-                                        name="amount_realized"
-                                        sum="Total Amount Realized"
-                                    />
-                            </tree>
-                        </field>
-                    </group>
-                    <group name="realization_3" string="Unbudgeted Realization">
-                        <field name="unbudgeted_realization_ids" nolabel="1">
-                            <tree>
-                                <field name="date" />
-                                <field name="company_currency_id" invisible="1" />
-                                <field name="account_id" />
-                                <field name="product_id" />
-                                <field
-                                        name="amount_realized"
-                                        sum="Total Amount Realized"
-                                    />
-                            </tree>
-                        </field>
-                    </group>
+                <page name="account" string="Accounts">
+                    <group name="include" string="Included" colspan="4" col="2" />
+                    <field name="account_ids" />
+                    <group name="exclude" string="Excluded" colspan="4" col="2" />
+                    <field name="exclude_account_ids" />
+                </page>
+                <page name="lines" string="Analytic Lines">
+                    <group name="all" string="All" colspan="4" col="2" />
+                    <field name="analytic_line_ids" />
+                    <group name="budgeted" string="Budgeted" colspan="4" col="2" />
+                    <field name="budgeted_analytic_line_ids" />
+                    <group name="unbudgeted" string="Unbudgeted" colspan="4" col="2" />
+                    <field name="unbudgeted_analytic_line_ids" />
+                    <group name="exclude" string="Exclude" colspan="4" col="2" />
+                    <field name="exclude_analytic_line_ids" />
                 </page>
             </xpath>
             <xpath expr="//group[@name='footer_left']" position="attributes">

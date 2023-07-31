@@ -1,6 +1,6 @@
 # Copyright 2022 OpenSynergy Indonesia
 # Copyright 2022 PT. Simetri Sinergi Indonesia
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
 from odoo import api, fields, models
@@ -80,6 +80,68 @@ class AnalyticBudgetBudget(models.Model):
             ],
         },
     )
+    account_ids = fields.Many2many(
+        string="Accounts",
+        comodel_name="account.account",
+        relation="rel_budget_analytic_2_account",
+        column1="budget_id",
+        column2="account_id",
+        readonly=True,
+        states={
+            "draft": [
+                ("readonly", False),
+            ],
+        },
+    )
+    exclude_account_ids = fields.Many2many(
+        string="Exclude Accounts",
+        comodel_name="account.account",
+        relation="rel_budget_analytic_2_exclude_account",
+        column1="budget_id",
+        column2="account_id",
+        readonly=True,
+        states={
+            "draft": [
+                ("readonly", False),
+            ],
+        },
+    )
+    analytic_line_ids = fields.Many2many(
+        string="All Analytic Lines",
+        comodel_name="account.analytic.line",
+        relation="rel_budget_analytic_2_all_line",
+        column1="budget_id",
+        column2="analytic_line_id",
+        compute="_compute_analytic_line",
+        store=True,
+    )
+    exclude_analytic_line_ids = fields.Many2many(
+        string="All Analytic Lines",
+        comodel_name="account.analytic.line",
+        relation="rel_budget_analytic_2_exclude_line",
+        column1="budget_id",
+        column2="analytic_line_id",
+        compute="_compute_analytic_line",
+        store=True,
+    )
+    budgeted_analytic_line_ids = fields.Many2many(
+        string="Budgeted Analytic Lines",
+        comodel_name="account.analytic.line",
+        relation="rel_budget_analytic_2_budgeted_line",
+        column1="budget_id",
+        column2="analytic_line_id",
+        compute="_compute_analytic_line",
+        store=True,
+    )
+    unbudgeted_analytic_line_ids = fields.Many2many(
+        string="Unbudgeted Analytic Lines",
+        comodel_name="account.analytic.line",
+        relation="rel_budget_analytic_2_unbudgeted_line",
+        column1="budget_id",
+        column2="analytic_line_id",
+        compute="_compute_analytic_line",
+        store=True,
+    )
     analytic_account_id = fields.Many2one(
         string="Analytic Account",
         comodel_name="account.analytic.account",
@@ -155,15 +217,46 @@ class AnalyticBudgetBudget(models.Model):
     )
 
     @api.depends(
+        "analytic_account_id",
+        "analytic_account_id.line_ids",
+        "analytic_account_id.line_ids.account_id",
+        "analytic_account_id.line_ids.general_account_id",
+        "analytic_account_id.line_ids.product_id",
+        "exclude_account_ids",
+        "account_ids",
+    )
+    def _compute_analytic_line(self):
+        AnalyticLine = self.env["account.analytic.line"]
+        for record in self:
+            record.analytic_line_ids = record.analytic_account_id.line_ids
+            criteria = [
+                ("account_id", "=", record.analytic_account_id.id),
+                ("general_account_id", "in", record.account_ids.ids),
+                ("general_account_id", "not in", record.exclude_account_ids.ids),
+            ]
+            record.budgeted_analytic_line_ids = AnalyticLine.search(criteria)
+            criteria = [
+                ("account_id", "=", record.analytic_account_id.id),
+                ("general_account_id", "not in", record.account_ids.ids),
+                ("general_account_id", "not in", record.exclude_account_ids.ids),
+            ]
+            record.unbudgeted_analytic_line_ids = AnalyticLine.search(criteria)
+            criteria = [
+                ("account_id", "=", record.analytic_account_id.id),
+                ("general_account_id", "in", record.exclude_account_ids.ids),
+            ]
+            record.exclude_analytic_line_ids = AnalyticLine.search(criteria)
+
+    @api.depends(
         "detail_ids",
         "detail_ids.price_subtotal",
-        "analytic_account_id.line_ids",
-        "analytic_account_id.line_ids.amount",
-        "analytic_account_id.line_ids.unit_amount",
-        "analytic_account_id.line_ids.account_id",
-        "analytic_account_id.line_ids.product_uom_id",
-        "analytic_account_id.line_ids.general_account_id",
-        "analytic_account_id.line_ids.move_id",
+        "analytic_line_ids",
+        "analytic_line_ids.amount",
+        "analytic_line_ids.unit_amount",
+        "analytic_line_ids.account_id",
+        "analytic_line_ids.product_uom_id",
+        "analytic_line_ids.general_account_id",
+        "analytic_line_ids.move_id",
     )
     def _compute_amount(self):
         for document in self:
@@ -193,30 +286,30 @@ class AnalyticBudgetBudget(models.Model):
             amount_planned_pl = amount_planned_revenue - amount_planned_cost
 
             # Realization Computation
-            for detail in document.budgeted_realization_ids.filtered(
-                lambda r: r.amount_realized > 0.0
+            for detail in document.budgeted_analytic_line_ids.filtered(
+                lambda r: r.amount > 0.0
             ):
-                amount_budgeted_revenue_realization += detail.amount_realized
+                amount_budgeted_revenue_realization += detail.amount
 
-            for detail in document.unbudgeted_realization_ids.filtered(
-                lambda r: r.amount_realized > 0.0
+            for detail in document.unbudgeted_analytic_line_ids.filtered(
+                lambda r: r.amount > 0.0
             ):
-                amount_unbudgeted_revenue_realization += detail.amount_realized
+                amount_unbudgeted_revenue_realization += detail.amount
 
             amount_revenue_realization = (
                 amount_unbudgeted_revenue_realization
                 + amount_budgeted_revenue_realization
             )
 
-            for detail in document.budgeted_realization_ids.filtered(
-                lambda r: r.amount_realized < 0.0
+            for detail in document.budgeted_analytic_line_ids.filtered(
+                lambda r: r.amount < 0.0
             ):
-                amount_budgeted_cost_realization += abs(detail.amount_realized)
+                amount_budgeted_cost_realization += abs(detail.amount)
 
-            for detail in document.unbudgeted_realization_ids.filtered(
-                lambda r: r.amount_realized < 0.0
+            for detail in document.unbudgeted_analytic_line_ids.filtered(
+                lambda r: r.amount < 0.0
             ):
-                amount_unbudgeted_cost_realization += abs(detail.amount_realized)
+                amount_unbudgeted_cost_realization += abs(detail.amount)
 
             amount_cost_realization = (
                 amount_unbudgeted_cost_realization + amount_budgeted_cost_realization
@@ -335,3 +428,22 @@ class AnalyticBudgetBudget(models.Model):
         ]
         res += policy_field
         return res
+
+    @api.onchange(
+        "type_id",
+    )
+    def onchange_exclude_account_ids(self):
+        self.exclude_account_ids = False
+        if self.type_id:
+            self.exclude_account_ids = self.type_id.exclude_account_ids
+
+    @api.onchange(
+        "type_id",
+    )
+    def onchange_account_ids(self):
+        self.account_ids = False
+        if self.type_id:
+            self.account_ids = (
+                self.type_id.all_allowed_revenue_account_ids
+                + self.type_id.all_allowed_cost_account_ids
+            )
