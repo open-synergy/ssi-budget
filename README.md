@@ -18,8 +18,8 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[ssi_analytic_budget](ssi_analytic_budget/) | 14.0.1.3.0 |  | Analytic Budget
-[ssi_financial_budget](ssi_financial_budget/) | 14.0.1.2.0 |  | Financial Budget
+[ssi_analytic_budget](ssi_analytic_budget/) | 14.0.1.4.0 |  | Analytic Budget
+[ssi_financial_budget](ssi_financial_budget/) | 14.0.1.3.0 |  | Financial Budget
 
 [//]: # (end addons)
 
