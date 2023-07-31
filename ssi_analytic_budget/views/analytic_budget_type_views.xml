@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- Copyright 2022 OpenSynergy Indonesia
      Copyright 2022 PT. Simetri Sinergi Indonesia
-     License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl). -->
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
 <odoo>
 <record id="analytic_budget_type_view_search" model="ir.ui.view">
     <field name="name">analytic_budget.type - search</field>
@@ -33,6 +33,9 @@
     <field name="mode">primary</field>
     <field name="arch" type="xml">
         <data>
+            <xpath expr="//field[@name='active']" position="after">
+                <field name="exclude_account_ids" widget="many2many_tags" />
+            </xpath>
             <xpath expr="//notebook/page[1]" position="before">
                 <page name="revenue" string="Revenue Settings">
                     <group name="revenue_1" colspan="4" col="2">
