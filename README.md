@@ -14,7 +14,12 @@ None
 
 [//]: # (addons)
 
-This part will be replaced when running the oca-gen-addons-table script from OCA/maintainer-tools.
+Available addons
+----------------
+addon | version | maintainers | summary
+--- | --- | --- | ---
+[ssi_analytic_budget](ssi_analytic_budget/) | 14.0.1.3.0 |  | Analytic Budget
+[ssi_financial_budget](ssi_financial_budget/) | 14.0.1.2.0 |  | Financial Budget
 
 [//]: # (end addons)
 
