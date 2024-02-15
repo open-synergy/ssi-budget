@@ -9,6 +9,7 @@ setuptools.setup(
     version=version,
     install_requires=[
         'odoo14-addon-ssi_analytic_budget',
+        'odoo14-addon-ssi_analytic_budget_work_log',
         'odoo14-addon-ssi_financial_budget',
     ],
     classifiers=[
