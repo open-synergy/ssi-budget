@@ -1,0 +1,1074 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* ssi_financial_budget
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_account__budget_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__budget_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail_summary__budget_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__budget_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary__budget_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__budget_id
+msgid "# Budget"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__name
+msgid "# Document"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__move_id
+msgid "# Move"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_account__account_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__account_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail_summary__account_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__account_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary__account_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__account_id
+msgid "Account"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_form
+msgid "Accounts"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_needaction
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__active
+msgid "Active"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__active_approval_ids
+msgid "Active Approvals"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__active_approver_partner_ids
+msgid "Active Partners"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__active_approver_user_ids
+msgid "Active Users"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__activity_ids
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__activity_ids
+msgid "Activities"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__activity_exception_decoration
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__activity_state
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__activity_state
+msgid "Activity State"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__activity_type_icon
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__activity_type_icon
+msgid "Activity Type Icon"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:res.groups,name:ssi_financial_budget.financial_budget_all_group
+msgid "All"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__allowed_account_ids
+msgid "Allowed Accounts"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__allowed_policy_template_ids
+msgid "Allowed Policy Templates"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__allowed_pricelist_ids
+msgid "Allowed Pricelists"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__allowed_uom_ids
+msgid "Allowed UoMs"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail_summary__amount
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__amount
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary__amount
+msgid "Amount"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__approval_template_id
+msgid "Approval Configuration"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__approval_template_id
+msgid "Approval Template"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__approval_ids
+msgid "Approvals"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__approve_ok
+msgid ""
+"Approve policy\n"
+"\n"
+"* If active user can see and execute 'Approve' button"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__approved
+msgid "Approved"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_attachment_count
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model,name:ssi_financial_budget.model_financial_budget_account
+msgid "Budget Account"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_form
+msgid "Budget Details"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__summary_ids
+msgid "Budget Summary"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:financial_budget.type,name:ssi_financial_budget.demo_financial_budget_type2
+msgid "COGS - (test)"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__approve_ok
+msgid "Can Approve"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__cancel_ok
+msgid "Can Cancel"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__confirm_ok
+msgid "Can Confirm"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__done_ok
+msgid "Can Finished"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__manual_number_ok
+msgid "Can Input Manual Document Number"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__reject_ok
+msgid "Can Reject"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__restart_ok
+msgid "Can Restart"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__restart_approval_ok
+msgid "Can Restart Approval"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__open_ok
+msgid "Can Start"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__terminate_ok
+msgid "Can Terminate"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_budget__state__cancel
+msgid "Cancel"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__cancel_reason_id
+msgid "Cancel Reason"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__cancel_ok
+msgid ""
+"Cancel policy\n"
+"\n"
+"* If active user can see and execute 'Cancel' button"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__code
+msgid "Code"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__company_id
+#: model:res.groups,name:ssi_financial_budget.financial_budget_company_group
+msgid "Company"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__company_currency_id
+msgid "Company Currency"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__company_partner_id
+msgid "Company Partner"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:res.groups,name:ssi_financial_budget.financial_budget_company_child_group
+msgid "Company and All Child Companies"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__company_id
+msgid ""
+"Company that own the document\n"
+"\n"
+"* Automatically filled with user's company.\n"
+"  Default company can be changed"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model,name:ssi_financial_budget.model_res_config_settings
+msgid "Config Settings"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__confirm_ok
+msgid ""
+"Confirm policy\n"
+"\n"
+"* If active user can see and execute 'Confirm' button"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_detail__direction__cost
+msgid "Cost"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__create_uid
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__create_uid
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__create_date
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__create_date
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__currency_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__currency_id
+msgid "Currency"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Custom Information"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__date_end
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__date_end
+msgid "Date End"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__date_start
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__date_start
+msgid "Date Start"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__name
+msgid "Description"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__detail_account_ids
+msgid "Detail Accounts"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__detail_summary_ids
+msgid "Detail Summary"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__detail_ids
+msgid "Details"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_diff
+msgid "Diff Amount"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__amount_diff
+msgid "Diff. Amount"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__direction
+msgid "Direction"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_account__display_name
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__display_name
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__display_name
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail_summary__display_name
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__display_name
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary__display_name
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__display_name
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__display_name
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_budget__state__done
+msgid "Done"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__done_ok
+msgid ""
+"Done policy\n"
+"\n"
+"* If active user can see and execute 'Done' button"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_budget__state__draft
+msgid "Draft"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:financial_budget.type,name:ssi_financial_budget.demo_financial_budget_type3
+msgid "Expense - (test)"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model,name:ssi_financial_budget.model_financial_budget_move_line_summary
+msgid "Financiak Budget Move Line Summary"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model,name:ssi_financial_budget.model_financial_budget_budget
+#: model:ir.module.category,name:ssi_financial_budget.financial_budget_data_ownership_module_category
+#: model:ir.module.category,name:ssi_financial_budget.financial_budget_workflow_module_category
+#: model:ir.ui.menu,name:ssi_financial_budget.menu_financial_budget_configuration
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Financial Budget"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings__module_ssi_financial_budget_custom_information
+msgid "Financial Budget - Custom Information"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings__module_ssi_financial_budget_qrcode
+msgid "Financial Budget - QR Code"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings__module_ssi_financial_budget_related_attachment
+msgid "Financial Budget - Related Attachment"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings__module_ssi_financial_budget_state_change_constrains
+msgid "Financial Budget - State Change Constrains"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings__module_ssi_financial_budget_status_check
+msgid "Financial Budget - Status Check"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model,name:ssi_financial_budget.model_financial_budget_detail
+msgid "Financial Budget Detail"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model,name:ssi_financial_budget.model_financial_budget_detail_summary
+msgid "Financial Budget Detail Summary"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model,name:ssi_financial_budget.model_financial_budget_move_line
+msgid "Financial Budget Move Line"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.actions.act_window,name:ssi_financial_budget.financial_budget_settings_action
+msgid "Financial Budget Settings"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model,name:ssi_financial_budget.model_financial_budget_summary
+msgid "Financial Budget Summary"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model,name:ssi_financial_budget.model_financial_budget_type
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__type_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__name
+#: model:res.groups,name:ssi_financial_budget.financial_budget_type_configuration_group
+msgid "Financial Budget Type"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.actions.act_window,name:ssi_financial_budget.financial_budget_type_action
+#: model:ir.ui.menu,name:ssi_financial_budget.financial_budget_type_menu
+msgid "Financial Budget Types"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.actions.act_window,name:ssi_financial_budget.financial_budget_budget_action
+#: model:ir.ui.menu,name:ssi_financial_budget.financial_budget_budget_menu
+msgid "Financial Budgets"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_follower_ids
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_channel_ids
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_channel_ids
+msgid "Followers (Channels)"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_partner_ids
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__activity_type_icon
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_account__id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail_summary__id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary__id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings__id
+msgid "ID"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__activity_exception_icon
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__activity_exception_icon
+msgid "Icon"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__activity_exception_icon
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__message_needaction
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__message_unread
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__message_needaction
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__message_unread
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__message_has_error
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_budget__state__open
+msgid "In Progress"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_is_follower
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_form
+msgid "Items"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__journal_id
+msgid "Journal"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_account____last_update
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget____last_update
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail____last_update
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail_summary____last_update
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line____last_update
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary____last_update
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary____last_update
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type____last_update
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__write_uid
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__write_uid
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__write_date
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__write_date
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_main_attachment_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_main_attachment_id
+msgid "Main Attachment"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__manual_number_ok
+msgid ""
+"Manual number assignment policy\n"
+"\n"
+"* If active user can edit document number"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__active
+msgid ""
+"Master data status\n"
+"\n"
+"* Inactive data can not be selected when creating new transaction\n"
+"* Transaction with inactive master data can still be viewed\n"
+"* Set master data as inactive if master data no longger needed,\n"
+"but master data already used on transaction"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__code
+msgid ""
+"Master data unique identifier.\n"
+"\n"
+"* Fill with '/' if You do not need unique identifier\n"
+"* Click 'Generate Code' button to automatically assign code.\n"
+"  Sequence template mush be set to perform this action\n"
+"  Only master data with '/' code will be assign automatic code"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_has_error
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_ids
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__move_line_summary_ids
+msgid "Move Line Summary"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__move_line_ids
+msgid "Move Lines"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__my_activity_date_deadline
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__need_validation
+msgid "Need Validation"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__activity_date_deadline
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__activity_summary
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__activity_summary
+msgid "Next Activity Summary"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__activity_type_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__activity_type_id
+msgid "Next Activity Type"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__next_approval_ids
+msgid "Next Approvals"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__note
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__note
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__note
+msgid "Note"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_needaction_counter
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_has_error_counter
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__message_needaction_counter
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__message_needaction_counter
+msgid "Number of messages which requires an action"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__message_has_error_counter
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__message_unread_counter
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__message_unread_counter
+msgid "Number of unread messages"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Optional Feature"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__period_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__period_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__period_id
+msgid "Period"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_planned
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__amount_planned
+msgid "Planned Amount"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__policy_template_id
+msgid "Policy Template"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__price_subtotal
+msgid "Price Subtotal"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__price_unit
+msgid "Price Unit"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__pricelist_id
+msgid "Pricelist"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__product_id
+msgid "Product"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__product_category_id
+msgid "Product Category"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "QR Code"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__quantity
+msgid "Quantity"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_form
+msgid "Realization"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_realized
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__amount_realized
+msgid "Realized Amount"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__reject_ok
+msgid ""
+"Reject policy\n"
+"\n"
+"* If active user can see and execute 'Reject' button"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__rejected
+msgid "Rejected"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Related Attachment"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__user_id
+msgid "Responsible"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__activity_user_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__activity_user_id
+msgid "Responsible User"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__restart_approval_ok
+msgid ""
+"Restart approval policy\n"
+"\n"
+"* If active user can see and execute 'Restart Approval' button"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__restart_ok
+msgid ""
+"Restart policy\n"
+"\n"
+"* If active user can see and execute 'Restart' button"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_detail__direction__revenue
+msgid "Revenue"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:financial_budget.type,name:ssi_financial_budget.demo_financial_budget_type1
+msgid "Revenue - (test)"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__reviewer_id
+msgid "Reviewer"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_detail__product_category_id
+msgid "Select category for the current product"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__standard_price_subtotal
+msgid "Standard Price Subtotal"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__standard_price_subtotal_diff
+msgid "Standard Price Subtotal Diff."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__standard_price_unit
+msgid "Standard Price Unit"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__standard_price_unit_diff
+msgid "Standard Price Unit Diff."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__open_ok
+msgid ""
+"Start policy\n"
+"\n"
+"* If active user can see and execute 'Start' button"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__state
+msgid "State"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "State Change Constrains"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Status Check"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__activity_state
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_form
+msgid "Summary"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_budget__state__terminate
+msgid "Terminate"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__terminate_reason_id
+msgid "Terminate Reason"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__terminate_ok
+msgid ""
+"Terminate policy\n"
+"\n"
+"* If active user can see and execute 'Terminate' button"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__name
+msgid ""
+"Transaction/document number\n"
+"\n"
+"* Unique indentifer of transaction\n"
+"* Leave '/' to automatically generate number\n"
+"* Change '/' into any number/identifier to manually assign number.\n"
+"  Manual number assignment can be done in 'Draft' state\n"
+"  Only user with 'Can Manualy Assign Number' policy can manually assign number.\n"
+"* Transaction with number other than '/' can not be deleted."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__type_id
+msgid "Type"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__activity_exception_decoration
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_unread
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_unread
+msgid "Unread Messages"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_unread_counter
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_unread_counter
+msgid "Unread Messages Counter"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__uom_id
+msgid "UoM"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__uom_quantity
+msgid "UoM Quantity"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Use QR Code"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Use custom information"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Use related attachment"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Use status check"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:res.groups,name:ssi_financial_budget.financial_budget_user_group
+msgid "User"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__user_id
+msgid ""
+"User that responsible for document\n"
+"\n"
+"* Create user can be different with responsible user\n"
+"* Automatically filled with user that initiate document creation.\n"
+"  Default responsible can be changed."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__reviewer_id
+msgid ""
+"User that responsible to review document\n"
+"\n"
+"* Unless it configured to approve reviewer does not equal to approver"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__active_approver_user_ids
+msgid "Users that can approve/reject document"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:res.groups,name:ssi_financial_budget.financial_budget_validator_group
+msgid "Validator"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:res.groups,name:ssi_financial_budget.financial_budget_viewer_group
+msgid "Viewer"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_budget__state__confirm
+msgid "Waiting for Approval"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__website_message_ids
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__website_message_ids
+msgid "Website Messages"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__website_message_ids
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__website_message_ids
+msgid "Website communication history"
+msgstr ""
