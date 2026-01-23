@@ -22,22 +22,26 @@ class FinancialBudgetDetail(models.Model):
         string="Period",
         comodel_name="date.range",
         related="budget_id.period_id",
+        compute_sudo=True,
         store=True,
     )
     date_start = fields.Date(
         string="Date Start",
         related="budget_id.period_id.date_start",
+        compute_sudo=True,
         store=True,
     )
     date_end = fields.Date(
         string="Date End",
         related="budget_id.period_id.date_end",
+        compute_sudo=True,
         store=True,
     )
     type_id = fields.Many2one(
         string="Type",
         comodel_name="financial_budget.type",
         related="budget_id.type_id",
+        compute_sudo=True,
         store=False,
     )
     account_id = fields.Many2one(
