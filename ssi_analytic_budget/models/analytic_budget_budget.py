@@ -113,6 +113,7 @@ class AnalyticBudgetBudget(models.Model):
         column1="budget_id",
         column2="analytic_line_id",
         compute="_compute_analytic_line",
+        compute_sudo=True,
         store=True,
     )
     exclude_analytic_line_ids = fields.Many2many(
@@ -122,6 +123,7 @@ class AnalyticBudgetBudget(models.Model):
         column1="budget_id",
         column2="analytic_line_id",
         compute="_compute_analytic_line",
+        compute_sudo=True,
         store=True,
     )
     budgeted_analytic_line_ids = fields.Many2many(
@@ -131,6 +133,7 @@ class AnalyticBudgetBudget(models.Model):
         column1="budget_id",
         column2="analytic_line_id",
         compute="_compute_analytic_line",
+        compute_sudo=True,
         store=True,
     )
     unbudgeted_analytic_line_ids = fields.Many2many(
@@ -140,6 +143,7 @@ class AnalyticBudgetBudget(models.Model):
         column1="budget_id",
         column2="analytic_line_id",
         compute="_compute_analytic_line",
+        compute_sudo=True,
         store=True,
     )
     analytic_account_id = fields.Many2one(
@@ -339,60 +343,70 @@ class AnalyticBudgetBudget(models.Model):
     amount_planned_revenue = fields.Monetary(
         string="Planned Revenue",
         compute="_compute_amount",
+        compute_sudo=True,
         store=True,
         currency_field="company_currency_id",
     )
     amount_planned_cost = fields.Monetary(
         string="Planned Cost",
         compute="_compute_amount",
+        compute_sudo=True,
         store=True,
         currency_field="company_currency_id",
     )
     amount_planned_pl = fields.Monetary(
         string="Planned Profit/Loss",
         compute="_compute_amount",
+        compute_sudo=True,
         store=True,
         currency_field="company_currency_id",
     )
     amount_unbudgeted_revenue_realization = fields.Monetary(
         string="Unbudgeted Revenue Realization",
         compute="_compute_amount",
+        compute_sudo=True,
         store=True,
         currency_field="company_currency_id",
     )
     amount_budgeted_revenue_realization = fields.Monetary(
         string="Budgeted Revenue Realization",
         compute="_compute_amount",
+        compute_sudo=True,
         store=True,
         currency_field="company_currency_id",
     )
     amount_revenue_realization = fields.Monetary(
         string="Revenue Realization",
         compute="_compute_amount",
+        compute_sudo=True,
         store=True,
         currency_field="company_currency_id",
     )
     amount_unbudgeted_cost_realization = fields.Monetary(
         string="Unbudgeted Cost Realization",
         compute="_compute_amount",
+        compute_sudo=True,
         store=True,
         currency_field="company_currency_id",
     )
     amount_budgeted_cost_realization = fields.Monetary(
         string="Budgeted Cost Realization",
         compute="_compute_amount",
+        compute_sudo=True,
         store=True,
         currency_field="company_currency_id",
     )
     amount_cost_realization = fields.Monetary(
         string="Cost Realization",
         compute="_compute_amount",
+        compute_sudo=True,
         store=True,
         currency_field="company_currency_id",
     )
     amount_profit_realization = fields.Monetary(
         string="Profit/Loss Realization",
         compute="_compute_amount",
+        compute_sudo=True,
         store=True,
         currency_field="company_currency_id",
     )

@@ -97,11 +97,13 @@ class FinancialBudgetBudget(models.Model):
     date_start = fields.Date(
         string="Date Start",
         related="period_id.date_start",
+        compute_sudo=True,
         store=True,
     )
     date_end = fields.Date(
         string="Date End",
         related="period_id.date_end",
+        compute_sudo=True,
         store=True,
     )
     detail_ids = fields.One2many(
@@ -164,18 +166,21 @@ class FinancialBudgetBudget(models.Model):
     amount_planned = fields.Monetary(
         string="Planned Amount",
         compute="_compute_amount",
+        compute_sudo=True,
         store=False,
         currency_field="company_currency_id",
     )
     amount_realized = fields.Monetary(
         string="Realized Amount",
         compute="_compute_amount",
+        compute_sudo=True,
         store=False,
         currency_field="company_currency_id",
     )
     amount_diff = fields.Monetary(
         string="Diff Amount",
         compute="_compute_amount",
+        compute_sudo=True,
         store=False,
         currency_field="company_currency_id",
     )
@@ -196,7 +201,7 @@ class FinancialBudgetBudget(models.Model):
 
     @api.model
     def _get_policy_field(self):
-        res = super(FinancialBudgetBudget, self)._get_policy_field()
+        res = super()._get_policy_field()
         policy_field = [
             "confirm_ok",
             "approve_ok",
