@@ -83,11 +83,13 @@ class AnalyticBudgetType(models.Model):
         string="All Allowed Revenue Account",
         comodel_name="account.account",
         compute="_compute_allowed_revenue_account",
+        compute_sudo=True,
         store=False,
     )
     all_allowed_cost_account_ids = fields.Many2many(
         string="All Allowed Cost Account",
         comodel_name="account.account",
         compute="_compute_allowed_cost_account",
+        compute_sudo=True,
         store=False,
     )

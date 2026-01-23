@@ -61,35 +61,41 @@ class AnalyticBudgetDetail(models.Model):
         string="Analytic Account",
         comodel_name="account.analytic.account",
         related="budget_id.analytic_account_id",
+        compute_sudo=True,
         store=True,
     )
     type_id = fields.Many2one(
         string="Type",
         comodel_name="analytic_budget.type",
         related="budget_id.type_id",
+        compute_sudo=True,
         store=False,
     )
     product_required = fields.Boolean(
         string="Product Required",
         compute="_compute_allowed_product",
+        compute_sudo=True,
         store=False,
     )
     allowed_product_categ_ids = fields.Many2many(
         string="Allowed Product Categories",
         comodel_name="product.category",
         compute="_compute_allowed_product",
+        compute_sudo=True,
         store=False,
     )
     allowed_product_ids = fields.Many2many(
         string="Allowed Products",
         comodel_name="product.product",
         compute="_compute_allowed_product",
+        compute_sudo=True,
         store=False,
     )
     allowed_account_ids = fields.Many2many(
         string="Allowed Accounts",
         comodel_name="account.account",
         compute="_compute_allowed_account",
+        compute_sudo=True,
         store=False,
     )
     account_id = fields.Many2one(
