@@ -19,8 +19,10 @@ Available addons
 addon | version | maintainers | summary
 --- | --- | --- | ---
 [ssi_analytic_budget](ssi_analytic_budget/) | 14.0.1.5.0 |  | Analytic Budget
+[ssi_analytic_budget_documenso_signing](ssi_analytic_budget_documenso_signing/) | 14.0.1.0.0 |  | Analytic Budget - Documenso Signing Integration
 [ssi_analytic_budget_work_log](ssi_analytic_budget_work_log/) | 14.0.1.0.0 |  | Analytic Budget - Work Log Integration
 [ssi_financial_budget](ssi_financial_budget/) | 14.0.1.4.0 |  | Financial Budget
+[ssi_financial_budget_documenso_signing](ssi_financial_budget_documenso_signing/) | 14.0.1.0.0 |  | Financial Budget - Documenso Signing Integration
 
 [//]: # (end addons)
 
