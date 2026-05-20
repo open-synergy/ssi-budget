@@ -8,6 +8,9 @@
     "category": "Accounting",
     "website": "https://simetri-sinergi.id",
     "author": "OpenSynergy Indonesia, PT. Simetri Sinergi Indonesia",
+    "contributors": [
+        "Andhitia Rama <andhitia.r@gmail.com>",
+    ],
     "license": "AGPL-3",
     "installable": True,
     "depends": [

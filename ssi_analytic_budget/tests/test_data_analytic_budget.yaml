@@ -1,0 +1,119 @@
+scenarios:
+  - name: "Analytic Budget - Full Workflow: draft to done"
+    steps:
+      - step: "Setup - create analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Analytic Account Budget"
+
+      - step: "Setup - create analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type AB"
+          code: "TBTAB"
+
+      - step: "Create analytic budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "EVAL: registry['budget_type'].id"
+          analytic_account_id: "EVAL: registry['analytic_account'].id"
+
+      - step: "Assert budget created in draft"
+        action: "assert"
+        target: "budget"
+        asserts:
+          state:
+            type: "value"
+            expected: "draft"
+
+      - step: "Confirm budget"
+        action: "call"
+        target: "budget"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Invalidate cache after confirm"
+        action: "call"
+        target: "budget"
+        method: "invalidate_cache"
+
+      - step: "Approve to open"
+        action: "call"
+        target: "budget"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "open"
+
+      - step: "Invalidate cache after open"
+        action: "call"
+        target: "budget"
+        method: "invalidate_cache"
+
+      - step: "Done budget"
+        action: "call"
+        target: "budget"
+        method: "action_done"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "done"
+
+  - name: "Analytic Budget Type - Master Data"
+    steps:
+      - step: "Create analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type MD"
+          code: "TBTMD"
+
+      - step: "Assert type created"
+        action: "assert"
+        target: "budget_type"
+        asserts:
+          name:
+            type: "value"
+            expected: "Test Budget Type MD"
+          code:
+            type: "value"
+            expected: "TBTMD"
+
+      - step: "Create analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test AA MD"
+
+      - step: "Create analytic budget with type"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "EVAL: registry['budget_type'].id"
+          analytic_account_id: "EVAL: registry['analytic_account'].id"
+
+      - step: "Assert budget in draft"
+        action: "assert"
+        target: "budget"
+        asserts:
+          state:
+            type: "value"
+            expected: "draft"
