@@ -185,6 +185,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_realization_budgeted__analytic_account_id
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_realization_unbudgeted__analytic_account_id
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_realization_unbudgeted_helper__analytic_account_id
+#: model_terms:ir.ui.view,arch_db:ssi_analytic_budget.analytic_budget_budget_view_search
 msgid "Analytic Account"
 msgstr ""
 
@@ -1167,6 +1168,7 @@ msgstr ""
 
 #. module: ssi_analytic_budget
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_detail__type_id
+#: model_terms:ir.ui.view,arch_db:ssi_analytic_budget.analytic_budget_budget_view_search
 msgid "Type"
 msgstr ""
 
