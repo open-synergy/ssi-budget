@@ -746,6 +746,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__period_id
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__period_id
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__period_id
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_search
 msgid "Period"
 msgstr ""
 
@@ -897,6 +898,11 @@ msgid "Standard Price Unit Diff."
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_search
+msgid "Start Date"
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__open_ok
 msgid ""
 "Start policy\n"
@@ -967,6 +973,7 @@ msgstr ""
 
 #. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__type_id
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_search
 msgid "Type"
 msgstr ""
 
