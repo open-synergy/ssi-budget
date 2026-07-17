@@ -1,0 +1,120 @@
+scenarios:
+  - name: "Financial Budget - Operating Unit propagation"
+    steps:
+      - step: "Setup - create date range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "date_range_type"
+        values:
+          name: "Test Fiscal Month Type FB OU 1"
+          fiscal_month: true
+
+      - step: "Setup - create date range period"
+        action: "create"
+        model: "date.range"
+        save_as: "period"
+        values:
+          name: "Test Period Jan 2024 FB OU 1"
+          type_id: "REC: date_range_type.id"
+          date_start: "2024-01-01"
+          date_end: "2024-01-31"
+
+      - step: "Setup - create financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Financial Budget Type OU 1"
+          code: "TFBTOU1"
+
+      - step: "Create financial_budget.budget with operating_unit_id"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          period_id: "REC: period.id"
+          operating_unit_id: "REF: operating_unit.main_operating_unit"
+
+      - step: "Assert financial_budget.budget operating_unit_id is set"
+        action: "assert"
+        target: "budget"
+        asserts:
+          operating_unit_id:
+            type: "value"
+            operator: "is_truthy"
+
+  - name: "Financial Budget - ir.rule restricts access by operating unit"
+    steps:
+      - step: "Setup - create date range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "date_range_type"
+        values:
+          name: "Test Fiscal Month Type FB OU 2"
+          fiscal_month: true
+
+      - step: "Setup - create date range period"
+        action: "create"
+        model: "date.range"
+        save_as: "period"
+        values:
+          name: "Test Period Jan 2024 FB OU 2"
+          type_id: "REC: date_range_type.id"
+          date_start: "2024-01-01"
+          date_end: "2024-01-31"
+
+      - step: "Setup - create financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Financial Budget Type OU 2"
+          code: "TFBTOU2"
+
+      - step: "Create financial_budget.budget with main operating unit"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          period_id: "REC: period.id"
+          operating_unit_id: "REF: operating_unit.main_operating_unit"
+
+      - step: "Create user restricted to a different operating unit"
+        action: "create"
+        model: "res.users"
+        save_as: "restricted_user"
+        values:
+          name: "Restricted Financial Budget OU User"
+          login: "restricted_financial_budget_ou_user@example.com"
+          groups_id:
+            - - 6
+              - 0
+              - - "REF: base.group_user"
+                - "REF: ssi_financial_budget.financial_budget_user_group"
+                - "REF:
+                  ssi_financial_budget_operating_unit.financial_budget_budget_ou_group"
+          assigned_operating_unit_ids:
+            - - 6
+              - 0
+              - - "REF: operating_unit.b2b_operating_unit"
+
+      - step: "Restricted user cannot see the record"
+        action: "search"
+        model: "financial_budget.budget"
+        domain: [["id", "=", "REC: budget.id"]]
+        save_as: "search_result"
+        as_user: "restricted_user"
+        expect_count: 0
+
+      - step: "Restricted user cannot write the record"
+        action: "write"
+        target: "budget"
+        as_user: "restricted_user"
+        expect_error:
+          type: "AccessError"
+        values:
+          type_id: "REC: budget_type.id"
