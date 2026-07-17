@@ -1,0 +1,98 @@
+scenarios:
+  - name: "Analytic Budget - Operating Unit propagation"
+    steps:
+      - step: "Setup - create analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Analytic Account Budget OU 1"
+
+      - step: "Setup - create analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type OU 1"
+          code: "TBTOU1"
+
+      - step: "Create analytic_budget.budget with operating_unit_id"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic_account.id"
+          operating_unit_id: "REF: operating_unit.main_operating_unit"
+
+      - step: "Assert analytic_budget.budget operating_unit_id is set"
+        action: "assert"
+        target: "budget"
+        asserts:
+          operating_unit_id:
+            type: "value"
+            operator: "is_truthy"
+
+  - name: "Analytic Budget - ir.rule restricts access by operating unit"
+    steps:
+      - step: "Setup - create analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Analytic Account Budget OU 2"
+
+      - step: "Setup - create analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type OU 2"
+          code: "TBTOU2"
+
+      - step: "Create analytic_budget.budget with main operating unit"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic_account.id"
+          operating_unit_id: "REF: operating_unit.main_operating_unit"
+
+      - step: "Create user restricted to a different operating unit"
+        action: "create"
+        model: "res.users"
+        save_as: "restricted_user"
+        values:
+          name: "Restricted Analytic Budget OU User"
+          login: "restricted_analytic_budget_ou_user@example.com"
+          groups_id:
+            - - 6
+              - 0
+              - - "REF: base.group_user"
+                - "REF: ssi_analytic_budget.analytic_budget_user_group"
+                - "REF:
+                  ssi_analytic_budget_operating_unit.analytic_budget_budget_ou_group"
+          assigned_operating_unit_ids:
+            - - 6
+              - 0
+              - - "REF: operating_unit.b2b_operating_unit"
+
+      - step: "Restricted user cannot see the record"
+        action: "search"
+        model: "analytic_budget.budget"
+        domain: [["id", "=", "REC: budget.id"]]
+        save_as: "search_result"
+        as_user: "restricted_user"
+        expect_count: 0
+
+      - step: "Restricted user cannot write the record"
+        action: "write"
+        target: "budget"
+        as_user: "restricted_user"
+        expect_error:
+          type: "AccessError"
+        values:
+          type_id: "REC: budget_type.id"
