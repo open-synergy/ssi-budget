@@ -6,6 +6,13 @@ from odoo import fields, models, tools
 
 
 class AnalyticBudgetCostSummaryAccount(models.Model):
+    """Report budgeted cost per analytic account and account.
+
+    SQL view (``_auto = False``) that sums the subtotal of cost
+    direction budget details grouped by budget, analytic account and
+    accounting account.
+    """
+
     _name = "analytic_budget.cost_summary_account"
     _description = "Analytic Budget Cost Summary By Account"
     _auto = False
@@ -32,6 +39,14 @@ class AnalyticBudgetCostSummaryAccount(models.Model):
     )
 
     def _select(self):
+        """Build the SELECT clause of the view query.
+
+        Selects the budget, company currency, account and analytic
+        account, plus the summed budgeted amount of the details.
+
+        :return: SQL SELECT fragment
+        :rtype: str
+        """
         select_str = """
         SELECT  row_number() OVER() as id,
                 a.id AS budget_id,
@@ -43,12 +58,26 @@ class AnalyticBudgetCostSummaryAccount(models.Model):
         return select_str
 
     def _from(self):
+        """Build the FROM clause of the view query.
+
+        The data source is the budget table, aliased as ``a``.
+
+        :return: SQL FROM fragment
+        :rtype: str
+        """
         from_str = """
         analytic_budget_budget AS a
         """
         return from_str
 
     def _where(self):
+        """Build the WHERE clause of the view query.
+
+        Restricts the budget details to the cost direction.
+
+        :return: SQL WHERE fragment
+        :rtype: str
+        """
         where_str = """
         WHERE   1 = 1 AND
                 b.direction = 'cost'
@@ -56,6 +85,13 @@ class AnalyticBudgetCostSummaryAccount(models.Model):
         return where_str
 
     def _join(self):
+        """Build the JOIN clause of the view query.
+
+        Joins the budget detail table, aliased as ``b``, to its budget.
+
+        :return: SQL JOIN fragment
+        :rtype: str
+        """
         join_str = """
         JOIN analytic_budget_detail AS b ON a.id = b.budget_id
 
@@ -63,6 +99,14 @@ class AnalyticBudgetCostSummaryAccount(models.Model):
         return join_str
 
     def _group_by(self):
+        """Build the GROUP BY clause of the view query.
+
+        Groups by budget, company currency, account and analytic
+        account so the amounts are summed per combination.
+
+        :return: SQL GROUP BY fragment
+        :rtype: str
+        """
         group_str = """
         GROUP BY    a.id,
                     a.company_currency_id,
@@ -72,6 +116,12 @@ class AnalyticBudgetCostSummaryAccount(models.Model):
         return group_str
 
     def init(self):
+        """Recreate the SQL view of the cost summary report.
+
+        Drops the view if it exists, then creates it again from the
+        query parts built by the ``_select``, ``_from``, ``_join``,
+        ``_where`` and ``_group_by`` methods.
+        """
         tools.drop_view_if_exists(self._cr, self._table)
         # pylint: disable=locally-disabled, sql-injection
         self._cr.execute(
