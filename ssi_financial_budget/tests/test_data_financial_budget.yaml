@@ -136,3 +136,61 @@ scenarios:
           state:
             type: "value"
             expected: "draft"
+
+  - name: "Financial Budget - Reject: confirm to reject"
+    steps:
+      - step: "Setup - create date range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "date_range_type"
+        values:
+          name: "Test Fiscal Month Type FB Reject"
+          fiscal_month: true
+
+      - step: "Setup - create date range period"
+        action: "create"
+        model: "date.range"
+        save_as: "period"
+        values:
+          name: "Test Period Feb 2024 FB"
+          type_id: "EVAL: registry['date_range_type'].id"
+          date_start: "2024-02-01"
+          date_end: "2024-02-29"
+
+      - step: "Setup - create financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Financial Budget Type Reject"
+          code: "TFBTRJ"
+
+      - step: "Create financial budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "EVAL: registry['budget_type'].id"
+          period_id: "EVAL: registry['period'].id"
+
+      - step: "Confirm budget"
+        action: "call"
+        target: "budget"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        refresh: true
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Reject budget (must not raise ValueError on state)"
+        action: "call"
+        target: "budget"
+        method: "action_reject_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "reject"
