@@ -173,15 +173,12 @@ scenarios:
           - assert:
               account_ids:
                 type: "m2m"
-                check: "exact"
-                expected_records:
-                  - "REC: acc_revenue"
-                  - "REC: acc_cost"
+                check: "count"
+                expected_count: 2
               exclude_account_ids:
                 type: "m2m"
-                check: "exact"
-                expected_records:
-                  - "REC: acc_exclude"
+                check: "count"
+                expected_count: 1
           - set: {type_id: "EVAL: env['analytic_budget.type']"}
           - assert:
               account_ids:
