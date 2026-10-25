@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 OpenSynergy Indonesia
+     Copyright 2026 PT. Simetri Sinergi Indonesia
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <template
+        id="assets_tests"
+        name="ssi_analytic_budget assets tests"
+        inherit_id="web.assets_tests"
+    >
+        <xpath expr="." position="inside">
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_approve_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_cancel_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_confirm_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_create_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_delete_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_edit_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_finish_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_reject_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_restart_approval_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_restart_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_terminate_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_type_activate_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_type_create_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_type_deactivate_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_type_delete_tour.js"
+            />
+            <script
+                type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_type_edit_tour.js"
+            />
+        </xpath>
+    </template>
+</odoo>
