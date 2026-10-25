@@ -1,0 +1,196 @@
+scenarios:
+  - name: "Analytic Budget - Documenso: signature requests empty by default"
+    steps:
+      - step: "Setup - create analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Analytic Account Budget DS 1"
+
+      - step: "Setup - create analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type DS 1"
+          code: "TBTDS1"
+
+      - step: "Create analytic budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget"
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Signature requests are empty on a new budget"
+        action: "assert"
+        target: "budget"
+        asserts:
+          signature_request_ids:
+            type: "value"
+            operator: "is_falsy"
+          signature_request_count:
+            type: "value"
+            expected: 0
+
+  - name: "Analytic Budget - Documenso: request refers to the budget"
+    steps:
+      - step: "Setup - create analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Analytic Account Budget DS 2"
+
+      - step: "Setup - create analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type DS 2"
+          code: "TBTDS2"
+
+      - step: "Setup - create Documenso backend"
+        action: "create"
+        model: "documenso.backend"
+        save_as: "backend"
+        values:
+          name: "Test Budget DS Backend 2"
+          base_url: "https://example.com"
+          api_key: "TEST-API-KEY"
+          version: "v2"
+          active: true
+
+      - step: "Setup - create py3o report for the budget model"
+        action: "create"
+        model: "ir.actions.report"
+        save_as: "report"
+        values:
+          name: "Test Budget DS Py3o Report 2"
+          model: "analytic_budget.budget"
+          report_type: "py3o"
+          report_name: "test_budget_ds_py3o_report_2"
+          py3o_filetype: "pdf"
+
+      - step: "Create analytic budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget"
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a signature request pointing at the budget"
+        action: "create"
+        model: "documenso.signature.request"
+        save_as: "request"
+        values:
+          backend_id: "REC: backend.id"
+          res_model: "analytic_budget.budget"
+          res_id: "REC: budget.id"
+          py3o_report_id: "REC: report.id"
+
+      - step: "Budget lists the request in signature_request_ids"
+        action: "assert"
+        target: "budget"
+        refresh: true
+        asserts:
+          signature_request_ids:
+            type: "o2m"
+            check: "contains"
+            expected_records:
+              - "REC: request"
+
+  - name: "Analytic Budget - Documenso: requests do not leak between budgets"
+    steps:
+      - step: "Setup - create analytic account for budget A"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account_a"
+        values:
+          name: "Test Analytic Account Budget DS 3A"
+
+      - step: "Setup - create analytic account for budget B"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account_b"
+        values:
+          name: "Test Analytic Account Budget DS 3B"
+
+      - step: "Setup - create analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type DS 3"
+          code: "TBTDS3"
+
+      - step: "Setup - create Documenso backend"
+        action: "create"
+        model: "documenso.backend"
+        save_as: "backend"
+        values:
+          name: "Test Budget DS Backend 3"
+          base_url: "https://example.com"
+          api_key: "TEST-API-KEY"
+          version: "v2"
+          active: true
+
+      - step: "Setup - create py3o report for the budget model"
+        action: "create"
+        model: "ir.actions.report"
+        save_as: "report"
+        values:
+          name: "Test Budget DS Py3o Report 3"
+          model: "analytic_budget.budget"
+          report_type: "py3o"
+          report_name: "test_budget_ds_py3o_report_3"
+          py3o_filetype: "pdf"
+
+      - step: "Create budget A"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget_a"
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic_account_a.id"
+
+      - step: "Create budget B"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget_b"
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic_account_b.id"
+
+      - step: "Create a signature request for budget A only"
+        action: "create"
+        model: "documenso.signature.request"
+        save_as: "request_a"
+        values:
+          backend_id: "REC: backend.id"
+          res_model: "analytic_budget.budget"
+          res_id: "REC: budget_a.id"
+          py3o_report_id: "REC: report.id"
+
+      - step: "Budget A lists its request"
+        action: "assert"
+        target: "budget_a"
+        refresh: true
+        asserts:
+          signature_request_ids:
+            type: "o2m"
+            check: "contains"
+            expected_records:
+              - "REC: request_a"
+
+      - step: "Budget B stays empty"
+        action: "assert"
+        target: "budget_b"
+        refresh: true
+        asserts:
+          signature_request_ids:
+            type: "value"
+            operator: "is_falsy"
