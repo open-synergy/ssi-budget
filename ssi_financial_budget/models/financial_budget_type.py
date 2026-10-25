@@ -7,6 +7,11 @@ from odoo import fields, models
 
 
 class FinancialBudgetType(models.Model):
+    """Master data of financial budget types.
+
+    Defines the budget categories and the accounts allowed for each type.
+    """
+
     _name = "financial_budget.type"
     _inherit = ["mixin.master_data"]
     _description = "Financial Budget Type"
