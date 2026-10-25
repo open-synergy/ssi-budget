@@ -16,7 +16,7 @@
     <field name="approver_selection_method">use_group</field>
     <field
             name="approver_group_ids"
-            eval="[(6,0,[ref('ssi_analytic_budget.analytic_budget_validator_group')])]"
+            eval="[(6,0,[ref('ssi_analytic_budget.analytic_budget_budget_validator_group')])]"
         />
 </record>
 </odoo>
