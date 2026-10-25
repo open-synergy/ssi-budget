@@ -11,10 +11,12 @@
     "depends": [
         "ssi_financial_budget",
         "ssi_operating_unit_mixin",
+        "web_tour",
     ],
     "data": [
         "security/res_group/financial_budget_budget.xml",
         "security/ir_rule/financial_budget_budget.xml",
-        "view/financial_budget_budget.xml",
+        "views/financial_budget_budget_views.xml",
+        "views/assets.xml",
     ],
 }
