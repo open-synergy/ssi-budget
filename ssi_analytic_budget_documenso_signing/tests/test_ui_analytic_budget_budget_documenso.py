@@ -16,6 +16,11 @@ class TestUiAnalyticBudgetBudgetDocumenso(HttpSavepointCase):
         ``base.user_admin`` is a member of the validator group of the base
         module, so it can open the menu without extra group setup. The
         record is moved to ``confirm`` here in Python, not via UI clicks.
+
+        The budget owner (``user_id``) is set to ``admin`` explicitly:
+        ``setUpClass`` runs as SUPERUSER, so the default owner would be
+        OdooBot and the internal user record rule would hide the record
+        from the tour session.
         """
         super().setUpClass()
         cls.admin = cls.env.ref("base.user_admin")
@@ -29,6 +34,7 @@ class TestUiAnalyticBudgetBudgetDocumenso(HttpSavepointCase):
             {
                 "type_id": budget_type.id,
                 "analytic_account_id": analytic_account.id,
+                "user_id": cls.admin.id,
             }
         )
         cls.budget.with_context(bypass_policy_check=True).action_confirm()
