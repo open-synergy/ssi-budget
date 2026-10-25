@@ -6,6 +6,13 @@ from odoo import api, fields, models
 
 
 class AnalyticBudgetDetail(models.Model):
+    """Planned revenue or cost line of an analytic budget.
+
+    Each line is priced through the product line price mixin and
+    is restricted to the accounts and products allowed by the
+    budget type.
+    """
+
     _name = "analytic_budget.detail"
     _description = "Analytic Budget Detail"
     _inherit = [
@@ -17,6 +24,13 @@ class AnalyticBudgetDetail(models.Model):
         "direction",
     )
     def _compute_allowed_account(self):
+        """Compute the accounts allowed for the line.
+
+        The allowed revenue or cost accounts of the budget type are
+        used, depending on the direction of the line.
+
+        :return: None
+        """
         for record in self:
             result = []
             if record.direction == "revenue":
@@ -31,6 +45,14 @@ class AnalyticBudgetDetail(models.Model):
         "account_id",
     )
     def _compute_allowed_product(self):
+        """Compute the products allowed for the line.
+
+        Looks up the budget type account matching the selected
+        account, then sets the allowed products, the allowed product
+        categories and whether a product is required.
+
+        :return: None
+        """
         obj_allowed = self.env["analytic_budget.type_account"]
         for record in self:
             result_product = []

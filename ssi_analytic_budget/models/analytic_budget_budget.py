@@ -5,8 +5,17 @@
 
 from odoo import api, fields, models
 
+from odoo.addons.ssi_decorator import ssi_decorator
+
 
 class AnalyticBudgetBudget(models.Model):
+    """Analytic budget document tied to one analytic account.
+
+    Holds planned revenue and cost details, compares them with the
+    analytic lines posted on the account, and follows the confirm,
+    open, done, cancel and terminate workflow.
+    """
+
     _name = "analytic_budget.budget"
     _inherit = [
         "mixin.transaction_confirm",
@@ -230,6 +239,14 @@ class AnalyticBudgetBudget(models.Model):
         "account_ids",
     )
     def _compute_analytic_line(self):
+        """Compute the analytic lines related to the budget.
+
+        Splits the lines of the analytic account into all, budgeted,
+        unbudgeted and excluded lines, based on the selected accounts
+        and the excluded accounts.
+
+        :return: None
+        """
         AnalyticLine = self.env["account.analytic.line"]
         for record in self:
             record.analytic_line_ids = record.analytic_account_id.line_ids
@@ -263,6 +280,14 @@ class AnalyticBudgetBudget(models.Model):
         "analytic_line_ids.move_id",
     )
     def _compute_amount(self):
+        """Compute planned and realized budget amounts.
+
+        Planned amounts come from the revenue and cost details.
+        Realization amounts come from the budgeted and unbudgeted
+        analytic lines, split by sign into revenue and cost.
+
+        :return: None
+        """
         for document in self:
             amount_planned_revenue = (
                 amount_planned_cost
@@ -424,6 +449,12 @@ class AnalyticBudgetBudget(models.Model):
             ("terminate", "Terminate"),
         ],
     )
+
+    @ssi_decorator.insert_on_form_view()
+    def _insert_form_element(self, view_arch):
+        if self._automatically_insert_view_element:
+            view_arch = self._reconfigure_statusbar_visible(view_arch)
+        return view_arch
 
     @api.model
     def _get_policy_field(self):
