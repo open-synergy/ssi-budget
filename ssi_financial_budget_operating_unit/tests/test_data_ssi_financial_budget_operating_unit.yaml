@@ -94,7 +94,7 @@ scenarios:
             - - 6
               - 0
               - - "REF: base.group_user"
-                - "REF: ssi_financial_budget.financial_budget_user_group"
+                - "REF: ssi_financial_budget.financial_budget_budget_user_group"
                 - "REF:
                   ssi_financial_budget_operating_unit.financial_budget_budget_ou_group"
           assigned_operating_unit_ids:
@@ -118,3 +118,54 @@ scenarios:
           type: "AccessError"
         values:
           type_id: "REC: budget_type.id"
+
+  - name: "Financial Budget - workflow group XML IDs renamed"
+    steps:
+      - step: "Resolve viewer group by its new XML ID"
+        action: "ref"
+        xml_id: "ssi_financial_budget.financial_budget_budget_viewer_group"
+        save_as: "viewer_group"
+
+      - step: "Resolve user group by its new XML ID"
+        action: "ref"
+        xml_id: "ssi_financial_budget.financial_budget_budget_user_group"
+        save_as: "user_group"
+
+      - step: "Resolve validator group by its new XML ID"
+        action: "ref"
+        xml_id: "ssi_financial_budget.financial_budget_budget_validator_group"
+        save_as: "validator_group"
+
+      - step: "User group implies viewer group"
+        action: "assert"
+        target: "user_group"
+        asserts:
+          implied_ids:
+            type: "m2m"
+            check: "contains"
+            expected_records:
+              - "REC: viewer_group"
+
+      - step: "Validator group implies user group"
+        action: "assert"
+        target: "validator_group"
+        asserts:
+          implied_ids:
+            type: "m2m"
+            check: "contains"
+            expected_records:
+              - "REC: user_group"
+
+      - step: "Old user group XML ID no longer resolves"
+        action: "create"
+        model: "res.users"
+        expect_error:
+          type: "ValueError"
+          message_contains: "External ID not found"
+        values:
+          name: "Old Group XML ID User"
+          login: "old_group_xml_id_user@example.com"
+          groups_id:
+            - - 6
+              - 0
+              - - "REF: ssi_financial_budget.financial_budget_user_group"
