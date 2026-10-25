@@ -6,6 +6,13 @@ from odoo import fields, models, tools
 
 
 class AnalyticBudgetRealizationUnbudgeted(models.Model):
+    """Report unbudgeted realizations of analytic budgets.
+
+    Read-only SQL view listing the realized amounts that match an
+    unbudgeted analytic account, account and product combination of a
+    budget, together with the realization date and company currency.
+    """
+
     _name = "analytic_budget.realization_unbudgeted"
     _description = "Analytic Budget Unbudgeted Realization"
     _auto = False
@@ -40,6 +47,15 @@ class AnalyticBudgetRealizationUnbudgeted(models.Model):
     )
 
     def _select(self):
+        """Return the ``SELECT`` clause of the report view.
+
+        Builds the view columns: a generated row id, the budget,
+        analytic account, account and product from the helper view,
+        plus the date, currency and realized amount of the matching
+        realization.
+
+        :return: SQL ``SELECT`` fragment as a string
+        """
         select_str = """
         SELECT
             row_number() OVER() as id,
@@ -54,18 +70,40 @@ class AnalyticBudgetRealizationUnbudgeted(models.Model):
         return select_str
 
     def _from(self):
+        """Return the ``FROM`` clause of the report view.
+
+        The data source is the unbudgeted realization helper view,
+        which lists the budget lines that have no budgeted amount.
+
+        :return: SQL table expression as a string
+        """
         from_str = """
         analytic_budget_realization_unbudgeted_helper AS a
         """
         return from_str
 
     def _where(self):
+        """Return the ``WHERE`` clause of the report view.
+
+        No extra criteria are applied; the rows are already limited by
+        the helper view and by the join conditions.
+
+        :return: SQL ``WHERE`` fragment as a string
+        """
         where_str = """
         WHERE 1 = 1
         """
         return where_str
 
     def _join(self):
+        """Return the ``JOIN`` clause of the report view.
+
+        Joins the helper view to the realization view on budget,
+        analytic account, account and product. A missing product is
+        matched to a missing product through ``COALESCE``.
+
+        :return: SQL ``JOIN`` fragment as a string
+        """
         join_str = """
         JOIN analytic_budget_realization AS b ON
             a.analytic_account_id = b.analytic_account_id AND
@@ -76,11 +114,23 @@ class AnalyticBudgetRealizationUnbudgeted(models.Model):
         return join_str
 
     def _group_by(self):
+        """Return the ``GROUP BY`` clause of the report view.
+
+        The view is not aggregated, so the clause is empty.
+
+        :return: SQL ``GROUP BY`` fragment as a string
+        """
         group_str = """
         """
         return group_str
 
     def init(self):
+        """Recreate the SQL view backing this report model.
+
+        Drops the view if it exists, then creates it again from the
+        ``_select``, ``_from``, ``_join``, ``_where`` and ``_group_by``
+        fragments.
+        """
         tools.drop_view_if_exists(self._cr, self._table)
         # pylint: disable=locally-disabled, sql-injection
         self._cr.execute(
