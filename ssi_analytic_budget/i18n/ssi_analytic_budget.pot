@@ -955,6 +955,7 @@ msgstr ""
 
 #. module: ssi_analytic_budget
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget__rejected
+#: model:ir.model.fields.selection,name:ssi_analytic_budget.selection__analytic_budget_budget__state__reject
 msgid "Rejected"
 msgstr ""
 
