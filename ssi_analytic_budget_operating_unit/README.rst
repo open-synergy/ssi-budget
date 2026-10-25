@@ -11,6 +11,11 @@ Extends ``analytic_budget.budget`` with ``mixin.single_operating_unit``, so
 analytic budget documents can be scoped and restricted per operating unit.
 
 
+Work Instruction
+================
+
+* `Analytic Budget <docs/analytic_budget_budget/index.html>`_
+
 Bug Tracker
 ===========
 
