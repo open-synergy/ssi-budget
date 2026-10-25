@@ -10,6 +10,11 @@ This module integrates Documenso digital signing into the Analytic Budget module
 It adds a Documenso signing tab to the analytic budget form view.
 
 
+Work Instruction
+================
+
+* `Analytic Budget <docs/analytic_budget_budget/index.html>`_
+
 Bug Tracker
 ===========
 
