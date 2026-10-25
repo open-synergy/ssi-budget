@@ -817,6 +817,7 @@ msgstr ""
 
 #. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__rejected
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_budget__state__reject
 msgid "Rejected"
 msgstr ""
 
