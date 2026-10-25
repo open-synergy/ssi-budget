@@ -25,6 +25,7 @@
         "ssi_transaction_terminate_mixin",
         "ssi_company_currency_mixin",
         "account_fiscal_month",
+        "web_tour",
     ],
     "data": [
         "security/ir_module_category_data.xml",
@@ -39,6 +40,7 @@
         "views/financial_budget_type_views.xml",
         "views/financial_budget_budget_views.xml",
         "views/res_config_settings_views.xml",
+        "views/assets.xml",
     ],
     "demo": [
         "demo/financial_budget_type_demo.xml",

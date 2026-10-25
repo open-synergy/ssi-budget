@@ -20,6 +20,26 @@ To install this module, you need to:
 5.  Search For *Financial Budget*
 6.  Install the module
 
+Work Instruction
+================
+
+* `Create Financial Budget Type <docs/financial_budget_type/01-create.html>`_
+* `Edit Financial Budget Type <docs/financial_budget_type/02-edit.html>`_
+* `Delete Financial Budget Type <docs/financial_budget_type/03-delete.html>`_
+* `Deactivate Financial Budget Type <docs/financial_budget_type/04-deactivate.html>`_
+* `Activate Financial Budget Type <docs/financial_budget_type/05-activate.html>`_
+* `Create Financial Budget <docs/financial_budget_budget/01-create.html>`_
+* `Edit Financial Budget <docs/financial_budget_budget/02-edit.html>`_
+* `Delete Financial Budget <docs/financial_budget_budget/03-delete.html>`_
+* `Confirm Financial Budget <docs/financial_budget_budget/04-confirm.html>`_
+* `Approve Financial Budget <docs/financial_budget_budget/05-approve.html>`_
+* `Reject Financial Budget <docs/financial_budget_budget/06-reject.html>`_
+* `Finish Financial Budget <docs/financial_budget_budget/09-finish.html>`_
+* `Cancel Financial Budget <docs/financial_budget_budget/10-cancel.html>`_
+* `Terminate Financial Budget <docs/financial_budget_budget/11-terminate.html>`_
+* `Restart Financial Budget <docs/financial_budget_budget/12-restart.html>`_
+* `Restart Approval Process of Financial Budget <docs/financial_budget_budget/14-restart-approval.html>`_
+
 Credits
 =======
 
