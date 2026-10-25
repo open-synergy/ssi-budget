@@ -1,0 +1,10 @@
+# Penyimpangan validator yang SAH & permanen untuk modul ssi_financial_budget.
+# Format: <validator> <kunci-temuan> -- <alasan>
+#
+# models/res_config_settings.py meng-_inherit "res.config.settings" milik Odoo
+# core (_name + _inherit sekaligus -- pola baku settings SSI/OCA), bukan wizard
+# baru. Memindahkannya ke wizards/, mengganti _name jadi tanpa titik, atau
+# menambah ACL res.config.settings akan merusak modul.
+module name-wizard-tanpa-notasi-titik|models/res_config_settings.py: _name 'res.config.settings' memakai notasi titik -- extension of core TransientModel, not a new wizard
+module berkas-wizard-berada-di-wizards|models/res_config_settings.py: TransientModel di luar wizards/ -- extension of core TransientModel, not a new wizard
+module acl-wizard-satu-user-access-tanpa-all-access|res.config.settings: tidak ada ACL sama sekali -- extension of core TransientModel, not a new wizard
