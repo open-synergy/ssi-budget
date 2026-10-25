@@ -6,6 +6,12 @@ from odoo import fields, models, tools
 
 
 class FinancialBudgetSummary(models.Model):
+    """SQL view reporting planned vs realized amount per budget account.
+
+    Each row is one account of one financial budget, showing the planned
+    amount, the realized amount and the difference between them.
+    """
+
     _name = "financial_budget.summary"
     _description = "Financial Budget Summary"
     _auto = False
@@ -36,6 +42,14 @@ class FinancialBudgetSummary(models.Model):
     )
 
     def _select(self):
+        """Build the SELECT clause of the report view.
+
+        Planned and realized amounts default to zero when the account
+        has no matching detail or move line summary.
+
+        :return: SQL SELECT fragment
+        :rtype: str
+        """
         select_str = """
         SELECT
             a.id AS id,
@@ -70,18 +84,36 @@ class FinancialBudgetSummary(models.Model):
         return select_str
 
     def _from(self):
+        """Build the FROM clause, using budget accounts as data source.
+
+        :return: SQL FROM fragment
+        :rtype: str
+        """
         from_str = """
         financial_budget_account AS a
         """
         return from_str
 
     def _where(self):
+        """Build the WHERE clause, which applies no extra criteria.
+
+        :return: SQL WHERE fragment
+        :rtype: str
+        """
         where_str = """
         WHERE 1 = 1
         """
         return where_str
 
     def _join(self):
+        """Build the JOIN clauses for amounts and budget currency.
+
+        Planned and realized summaries are joined by budget and account,
+        and the budget provides the company currency.
+
+        :return: SQL JOIN fragment
+        :rtype: str
+        """
         join_str = """
         LEFT JOIN financial_budget_detail_summary AS b ON  a.budget_id = b.budget_id AND
                                             a.account_id = b.account_id
@@ -93,11 +125,17 @@ class FinancialBudgetSummary(models.Model):
         return join_str
 
     def _group_by(self):
+        """Build the GROUP BY clause, which is empty for this view.
+
+        :return: SQL GROUP BY fragment
+        :rtype: str
+        """
         group_str = """
         """
         return group_str
 
     def init(self):
+        """Drop and recreate the SQL view from the query fragments."""
         tools.drop_view_if_exists(self._cr, self._table)
         # pylint: disable=locally-disabled, sql-injection
         self._cr.execute(
