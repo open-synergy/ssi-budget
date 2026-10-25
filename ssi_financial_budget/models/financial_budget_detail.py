@@ -6,6 +6,12 @@ from odoo import fields, models
 
 
 class FinancialBudgetDetail(models.Model):
+    """Planned line of a financial budget.
+
+    Holds the product, price and quantity planned for one account
+    and direction (revenue or cost) of a financial budget.
+    """
+
     _name = "financial_budget.detail"
     _description = "Financial Budget Detail"
     _inherit = [

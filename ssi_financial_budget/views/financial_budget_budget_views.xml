@@ -130,6 +130,12 @@
                                 <field name="account_id" />
                                 <field name="amount" />
                             </tree>
+                            <form>
+                                <group name="detail_summary_form" colspan="4" col="2">
+                                    <field name="account_id" />
+                                    <field name="amount" />
+                                </group>
+                            </form>
                         </field>
                     </group>
                     <group name="detail_3" colspan="4" col="2">
@@ -147,6 +153,11 @@
                         <tree>
                             <field name="account_id" />
                         </tree>
+                        <form>
+                            <group name="account_form" colspan="4" col="2">
+                                <field name="account_id" />
+                            </group>
+                        </form>
                     </field>
                 </page>
                 <page name="move_line" string="Realization">
@@ -158,6 +169,18 @@
                                 <field name="journal_id" />
                                 <field name="amount" />
                             </tree>
+                            <form>
+                                <group name="move_line_form" colspan="4" col="2">
+                                    <group name="move_line_form_1" colspan="1" col="2">
+                                        <field name="move_id" />
+                                        <field name="account_id" />
+                                    </group>
+                                    <group name="move_line_form_2" colspan="1" col="2">
+                                        <field name="journal_id" />
+                                        <field name="amount" />
+                                    </group>
+                                </group>
+                            </form>
                         </field>
                     </group>
                     <group name="move_line_2" colspan="4" col="2" string="Summary">
@@ -166,6 +189,16 @@
                                 <field name="account_id" />
                                 <field name="amount" />
                             </tree>
+                            <form>
+                                <group
+                                        name="move_line_summary_form"
+                                        colspan="4"
+                                        col="2"
+                                    >
+                                    <field name="account_id" />
+                                    <field name="amount" />
+                                </group>
+                            </form>
                         </field>
                     </group>
                 </page>
@@ -179,6 +212,19 @@
                                 <field name="amount_realized" />
                                 <field name="amount_diff" />
                             </tree>
+                            <form>
+                                <group name="summary_form" colspan="4" col="2">
+                                    <group name="summary_form_1" colspan="1" col="2">
+                                        <field name="currency_id" invisible="1" />
+                                        <field name="account_id" />
+                                    </group>
+                                    <group name="summary_form_2" colspan="1" col="2">
+                                        <field name="amount_planned" />
+                                        <field name="amount_realized" />
+                                        <field name="amount_diff" />
+                                    </group>
+                                </group>
+                            </form>
                         </field>
                     </group>
                 </page>
