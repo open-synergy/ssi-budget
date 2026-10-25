@@ -15,8 +15,11 @@
     "depends": [
         "ssi_financial_budget",
         "ssi_connector_documenso_signing",
+        "web_tour",
     ],
-    "data": [],
+    "data": [
+        "views/assets.xml",
+    ],
     "demo": [],
     "images": [],
 }

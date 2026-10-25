@@ -1,0 +1,244 @@
+scenarios:
+  - name: "Financial Budget - Documenso: signature requests empty by default"
+    steps:
+      - step: "Setup - create fiscal month period type 1"
+        action: "create"
+        model: "date.range.type"
+        save_as: "period_type"
+        values:
+          name: "Test FB DS Period Type 1"
+          fiscal_month: true
+          allow_overlap: true
+
+      - step: "Setup - create period 1"
+        action: "create"
+        model: "date.range"
+        save_as: "period"
+        values:
+          name: "Test FB DS Period 1"
+          type_id: "REC: period_type.id"
+          date_start: "2042-01-01"
+          date_end: "2042-01-28"
+
+      - step: "Setup - create financial budget type 1"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test FB DS Type 1"
+          code: "TFBDS1"
+
+      - step: "Create financial budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget"
+        values:
+          type_id: "REC: budget_type.id"
+          period_id: "REC: period.id"
+
+      - step: "Signature requests are empty on a new budget"
+        action: "assert"
+        target: "budget"
+        asserts:
+          signature_request_ids:
+            type: "value"
+            operator: "is_falsy"
+          signature_request_count:
+            type: "value"
+            expected: 0
+
+  - name: "Financial Budget - Documenso: request refers to the budget"
+    steps:
+      - step: "Setup - create fiscal month period type 2"
+        action: "create"
+        model: "date.range.type"
+        save_as: "period_type"
+        values:
+          name: "Test FB DS Period Type 2"
+          fiscal_month: true
+          allow_overlap: true
+
+      - step: "Setup - create period 2"
+        action: "create"
+        model: "date.range"
+        save_as: "period"
+        values:
+          name: "Test FB DS Period 2"
+          type_id: "REC: period_type.id"
+          date_start: "2042-02-01"
+          date_end: "2042-02-28"
+
+      - step: "Setup - create financial budget type 2"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test FB DS Type 2"
+          code: "TFBDS2"
+
+      - step: "Setup - create Documenso backend"
+        action: "create"
+        model: "documenso.backend"
+        save_as: "backend"
+        values:
+          name: "Test FB DS Backend 2"
+          base_url: "https://example.com"
+          api_key: "TEST-API-KEY"
+          version: "v2"
+          active: true
+
+      - step: "Setup - create py3o report for the budget model"
+        action: "create"
+        model: "ir.actions.report"
+        save_as: "report"
+        values:
+          name: "Test FB DS Py3o Report 2"
+          model: "financial_budget.budget"
+          report_type: "py3o"
+          report_name: "test_fb_ds_py3o_report_2"
+          py3o_filetype: "pdf"
+
+      - step: "Create financial budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget"
+        values:
+          type_id: "REC: budget_type.id"
+          period_id: "REC: period.id"
+
+      - step: "Create a signature request pointing at the budget"
+        action: "create"
+        model: "documenso.signature.request"
+        save_as: "request"
+        values:
+          backend_id: "REC: backend.id"
+          res_model: "financial_budget.budget"
+          res_id: "REC: budget.id"
+          py3o_report_id: "REC: report.id"
+
+      - step: "Budget lists the request in signature_request_ids"
+        action: "assert"
+        target: "budget"
+        refresh: true
+        asserts:
+          signature_request_ids:
+            type: "o2m"
+            check: "contains"
+            expected_records:
+              - "REC: request"
+
+  - name: "Financial Budget - Documenso: requests do not leak between budgets"
+    steps:
+      - step: "Setup - create fiscal month period type 3A"
+        action: "create"
+        model: "date.range.type"
+        save_as: "period_type_a"
+        values:
+          name: "Test FB DS Period Type 3A"
+          fiscal_month: true
+          allow_overlap: true
+
+      - step: "Setup - create period 3A"
+        action: "create"
+        model: "date.range"
+        save_as: "period_a"
+        values:
+          name: "Test FB DS Period 3A"
+          type_id: "REC: period_type_a.id"
+          date_start: "2042-03-01"
+          date_end: "2042-03-28"
+
+      - step: "Setup - create fiscal month period type 3B"
+        action: "create"
+        model: "date.range.type"
+        save_as: "period_type_b"
+        values:
+          name: "Test FB DS Period Type 3B"
+          fiscal_month: true
+          allow_overlap: true
+
+      - step: "Setup - create period 3B"
+        action: "create"
+        model: "date.range"
+        save_as: "period_b"
+        values:
+          name: "Test FB DS Period 3B"
+          type_id: "REC: period_type_b.id"
+          date_start: "2042-04-01"
+          date_end: "2042-04-28"
+
+      - step: "Setup - create financial budget type 3"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test FB DS Type 3"
+          code: "TFBDS3"
+
+      - step: "Setup - create Documenso backend"
+        action: "create"
+        model: "documenso.backend"
+        save_as: "backend"
+        values:
+          name: "Test FB DS Backend 3"
+          base_url: "https://example.com"
+          api_key: "TEST-API-KEY"
+          version: "v2"
+          active: true
+
+      - step: "Setup - create py3o report for the budget model"
+        action: "create"
+        model: "ir.actions.report"
+        save_as: "report"
+        values:
+          name: "Test FB DS Py3o Report 3"
+          model: "financial_budget.budget"
+          report_type: "py3o"
+          report_name: "test_fb_ds_py3o_report_3"
+          py3o_filetype: "pdf"
+
+      - step: "Create budget A"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget_a"
+        values:
+          type_id: "REC: budget_type.id"
+          period_id: "REC: period_a.id"
+
+      - step: "Create budget B"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget_b"
+        values:
+          type_id: "REC: budget_type.id"
+          period_id: "REC: period_b.id"
+
+      - step: "Create a signature request for budget A only"
+        action: "create"
+        model: "documenso.signature.request"
+        save_as: "request_a"
+        values:
+          backend_id: "REC: backend.id"
+          res_model: "financial_budget.budget"
+          res_id: "REC: budget_a.id"
+          py3o_report_id: "REC: report.id"
+
+      - step: "Budget A lists its request"
+        action: "assert"
+        target: "budget_a"
+        refresh: true
+        asserts:
+          signature_request_ids:
+            type: "o2m"
+            check: "contains"
+            expected_records:
+              - "REC: request_a"
+
+      - step: "Budget B stays empty"
+        action: "assert"
+        target: "budget_b"
+        refresh: true
+        asserts:
+          signature_request_ids:
+            type: "value"
+            operator: "is_falsy"

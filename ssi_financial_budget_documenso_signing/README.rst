@@ -9,6 +9,10 @@ Financial Budget - Documenso Signing Integration
 This module integrates Documenso digital signing into the Financial Budget module.
 It adds a Documenso signing tab to the financial budget form view.
 
+Work Instruction
+================
+
+* `Financial Budget <docs/financial_budget_budget/index.html>`_
 
 Bug Tracker
 ===========
