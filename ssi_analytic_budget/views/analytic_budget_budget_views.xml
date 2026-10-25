@@ -341,7 +341,7 @@
         name="Analytic Budgets"
         sequence="1"
         parent="ssi_cost_accounting.menu_root_budget"
-        groups="analytic_budget_viewer_group"
+        groups="ssi_analytic_budget.analytic_budget_budget_viewer_group"
         action="analytic_budget_budget_action"
     />
 </odoo>
