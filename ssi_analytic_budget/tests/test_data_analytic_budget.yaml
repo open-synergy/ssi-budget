@@ -1,3 +1,6 @@
+options:
+  auto_refresh: true
+
 scenarios:
   - name: "Analytic Budget - Full Workflow: draft to done"
     steps:
@@ -43,11 +46,6 @@ scenarios:
             type: "value"
             expected: "confirm"
 
-      - step: "Invalidate cache after confirm"
-        action: "call"
-        target: "budget"
-        method: "invalidate_cache"
-
       - step: "Approve to open"
         action: "call"
         target: "budget"
@@ -57,11 +55,6 @@ scenarios:
           state:
             type: "value"
             expected: "open"
-
-      - step: "Invalidate cache after open"
-        action: "call"
-        target: "budget"
-        method: "invalidate_cache"
 
       - step: "Done budget"
         action: "call"
@@ -117,3 +110,85 @@ scenarios:
           state:
             type: "value"
             expected: "draft"
+
+  - name: "Analytic Budget - Onchange type fills accounts"
+    steps:
+      - step: "Get account type expenses"
+        action: "ref"
+        xml_id: "account.data_account_type_expenses"
+        save_as: "account_type_expenses"
+
+      - step: "Create revenue account"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_revenue"
+        values:
+          name: "Test Revenue Account OC"
+          code: "XABOC01"
+          user_type_id: "EVAL: registry['account_type_expenses'].id"
+
+      - step: "Create cost account"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_cost"
+        values:
+          name: "Test Cost Account OC"
+          code: "XABOC02"
+          user_type_id: "EVAL: registry['account_type_expenses'].id"
+
+      - step: "Create excluded account"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_exclude"
+        values:
+          name: "Test Excluded Account OC"
+          code: "XABOC03"
+          user_type_id: "EVAL: registry['account_type_expenses'].id"
+
+      - step: "Create analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Analytic Account OC"
+
+      - step: "Create budget type with allowed and excluded accounts"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type OC"
+          code: "TBTOC"
+          allowed_revenue_account_ids: "EVAL: [(6, 0, [registry['acc_revenue'].id])]"
+          allowed_cost_account_ids: "EVAL: [(6, 0, [registry['acc_cost'].id])]"
+          exclude_account_ids: "EVAL: [(6, 0, [registry['acc_exclude'].id])]"
+
+      - step: "Set type then clear it on the form"
+        action: "form"
+        model: "analytic_budget.budget"
+        save: false
+        ops:
+          - set: {analytic_account_id: "REC: analytic_account"}
+          - set: {type_id: "REC: budget_type"}
+          - assert:
+              account_ids:
+                type: "m2m"
+                check: "exact"
+                expected_records:
+                  - "REC: acc_revenue"
+                  - "REC: acc_cost"
+              exclude_account_ids:
+                type: "m2m"
+                check: "exact"
+                expected_records:
+                  - "REC: acc_exclude"
+          - set: {type_id: "EVAL: env['analytic_budget.type']"}
+          - assert:
+              account_ids:
+                type: "m2m"
+                check: "count"
+                expected_count: 0
+              exclude_account_ids:
+                type: "m2m"
+                check: "count"
+                expected_count: 0
