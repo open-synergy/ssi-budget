@@ -5,8 +5,18 @@
 
 from odoo import api, fields, models
 
+from odoo.addons.ssi_decorator import ssi_decorator
+
 
 class FinancialBudgetBudget(models.Model):
+    """Financial budget document for one fiscal period.
+
+    Plans revenue and cost amounts per account through its detail
+    lines and compares them with the realized journal items. The
+    document follows the confirm, approval, open, done, cancel and
+    terminate workflow.
+    """
+
     _name = "financial_budget.budget"
     _inherit = [
         "mixin.transaction_confirm",
@@ -149,6 +159,12 @@ class FinancialBudgetBudget(models.Model):
     )
 
     def _compute_amount(self):
+        """Compute the planned, realized and difference amounts.
+
+        Planned is the sum of ``price_subtotal`` of the detail lines,
+        realized is the sum of ``amount`` of the realization move
+        lines, and difference is planned minus realized.
+        """
         for record in self:
             amount_planned = amount_realized = amount_diff = 0.0
             for detail in record.detail_ids:
@@ -199,6 +215,12 @@ class FinancialBudgetBudget(models.Model):
             ("terminate", "Terminate"),
         ],
     )
+
+    @ssi_decorator.insert_on_form_view()
+    def _insert_form_element(self, view_arch):
+        if self._automatically_insert_view_element:
+            view_arch = self._reconfigure_statusbar_visible(view_arch)
+        return view_arch
 
     @api.model
     def _get_policy_field(self):
