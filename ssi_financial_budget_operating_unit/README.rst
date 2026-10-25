@@ -11,6 +11,11 @@ Extends ``financial_budget.budget`` with ``mixin.single_operating_unit``, so
 financial budget documents can be scoped and restricted per operating unit.
 
 
+Work Instruction
+================
+
+* `Financial Budget <docs/financial_budget_budget/index.html>`_
+
 Bug Tracker
 ===========
 
