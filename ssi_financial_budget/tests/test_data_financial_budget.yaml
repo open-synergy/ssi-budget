@@ -1,3 +1,6 @@
+options:
+  auto_refresh: true
+
 scenarios:
   - name: "Financial Budget - Full Workflow: draft to done"
     steps:
@@ -54,11 +57,6 @@ scenarios:
             type: "value"
             expected: "confirm"
 
-      - step: "Invalidate cache after confirm"
-        action: "call"
-        target: "budget"
-        method: "invalidate_cache"
-
       - step: "Approve to open"
         action: "call"
         target: "budget"
@@ -68,11 +66,6 @@ scenarios:
           state:
             type: "value"
             expected: "open"
-
-      - step: "Invalidate cache after open"
-        action: "call"
-        target: "budget"
-        method: "invalidate_cache"
 
       - step: "Done budget"
         action: "call"
