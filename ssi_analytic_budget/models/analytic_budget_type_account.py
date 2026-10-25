@@ -6,6 +6,12 @@ from odoo import fields, models
 
 
 class AnalyticBudgetTypeAccount(models.Model):
+    """Account line of an analytic budget type.
+
+    Link an account and a direction (revenue or cost) to a type, with
+    optional product and product category restrictions.
+    """
+
     _name = "analytic_budget.type_account"
     _description = "Analytic Budget Type Account"
 

@@ -55,6 +55,19 @@
                                         widget="many2many_tags"
                                     />
                             </tree>
+                            <form>
+                                <group name="revenue_2" colspan="4" col="2">
+                                    <field name="account_id" />
+                                    <field
+                                            name="allowed_product_ids"
+                                            widget="many2many_tags"
+                                        />
+                                    <field
+                                            name="allowed_product_categ_ids"
+                                            widget="many2many_tags"
+                                        />
+                                </group>
+                            </form>
                         </field>
                     </group>
                 </page>
@@ -76,6 +89,19 @@
                                         widget="many2many_tags"
                                     />
                             </tree>
+                            <form>
+                                <group name="cost_2" colspan="4" col="2">
+                                    <field name="account_id" />
+                                    <field
+                                            name="allowed_product_ids"
+                                            widget="many2many_tags"
+                                        />
+                                    <field
+                                            name="allowed_product_categ_ids"
+                                            widget="many2many_tags"
+                                        />
+                                </group>
+                            </form>
                         </field>
                     </group>
                 </page>

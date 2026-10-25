@@ -7,6 +7,12 @@ from odoo import fields, models
 
 
 class AnalyticBudgetType(models.Model):
+    """Master data of analytic budget types.
+
+    A type defines which revenue and cost accounts, optionally narrowed
+    by product or product category, a budget of that type may use.
+    """
+
     _name = "analytic_budget.type"
     _inherit = ["mixin.master_data"]
     _description = "Analytic Budget Type"
@@ -16,6 +22,11 @@ class AnalyticBudgetType(models.Model):
     )
 
     def _compute_allowed_revenue_account(self):
+        """Compute ``all_allowed_revenue_account_ids``.
+
+        Merge the accounts allowed without product with the accounts
+        configured in the revenue account lines.
+        """
         for record in self:
             result = []
             result += record.allowed_revenue_account_ids.ids
@@ -24,6 +35,11 @@ class AnalyticBudgetType(models.Model):
             record.all_allowed_revenue_account_ids = result
 
     def _compute_allowed_cost_account(self):
+        """Compute ``all_allowed_cost_account_ids``.
+
+        Merge the accounts allowed without product with the accounts
+        configured in the cost account lines.
+        """
         for record in self:
             result = []
             result += record.allowed_cost_account_ids.ids
