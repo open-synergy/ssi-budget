@@ -6,6 +6,13 @@ from odoo import fields, models, tools
 
 
 class FinancialBudgetMoveLine(models.Model):
+    """Report journal entry lines that count toward a budget.
+
+    SQL view (``_auto = False``) listing, for every budget, the posted
+    journal items of the accounts mapped to its budget type, signed as
+    budget amounts.
+    """
+
     _name = "financial_budget.move_line"
     _description = "Financial Budget Move Line"
     _auto = False
@@ -35,6 +42,14 @@ class FinancialBudgetMoveLine(models.Model):
     )
 
     def _select(self):
+        """Build the SELECT clause of the view.
+
+        Computes the budget amount per journal item: debit minus credit for
+        asset and expense accounts, credit minus debit otherwise.
+
+        :return: SQL SELECT fragment
+        :rtype: str
+        """
         select_str = """
         SELECT
             row_number() OVER() as id,
@@ -55,12 +70,26 @@ class FinancialBudgetMoveLine(models.Model):
         return select_str
 
     def _from(self):
+        """Build the FROM clause of the view.
+
+        Budgets are the driving table of the query.
+
+        :return: SQL table expression
+        :rtype: str
+        """
         from_str = """
         financial_budget_budget AS a
         """
         return from_str
 
     def _where(self):
+        """Build the WHERE clause of the view.
+
+        Keeps only journal items belonging to posted journal entries.
+
+        :return: SQL WHERE fragment
+        :rtype: str
+        """
         where_str = """
         WHERE 1 = 1 AND
         f.state = 'posted'
@@ -68,6 +97,14 @@ class FinancialBudgetMoveLine(models.Model):
         return where_str
 
     def _join(self):
+        """Build the JOIN clauses of the view.
+
+        Links each budget to its type, the accounts mapped to that type,
+        its period, and the journal items dated within that period.
+
+        :return: SQL JOIN fragment
+        :rtype: str
+        """
         join_str = """
         JOIN financial_budget_type AS b ON a.type_id = b.id
         JOIN rel_financial_budget_type_2_account AS c ON b.id = c.type_id
@@ -82,11 +119,23 @@ class FinancialBudgetMoveLine(models.Model):
         return join_str
 
     def _group_by(self):
+        """Build the GROUP BY clause of the view.
+
+        The view is not aggregated, so the fragment is empty.
+
+        :return: SQL GROUP BY fragment
+        :rtype: str
+        """
         group_str = """
         """
         return group_str
 
     def init(self):
+        """Recreate the SQL view when the module is installed or updated.
+
+        Drops the existing view, then creates it again from the select,
+        from, join, where and group by fragments.
+        """
         tools.drop_view_if_exists(self._cr, self._table)
         # pylint: disable=locally-disabled, sql-injection
         self._cr.execute(
