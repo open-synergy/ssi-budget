@@ -72,7 +72,7 @@ scenarios:
             - - 6
               - 0
               - - "REF: base.group_user"
-                - "REF: ssi_analytic_budget.analytic_budget_user_group"
+                - "REF: ssi_analytic_budget.analytic_budget_budget_user_group"
                 - "REF:
                   ssi_analytic_budget_operating_unit.analytic_budget_budget_ou_group"
           assigned_operating_unit_ids:
@@ -96,3 +96,67 @@ scenarios:
           type: "AccessError"
         values:
           type_id: "REC: budget_type.id"
+
+  - name: "Analytic Budget - workflow groups renamed"
+    steps:
+      - step: "Get renamed viewer group"
+        action: "ref"
+        xml_id: "ssi_analytic_budget.analytic_budget_budget_viewer_group"
+        save_as: "viewer_group"
+
+      - step: "Get renamed user group"
+        action: "ref"
+        xml_id: "ssi_analytic_budget.analytic_budget_budget_user_group"
+        save_as: "user_group"
+
+      - step: "Get renamed validator group"
+        action: "ref"
+        xml_id: "ssi_analytic_budget.analytic_budget_budget_validator_group"
+        save_as: "validator_group"
+
+      - step: "Validator group implies the user group"
+        action: "assert"
+        target: "validator_group"
+        asserts:
+          implied_ids:
+            type: "m2m"
+            check: "contains"
+            expected_records:
+              - "REC: user_group"
+
+      - step: "User group implies the viewer group"
+        action: "assert"
+        target: "user_group"
+        asserts:
+          implied_ids:
+            type: "m2m"
+            check: "contains"
+            expected_records:
+              - "REC: viewer_group"
+
+      - step: "Old viewer XML ID no longer exists"
+        action: "search"
+        model: "ir.model.data"
+        domain:
+          - ["module", "=", "ssi_analytic_budget"]
+          - ["name", "=", "analytic_budget_viewer_group"]
+        save_as: "old_viewer"
+        expect_count: 0
+
+      - step: "Old user XML ID no longer exists"
+        action: "search"
+        model: "ir.model.data"
+        domain:
+          - ["module", "=", "ssi_analytic_budget"]
+          - ["name", "=", "analytic_budget_user_group"]
+        save_as: "old_user"
+        expect_count: 0
+
+      - step: "Old validator XML ID no longer exists"
+        action: "search"
+        model: "ir.model.data"
+        domain:
+          - ["module", "=", "ssi_analytic_budget"]
+          - ["name", "=", "analytic_budget_validator_group"]
+        save_as: "old_validator"
+        expect_count: 0
