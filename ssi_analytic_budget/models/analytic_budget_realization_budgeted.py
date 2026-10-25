@@ -6,6 +6,13 @@ from odoo import fields, models, tools
 
 
 class AnalyticBudgetRealizationBudgeted(models.Model):
+    """Report on budgeted amount versus realization per analytic account.
+
+    SQL view model (``_auto = False``). Each row combines a budget detail
+    line with the realization records matching its analytic account,
+    account and product, reporting the budgeted and realized amounts.
+    """
+
     _name = "analytic_budget.realization_budgeted"
     _description = "Analytic Budget Budgeted Realization"
     _auto = False
@@ -44,6 +51,14 @@ class AnalyticBudgetRealizationBudgeted(models.Model):
     )
 
     def _select(self):
+        """Build the SELECT clause of the report view.
+
+        Budgeted amount is positive for revenue and negative for cost
+        lines; realized amount defaults to zero when absent.
+
+        :return: SQL SELECT fragment.
+        :rtype: str
+        """
         select_str = """
         SELECT
             a.id as id,
@@ -64,18 +79,40 @@ class AnalyticBudgetRealizationBudgeted(models.Model):
         return select_str
 
     def _from(self):
+        """Build the FROM clause of the report view.
+
+        The data source is the budget detail table.
+
+        :return: SQL FROM fragment.
+        :rtype: str
+        """
         from_str = """
         analytic_budget_detail AS a
         """
         return from_str
 
     def _where(self):
+        """Build the WHERE clause of the report view.
+
+        No filtering criteria are applied.
+
+        :return: SQL WHERE fragment.
+        :rtype: str
+        """
         where_str = """
         WHERE 1 = 1
         """
         return where_str
 
     def _join(self):
+        """Build the JOIN clauses of the report view.
+
+        Joins the budget header and matches realization records on
+        analytic account, account and product.
+
+        :return: SQL JOIN fragment.
+        :rtype: str
+        """
         join_str = """
         JOIN analytic_budget_budget AS b ON a.budget_id = b.id
         RIGHT JOIN analytic_budget_realization AS c ON
@@ -86,11 +123,24 @@ class AnalyticBudgetRealizationBudgeted(models.Model):
         return join_str
 
     def _group_by(self):
+        """Build the GROUP BY clause of the report view.
+
+        No grouping is applied.
+
+        :return: SQL GROUP BY fragment.
+        :rtype: str
+        """
         group_str = """
         """
         return group_str
 
     def init(self):
+        """Recreate the SQL view backing this model.
+
+        Drops the existing view and creates it again from the SQL
+        fragments built by the ``_select``, ``_from``, ``_join``,
+        ``_where`` and ``_group_by`` methods.
+        """
         tools.drop_view_if_exists(self._cr, self._table)
         # pylint: disable=locally-disabled, sql-injection
         self._cr.execute(
