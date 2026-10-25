@@ -443,6 +443,7 @@ class AnalyticBudgetBudget(models.Model):
         selection=[
             ("draft", "Draft"),
             ("confirm", "Waiting for Approval"),
+            ("reject", "Rejected"),
             ("open", "In Progress"),
             ("done", "Done"),
             ("cancel", "Cancel"),
