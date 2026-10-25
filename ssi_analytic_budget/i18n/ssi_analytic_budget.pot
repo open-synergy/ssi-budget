@@ -1256,7 +1256,7 @@ msgid "Use status check"
 msgstr ""
 
 #. module: ssi_analytic_budget
-#: model:res.groups,name:ssi_analytic_budget.analytic_budget_user_group
+#: model:res.groups,name:ssi_analytic_budget.analytic_budget_budget_user_group
 msgid "User"
 msgstr ""
 
@@ -1284,12 +1284,12 @@ msgid "Users that can approve/reject document"
 msgstr ""
 
 #. module: ssi_analytic_budget
-#: model:res.groups,name:ssi_analytic_budget.analytic_budget_validator_group
+#: model:res.groups,name:ssi_analytic_budget.analytic_budget_budget_validator_group
 msgid "Validator"
 msgstr ""
 
 #. module: ssi_analytic_budget
-#: model:res.groups,name:ssi_analytic_budget.analytic_budget_viewer_group
+#: model:res.groups,name:ssi_analytic_budget.analytic_budget_budget_viewer_group
 msgid "Viewer"
 msgstr ""
 
