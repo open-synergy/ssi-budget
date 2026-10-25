@@ -6,6 +6,12 @@ from odoo import fields, models, tools
 
 
 class FinancialBudgetDetailSummary(models.Model):
+    """Report the budget amount grouped by budget and account.
+
+    SQL view model (``_auto = False``) that sums the subtotal of the
+    ``financial_budget.detail`` lines per budget and per account.
+    """
+
     _name = "financial_budget.detail_summary"
     _description = "Financial Budget Detail Summary"
     _auto = False
@@ -23,6 +29,12 @@ class FinancialBudgetDetailSummary(models.Model):
     )
 
     def _select(self):
+        """Return the ``SELECT`` clause of the report view.
+
+        Selects the budget, the account, and the summed line subtotal.
+
+        :return: SQL ``SELECT`` fragment
+        """
         select_str = """
         SELECT
             row_number() OVER() as id,
@@ -33,23 +45,47 @@ class FinancialBudgetDetailSummary(models.Model):
         return select_str
 
     def _from(self):
+        """Return the source table of the report view.
+
+        The data source is the ``financial_budget_detail`` table.
+
+        :return: SQL table fragment placed after ``FROM``
+        """
         from_str = """
         financial_budget_detail AS a
         """
         return from_str
 
     def _where(self):
+        """Return the ``WHERE`` clause of the report view.
+
+        No filtering criteria are applied; every detail line is included.
+
+        :return: SQL ``WHERE`` fragment
+        """
         where_str = """
         WHERE 1 = 1
         """
         return where_str
 
     def _join(self):
+        """Return the ``JOIN`` clauses of the report view.
+
+        Extension point: no table is joined by default.
+
+        :return: SQL ``JOIN`` fragment
+        """
         join_str = """
         """
         return join_str
 
     def _group_by(self):
+        """Return the ``GROUP BY`` clause of the report view.
+
+        Groups the detail lines per budget and per account.
+
+        :return: SQL ``GROUP BY`` fragment
+        """
         group_str = """
         GROUP BY    a.budget_id,
                     a.account_id
@@ -57,6 +93,12 @@ class FinancialBudgetDetailSummary(models.Model):
         return group_str
 
     def init(self):
+        """Recreate the SQL view backing this model.
+
+        Drop the view if it exists, then create it again from the
+        ``_select``, ``_from``, ``_join``, ``_where`` and ``_group_by``
+        fragments.
+        """
         tools.drop_view_if_exists(self._cr, self._table)
         # pylint: disable=locally-disabled, sql-injection
         self._cr.execute(
