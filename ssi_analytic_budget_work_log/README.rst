@@ -19,6 +19,11 @@ To install this module, you need to:
 5.  Search For *Analytic Budget - Work Log Integration*
 6.  Install the module
 
+Work Instruction
+================
+
+* `Analytic Budget <docs/analytic_budget_budget/index.html>`_
+
 Bug Tracker
 ===========
 

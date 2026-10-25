@@ -1,0 +1,238 @@
+scenarios:
+  - name: "Analytic Budget - Work Log: work logs empty by default"
+    steps:
+      - step: "Setup - create analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Analytic Account Budget WL 1"
+
+      - step: "Setup - create analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type WL 1"
+          code: "TBTWL1"
+
+      - step: "Create analytic budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget"
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Work logs are empty on a new budget"
+        action: "assert"
+        target: "budget"
+        asserts:
+          work_log_ids:
+            type: "value"
+            operator: "is_falsy"
+          total_work:
+            type: "value"
+            expected: 0.0
+
+  - name: "Analytic Budget - Work Log: work log refers to the budget"
+    steps:
+      - step: "Setup - create analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account"
+        values:
+          name: "Test Analytic Account Budget WL 2"
+
+      - step: "Setup - create analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type WL 2"
+          code: "TBTWL2"
+
+      - step: "Setup - create employee"
+        action: "create"
+        model: "hr.employee"
+        save_as: "employee"
+        values:
+          name: "Test Employee Budget WL 2"
+
+      - step: "Setup - get working schedule"
+        action: "search"
+        model: "resource.calendar"
+        domain: []
+        save_as: "working_schedule"
+        limit: 1
+        order: "id asc"
+
+      - step: "Setup - create timesheet for the employee"
+        action: "create"
+        model: "hr.timesheet"
+        save_as: "timesheet"
+        as_user: "base.user_admin"
+        values:
+          employee_id: "REC: employee.id"
+          date_start: 2024-01-01
+          date_end: 2024-01-31
+          working_schedule_id: "REC: working_schedule.id"
+
+      - step: "Setup - open the timesheet"
+        action: "call"
+        target: "timesheet"
+        method: "action_open"
+        as_user: "base.user_admin"
+
+      - step: "Setup - get the ir.model of the budget"
+        action: "search"
+        model: "ir.model"
+        domain: [["model", "=", "analytic_budget.budget"]]
+        save_as: "ir_model"
+        limit: 1
+
+      - step: "Create analytic budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget"
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Create a work log against the budget"
+        action: "create"
+        model: "hr.work_log"
+        save_as: "work_log"
+        as_user: "base.user_admin"
+        values:
+          employee_id: "REC: employee.id"
+          description: "Test Budget Work Log 2"
+          model_id: "REC: ir_model.id"
+          work_object_id: "REC: budget.id"
+          date: 2024-01-15
+          amount: 4.0
+          analytic_account_id: "REC: analytic_account.id"
+
+      - step: "Budget lists the work log in work_log_ids"
+        action: "assert"
+        target: "budget"
+        refresh: true
+        asserts:
+          work_log_ids:
+            type: "o2m"
+            check: "contains"
+            expected_records:
+              - "REC: work_log"
+
+  - name: "Analytic Budget - Work Log: logs do not leak between budgets"
+    steps:
+      - step: "Setup - create analytic account for budget A"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account_a"
+        values:
+          name: "Test Analytic Account Budget WL 3A"
+
+      - step: "Setup - create analytic account for budget B"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "analytic_account_b"
+        values:
+          name: "Test Analytic Account Budget WL 3B"
+
+      - step: "Setup - create analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Budget Type WL 3"
+          code: "TBTWL3"
+
+      - step: "Setup - create employee"
+        action: "create"
+        model: "hr.employee"
+        save_as: "employee"
+        values:
+          name: "Test Employee Budget WL 3"
+
+      - step: "Setup - get working schedule"
+        action: "search"
+        model: "resource.calendar"
+        domain: []
+        save_as: "working_schedule"
+        limit: 1
+        order: "id asc"
+
+      - step: "Setup - create timesheet for the employee"
+        action: "create"
+        model: "hr.timesheet"
+        save_as: "timesheet"
+        as_user: "base.user_admin"
+        values:
+          employee_id: "REC: employee.id"
+          date_start: 2024-01-01
+          date_end: 2024-01-31
+          working_schedule_id: "REC: working_schedule.id"
+
+      - step: "Setup - open the timesheet"
+        action: "call"
+        target: "timesheet"
+        method: "action_open"
+        as_user: "base.user_admin"
+
+      - step: "Setup - get the ir.model of the budget"
+        action: "search"
+        model: "ir.model"
+        domain: [["model", "=", "analytic_budget.budget"]]
+        save_as: "ir_model"
+        limit: 1
+
+      - step: "Create budget A"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget_a"
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic_account_a.id"
+
+      - step: "Create budget B"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "budget_b"
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic_account_b.id"
+
+      - step: "Create a work log for budget A only"
+        action: "create"
+        model: "hr.work_log"
+        save_as: "work_log_a"
+        as_user: "base.user_admin"
+        values:
+          employee_id: "REC: employee.id"
+          description: "Test Budget Work Log 3A"
+          model_id: "REC: ir_model.id"
+          work_object_id: "REC: budget_a.id"
+          date: 2024-01-15
+          amount: 2.0
+          analytic_account_id: "REC: analytic_account_a.id"
+
+      - step: "Budget A lists its work log"
+        action: "assert"
+        target: "budget_a"
+        refresh: true
+        asserts:
+          work_log_ids:
+            type: "o2m"
+            check: "contains"
+            expected_records:
+              - "REC: work_log_a"
+
+      - step: "Budget B stays empty"
+        action: "assert"
+        target: "budget_b"
+        refresh: true
+        asserts:
+          work_log_ids:
+            type: "value"
+            operator: "is_falsy"
