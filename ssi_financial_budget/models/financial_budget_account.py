@@ -6,6 +6,12 @@ from odoo import fields, models, tools
 
 
 class FinancialBudgetAccount(models.Model):
+    """SQL view of the accounts allowed for each budget.
+
+    Report model (``_auto = False``) backed by a database view. Each
+    row links a budget to one account permitted by the budget type.
+    """
+
     _name = "financial_budget.account"
     _description = "Budget Account"
     _auto = False
@@ -20,6 +26,13 @@ class FinancialBudgetAccount(models.Model):
     )
 
     def _select(self):
+        """Return the SELECT clause of the view query.
+
+        Builds one row per budget and account pair, with a generated
+        row number as the record id.
+
+        :return: SQL ``SELECT`` fragment
+        """
         select_str = """
         SELECT
             row_number() OVER() as id,
@@ -29,18 +42,37 @@ class FinancialBudgetAccount(models.Model):
         return select_str
 
     def _from(self):
+        """Return the FROM clause of the view query.
+
+        The source of data is the budget table.
+
+        :return: SQL table expression
+        """
         from_str = """
         financial_budget_budget AS a
         """
         return from_str
 
     def _where(self):
+        """Return the WHERE clause of the view query.
+
+        No filtering criteria are applied; every budget is included.
+
+        :return: SQL ``WHERE`` fragment
+        """
         where_str = """
         WHERE 1 = 1
         """
         return where_str
 
     def _join(self):
+        """Return the JOIN clauses of the view query.
+
+        Joins each budget to its type and to the accounts allowed
+        for that type.
+
+        :return: SQL ``JOIN`` fragment
+        """
         join_str = """
         JOIN financial_budget_type AS b ON a.type_id = b.id
         JOIN rel_financial_budget_type_2_account AS c ON b.id = c.type_id
@@ -48,11 +80,23 @@ class FinancialBudgetAccount(models.Model):
         return join_str
 
     def _group_by(self):
+        """Return the GROUP BY clause of the view query.
+
+        No grouping is applied; the fragment is empty.
+
+        :return: SQL ``GROUP BY`` fragment
+        """
         group_str = """
         """
         return group_str
 
     def init(self):
+        """Recreate the database view for this model.
+
+        Drops the view if it exists, then creates it from the
+        fragments returned by the ``_select``, ``_from``, ``_join``,
+        ``_where`` and ``_group_by`` methods.
+        """
         tools.drop_view_if_exists(self._cr, self._table)
         # pylint: disable=locally-disabled, sql-injection
         self._cr.execute(
