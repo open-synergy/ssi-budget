@@ -70,6 +70,14 @@ odoo.define("ssi_financial_budget.financial_budget_budget_create_tour", function
                 in_modal: false,
             },
             {
+                content: "Periodicity is shown before the Period",
+                trigger: ".o_field_widget[name='periodicity']",
+                extra_trigger: ".o_form_view.o_form_editable",
+                run: function () {
+                    // Assertion only; do not trigger the default click action.
+                },
+            },
+            {
                 content: "Select the Period",
                 trigger: ".o_field_many2one[name='period_id'] input",
                 extra_trigger: ".o_form_view.o_form_editable",

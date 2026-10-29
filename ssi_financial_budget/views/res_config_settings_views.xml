@@ -155,6 +155,27 @@
                         </div>
                     </div>
                 </div>
+                <h2>Yearly Budget</h2>
+                <div
+                        class="row mt16 o_settings_container"
+                        id="financial_budget_yearly_budget"
+                    >
+                    <div
+                            id="use_ssi_financial_budget_yearly_range_type"
+                            class="col-12 col-lg-6 o_setting_box"
+                        >
+                        <div class="o_setting_right_pane">
+                            <label
+                                    for="financial_budget_yearly_range_type_id"
+                                    string="Yearly Range Type"
+                                />
+                            <div class="text-muted">
+                                Date range type used as the period of yearly budgets
+                            </div>
+                            <field name="financial_budget_yearly_range_type_id" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </xpath>
     </field>

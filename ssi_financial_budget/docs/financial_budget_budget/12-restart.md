@@ -10,6 +10,10 @@
 ## Pre-Condition
 
 - **Record:** Status is **Cancelled** or **Rejected**.
+- **Record:** For a yearly budget, none of its monthly budgets is in status **Draft**,
+  **Waiting for Approval**, **In Progress**, **Done**, or **Terminated**.
+- **Record:** For a monthly budget with a parent budget, restarting does not make the
+  monthly budgets of an account exceed the amount of the parent budget.
 - **Config:** An active `policy.template` for this model grants `restart_ok` for that
   state to the actor's group.
 - **Access:** User is in group _Financial Budget / Validator_.

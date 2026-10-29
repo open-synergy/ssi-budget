@@ -1,0 +1,1473 @@
+options:
+  auto_refresh: true
+
+scenarios:
+  - name: "Financial Budget Yearly - Periodicity default and accepted periods"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBY Fiscal Month S1"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBY Yearly S1"
+
+      - step: "Setup - set the yearly range type on the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "Year S1"
+          type_id: "REC: yr_type"
+          date_start: "2031-01-01"
+          date_end: "2031-12-31"
+
+      - step: "Setup - range M2031-01"
+        action: "create"
+        model: "date.range"
+        save_as: "m2031_01"
+        values:
+          name: "M2031-01 S1"
+          type_id: "REC: fm_type"
+          date_start: "2031-01-01"
+          date_end: "2031-01-31"
+
+      - step: "Setup - account A"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBY Account A S1"
+          code: "YAS1"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - account B"
+        action: "create"
+        model: "account.account"
+        save_as: "account_b"
+        values:
+          name: "FBY Account B S1"
+          code: "YBS1"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBY Type S1"
+          code: "FBYS1"
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_a'].id, registry['account_b'].id])]"
+
+      - step: "Create monthly budget without periodicity"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "monthly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          period_id: "REC: m2031_01.id"
+
+      - step: "Assert default periodicity is monthly"
+        action: "assert"
+        target: "monthly"
+        asserts:
+          periodicity:
+            type: "value"
+            expected: "monthly"
+
+      - step: "Create yearly budget with the company yearly range"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "yearly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+
+      - step: "Assert yearly periodicity"
+        action: "assert"
+        target: "yearly"
+        asserts:
+          periodicity:
+            type: "value"
+            expected: "yearly"
+
+  - name: "Financial Budget Yearly - Period must match the periodicity"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBY Fiscal Month S2"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBY Yearly S2"
+
+      - step: "Setup - set the yearly range type on the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "Year S2"
+          type_id: "REC: yr_type"
+          date_start: "2032-01-01"
+          date_end: "2032-12-31"
+
+      - step: "Setup - range M2032-01"
+        action: "create"
+        model: "date.range"
+        save_as: "m2032_01"
+        values:
+          name: "M2032-01 S2"
+          type_id: "REC: fm_type"
+          date_start: "2032-01-01"
+          date_end: "2032-01-31"
+
+      - step: "Setup - account A"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBY Account A S2"
+          code: "YAS2"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - account B"
+        action: "create"
+        model: "account.account"
+        save_as: "account_b"
+        values:
+          name: "FBY Account B S2"
+          code: "YBS2"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBY Type S2"
+          code: "FBYS2"
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_a'].id, registry['account_b'].id])]"
+
+      - step: "Yearly budget with a fiscal month period"
+        action: "create"
+        model: "financial_budget.budget"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: m2032_01.id"
+
+      - step: "Monthly budget with a yearly period"
+        action: "create"
+        model: "financial_budget.budget"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: year.id"
+
+      - step: "Clear the yearly range type of the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: false
+
+      - step: "Yearly budget while the company setting is empty"
+        action: "create"
+        model: "financial_budget.budget"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+
+  - name: "Financial Budget Yearly - Realization covers the whole year"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBY Fiscal Month S3"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBY Yearly S3"
+
+      - step: "Setup - set the yearly range type on the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "Year S3"
+          type_id: "REC: yr_type"
+          date_start: "2033-01-01"
+          date_end: "2033-12-31"
+
+      - step: "Setup - range M2033-01"
+        action: "create"
+        model: "date.range"
+        save_as: "m2033_01"
+        values:
+          name: "M2033-01 S3"
+          type_id: "REC: fm_type"
+          date_start: "2033-01-01"
+          date_end: "2033-01-31"
+
+      - step: "Setup - account A"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBY Account A S3"
+          code: "YAS3"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - balancing account"
+        action: "create"
+        model: "account.account"
+        save_as: "account_bal"
+        values:
+          name: "FBY Account BAL S3"
+          code: "YBLS3"
+          user_type_id: "REF: account.data_account_type_current_assets"
+
+      - step: "Setup - journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "FBY Journal S3"
+          code: "YS3"
+          type: general
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBY Type S3"
+          code: "FBYS3"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['account_a'].id])]"
+
+      - step: "Create yearly budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "yearly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 5000000,
+                },
+              ]
+
+      - step: "Create journal entry 1"
+        action: "create"
+        model: "account.move"
+        save_as: "move0"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2033-03-10"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_a'].id",
+                  debit: 0.0,
+                  credit: 1000000.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 1000000.0,
+                  credit: 0.0,
+                },
+              ]
+
+      - step: "Post journal entry 1"
+        action: "call"
+        target: "move0"
+        method: "action_post"
+
+      - step: "Create journal entry 2"
+        action: "create"
+        model: "account.move"
+        save_as: "move1"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2033-08-20"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_a'].id",
+                  debit: 0.0,
+                  credit: 2000000.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 2000000.0,
+                  credit: 0.0,
+                },
+              ]
+
+      - step: "Post journal entry 2"
+        action: "call"
+        target: "move1"
+        method: "action_post"
+
+      - step: "Assert realized amount covers both months"
+        action: "assert"
+        target: "yearly"
+        asserts:
+          amount_realized:
+            type: "value"
+            expected: 3000000.0
+
+  - name: "Financial Budget Yearly - Monthly budget must match its parent"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBY Fiscal Month S4"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBY Yearly S4"
+
+      - step: "Setup - set the yearly range type on the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "Year S4"
+          type_id: "REC: yr_type"
+          date_start: "2034-01-01"
+          date_end: "2034-12-31"
+
+      - step: "Setup - range M2034-01"
+        action: "create"
+        model: "date.range"
+        save_as: "m2034_01"
+        values:
+          name: "M2034-01 S4"
+          type_id: "REC: fm_type"
+          date_start: "2034-01-01"
+          date_end: "2034-01-31"
+
+      - step: "Setup - range M2035-01"
+        action: "create"
+        model: "date.range"
+        save_as: "m2035_01"
+        values:
+          name: "M2035-01 S4"
+          type_id: "REC: fm_type"
+          date_start: "2035-01-01"
+          date_end: "2035-01-31"
+
+      - step: "Setup - account A"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBY Account A S4"
+          code: "YAS4"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - account B"
+        action: "create"
+        model: "account.account"
+        save_as: "account_b"
+        values:
+          name: "FBY Account B S4"
+          code: "YBS4"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBY Type S4"
+          code: "FBYS4"
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_a'].id, registry['account_b'].id])]"
+
+      - step: "Setup - second budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type2"
+        values:
+          name: "FBY Type S4B"
+          code: "FBYS4B"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['account_a'].id])]"
+
+      - step: "Setup - other company"
+        action: "create"
+        model: "res.company"
+        save_as: "other_company"
+        values:
+          name: "FBY Other Company S4"
+
+      - step: "Create yearly parent"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "parent"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 1200000,
+                },
+              ]
+
+      - step: "Monthly outside the parent period"
+        action: "create"
+        model: "financial_budget.budget"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2035_01.id"
+          parent_id: "REC: parent.id"
+
+      - step: "Monthly with another type"
+        action: "create"
+        model: "financial_budget.budget"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+        values:
+          type_id: "REC: budget_type2.id"
+          periodicity: "monthly"
+          period_id: "REC: m2034_01.id"
+          parent_id: "REC: parent.id"
+
+      - step: "Monthly with another company"
+        action: "create"
+        model: "financial_budget.budget"
+        expect_error:
+          type: "ValidationError"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2034_01.id"
+          parent_id: "REC: parent.id"
+          company_id: "REC: other_company.id"
+
+      - step: "Monthly with an account missing in the parent"
+        action: "create"
+        model: "financial_budget.budget"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2034_01.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_b'].id",
+                  direction: "revenue",
+                  amount: 100,
+                },
+              ]
+
+      - step: "Monthly with another direction"
+        action: "create"
+        model: "financial_budget.budget"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2034_01.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "cost",
+                  amount: 100,
+                },
+              ]
+
+      - step: "Yearly budget with a parent"
+        action: "create"
+        model: "financial_budget.budget"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          parent_id: "REC: parent.id"
+
+      - step: "Valid monthly budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "child"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2034_01.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 100,
+                },
+              ]
+
+      - step: "Assert the parent link"
+        action: "assert"
+        target: "child"
+        asserts:
+          parent_id:
+            type: "m2o"
+            expected: "REC: parent"
+
+  - name: "Financial Budget Yearly - Allocation limit per account"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBY Fiscal Month S5"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBY Yearly S5"
+
+      - step: "Setup - set the yearly range type on the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "Year S5"
+          type_id: "REC: yr_type"
+          date_start: "2036-01-01"
+          date_end: "2036-12-31"
+
+      - step: "Setup - range M2036-01"
+        action: "create"
+        model: "date.range"
+        save_as: "m2036_01"
+        values:
+          name: "M2036-01 S5"
+          type_id: "REC: fm_type"
+          date_start: "2036-01-01"
+          date_end: "2036-01-31"
+
+      - step: "Setup - range M2036-02"
+        action: "create"
+        model: "date.range"
+        save_as: "m2036_02"
+        values:
+          name: "M2036-02 S5"
+          type_id: "REC: fm_type"
+          date_start: "2036-02-01"
+          date_end: "2036-02-29"
+
+      - step: "Setup - account A"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBY Account A S5"
+          code: "YAS5"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - account B"
+        action: "create"
+        model: "account.account"
+        save_as: "account_b"
+        values:
+          name: "FBY Account B S5"
+          code: "YBS5"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBY Type S5"
+          code: "FBYS5"
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_a'].id, registry['account_b'].id])]"
+
+      - step: "Create yearly parent"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "parent"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 1200000,
+                },
+              ]
+
+      - step: "Monthly 1 of 700000"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "child1"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2036_01.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 700000,
+                },
+              ]
+
+      - step: "Monthly 2 of 600000 exceeds the parent"
+        action: "create"
+        model: "financial_budget.budget"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2036_02.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 600000,
+                },
+              ]
+
+      - step: "Setup - cancel reason"
+        action: "create"
+        model: "base.cancel_reason"
+        save_as: "reason"
+        values:
+          name: "FBY reason child1"
+          code: "FBY-CHILD1"
+
+      - step: "Cancel child1 by wizard"
+        action: "wizard"
+        model: "base.select_cancel_reason"
+        target: "child1"
+        as_user: "base.user_admin"
+        values:
+          cancel_reason_id: "REC: reason"
+        method: "action_confirm"
+        asserts:
+          state:
+            type: "value"
+            expected: "cancel"
+
+      - step: "Monthly 2 of 600000 fits once monthly 1 is cancelled"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "child2"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2036_02.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 600000,
+                },
+              ]
+
+      - step: "Restart monthly 1 would exceed the parent"
+        action: "call"
+        target: "child1"
+        method: "action_restart"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+
+  - name: "Financial Budget Yearly - Parent guards"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBY Fiscal Month S6"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBY Yearly S6"
+
+      - step: "Setup - set the yearly range type on the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "Year S6"
+          type_id: "REC: yr_type"
+          date_start: "2037-01-01"
+          date_end: "2037-12-31"
+
+      - step: "Setup - range M2037-01"
+        action: "create"
+        model: "date.range"
+        save_as: "m2037_01"
+        values:
+          name: "M2037-01 S6"
+          type_id: "REC: fm_type"
+          date_start: "2037-01-01"
+          date_end: "2037-01-31"
+
+      - step: "Setup - range M2037-02"
+        action: "create"
+        model: "date.range"
+        save_as: "m2037_02"
+        values:
+          name: "M2037-02 S6"
+          type_id: "REC: fm_type"
+          date_start: "2037-02-01"
+          date_end: "2037-02-28"
+
+      - step: "Setup - account A"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBY Account A S6"
+          code: "YAS6"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBY Type S6"
+          code: "FBYS6"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['account_a'].id])]"
+
+      - step: "Create yearly parent 1"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "parent1"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+
+      - step: "Monthly under parent 1"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "c1"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2037_01.id"
+          parent_id: "REC: parent1.id"
+
+      - step: "Cancel parent 1 with a monthly budget"
+        action: "call"
+        target: "parent1"
+        method: "action_cancel"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+
+      - step: "Create yearly parent 2"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "parent2"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+
+      - step: "Setup - cancel reason"
+        action: "create"
+        model: "base.cancel_reason"
+        save_as: "reason2"
+        values:
+          name: "FBY reason parent2"
+          code: "FBY-PARENT2"
+
+      - step: "Cancel parent2 by wizard"
+        action: "wizard"
+        model: "base.select_cancel_reason"
+        target: "parent2"
+        as_user: "base.user_admin"
+        values:
+          cancel_reason_id: "REC: reason2"
+        method: "action_confirm"
+        asserts:
+          state:
+            type: "value"
+            expected: "cancel"
+
+      - step: "Monthly under parent 2"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "c2"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2037_02.id"
+          parent_id: "REC: parent2.id"
+
+      - step: "Restart parent 2 with a monthly budget"
+        action: "call"
+        target: "parent2"
+        method: "action_restart"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "ValidationError"
+
+  - name: "Financial Budget Yearly - Allocated and unallocated amounts"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBY Fiscal Month S7"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBY Yearly S7"
+
+      - step: "Setup - set the yearly range type on the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "Year S7"
+          type_id: "REC: yr_type"
+          date_start: "2038-01-01"
+          date_end: "2038-12-31"
+
+      - step: "Setup - range M2038-01"
+        action: "create"
+        model: "date.range"
+        save_as: "m2038_01"
+        values:
+          name: "M2038-01 S7"
+          type_id: "REC: fm_type"
+          date_start: "2038-01-01"
+          date_end: "2038-01-31"
+
+      - step: "Setup - range M2038-02"
+        action: "create"
+        model: "date.range"
+        save_as: "m2038_02"
+        values:
+          name: "M2038-02 S7"
+          type_id: "REC: fm_type"
+          date_start: "2038-02-01"
+          date_end: "2038-02-28"
+
+      - step: "Setup - account A"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBY Account A S7"
+          code: "YAS7"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBY Type S7"
+          code: "FBYS7"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['account_a'].id])]"
+
+      - step: "Create yearly parent"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "parent"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 1200000,
+                },
+              ]
+
+      - step: "Monthly 1 of 700000"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "child1"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2038_01.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 700000,
+                },
+              ]
+
+      - step: "Monthly 2 of 300000"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "child2"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: m2038_02.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 300000,
+                },
+              ]
+
+      - step: "Setup - cancel reason"
+        action: "create"
+        model: "base.cancel_reason"
+        save_as: "reason"
+        values:
+          name: "FBY reason child2"
+          code: "FBY-CHILD2"
+
+      - step: "Cancel child2 by wizard"
+        action: "wizard"
+        model: "base.select_cancel_reason"
+        target: "child2"
+        as_user: "base.user_admin"
+        values:
+          cancel_reason_id: "REC: reason"
+        method: "action_confirm"
+        asserts:
+          state:
+            type: "value"
+            expected: "cancel"
+
+      - step: "Find the parent detail line"
+        action: "search"
+        model: "financial_budget.detail"
+        save_as: "pdetail"
+        domain:
+          - ["budget_id", "=", "REC: parent.id"]
+        limit: 1
+        expect_count: 1
+
+      - step: "Assert allocated and unallocated"
+        action: "assert"
+        target: "pdetail"
+        asserts:
+          amount_allocated:
+            type: "value"
+            expected: 700000.0
+          amount_unallocated:
+            type: "value"
+            expected: 500000.0
+
+  - name: "Financial Budget Yearly - Create monthly budgets"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBY Fiscal Month S8"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBY Yearly S8"
+
+      - step: "Setup - set the yearly range type on the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "Year S8"
+          type_id: "REC: yr_type"
+          date_start: "2040-01-01"
+          date_end: "2040-12-31"
+
+      - step: "Setup - range M2040-01"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_01"
+        values:
+          name: "M2040-01 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-01-01"
+          date_end: "2040-01-31"
+
+      - step: "Setup - range M2040-02"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_02"
+        values:
+          name: "M2040-02 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-02-01"
+          date_end: "2040-02-29"
+
+      - step: "Setup - range M2040-03"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_03"
+        values:
+          name: "M2040-03 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-03-01"
+          date_end: "2040-03-31"
+
+      - step: "Setup - range M2040-04"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_04"
+        values:
+          name: "M2040-04 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-04-01"
+          date_end: "2040-04-30"
+
+      - step: "Setup - range M2040-05"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_05"
+        values:
+          name: "M2040-05 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-05-01"
+          date_end: "2040-05-31"
+
+      - step: "Setup - range M2040-06"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_06"
+        values:
+          name: "M2040-06 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-06-01"
+          date_end: "2040-06-30"
+
+      - step: "Setup - range M2040-07"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_07"
+        values:
+          name: "M2040-07 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-07-01"
+          date_end: "2040-07-31"
+
+      - step: "Setup - range M2040-08"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_08"
+        values:
+          name: "M2040-08 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-08-01"
+          date_end: "2040-08-31"
+
+      - step: "Setup - range M2040-09"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_09"
+        values:
+          name: "M2040-09 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-09-01"
+          date_end: "2040-09-30"
+
+      - step: "Setup - range M2040-10"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_10"
+        values:
+          name: "M2040-10 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-10-01"
+          date_end: "2040-10-31"
+
+      - step: "Setup - range M2040-11"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_11"
+        values:
+          name: "M2040-11 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-11-01"
+          date_end: "2040-11-30"
+
+      - step: "Setup - range M2040-12"
+        action: "create"
+        model: "date.range"
+        save_as: "m2040_12"
+        values:
+          name: "M2040-12 S8"
+          type_id: "REC: fm_type"
+          date_start: "2040-12-01"
+          date_end: "2040-12-31"
+
+      - step: "Setup - account A"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBY Account A S8"
+          code: "YAS8"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBY Type S8"
+          code: "FBYS8"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['account_a'].id])]"
+
+      - step: "Create yearly parent"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "parent"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          detail_ids:
+            - [
+                0,
+                0,
+                {
+                  account_id: "EVAL: registry['account_a'].id",
+                  direction: "revenue",
+                  amount: 1200000,
+                },
+              ]
+
+      - step: "Create monthly budgets on a draft parent"
+        action: "call"
+        target: "parent"
+        method: "action_create_monthly_budgets"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "UserError"
+
+      - step: "Confirm parent"
+        action: "call"
+        target: "parent"
+        method: "action_confirm"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "confirm"
+
+      - step: "Approve parent to open"
+        action: "call"
+        target: "parent"
+        method: "action_approve_approval"
+        as_user: "base.user_admin"
+        asserts:
+          state:
+            type: "value"
+            expected: "open"
+
+      - step: "Create monthly budgets"
+        action: "call"
+        target: "parent"
+        method: "action_create_monthly_budgets"
+        as_user: "base.user_admin"
+
+      - step: "Twelve draft monthly budgets exist"
+        action: "search"
+        model: "financial_budget.budget"
+        save_as: "children"
+        domain:
+          - ["parent_id", "=", "REC: parent.id"]
+          - ["state", "=", "draft"]
+          - ["periodicity", "=", "monthly"]
+        expect_count: 12
+
+      - step: "Twelve detail lines exist"
+        action: "search"
+        model: "financial_budget.detail"
+        save_as: "lines"
+        domain:
+          - ["budget_id.parent_id", "=", "REC: parent.id"]
+          - ["amount", "=", 100000]
+        expect_count: 12
+
+      - step: "Create monthly budgets a second time"
+        action: "call"
+        target: "parent"
+        method: "action_create_monthly_budgets"
+        as_user: "base.user_admin"
+        expect_error:
+          type: "UserError"
+
+  - name: "Financial Budget Yearly - Settings"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBY Fiscal Month S9"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBY Yearly S9"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "Year S9"
+          type_id: "REC: yr_type"
+          date_start: "2039-01-01"
+          date_end: "2039-12-31"
+
+      - step: "Setup - account A"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBY Account A S9"
+          code: "YAS9"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBY Type S9"
+          code: "FBYS9"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['account_a'].id])]"
+
+      - step: "Create the settings with the yearly range type"
+        action: "create"
+        model: "res.config.settings"
+        save_as: "settings"
+        values:
+          financial_budget_yearly_range_type_id: "REC: yr_type.id"
+
+      - step: "Apply the settings"
+        action: "call"
+        target: "settings"
+        method: "execute"
+
+      - step: "Assert the company received the range type"
+        action: "assert"
+        target: "company"
+        asserts:
+          financial_budget_yearly_range_type_id:
+            type: "m2o"
+            expected: "REC: yr_type"
+
+      - step: "Restore the company setting"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: false
