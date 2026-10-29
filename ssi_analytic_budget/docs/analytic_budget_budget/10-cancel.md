@@ -13,6 +13,8 @@
   **Done**.
 - **Config:** An active `policy.template` for this model grants `cancel_ok` for that
   state to the actor's group.
+- **Record:** The budget has no child budget that is still active (Draft, Waiting for
+  Approval, In Progress, Done or Terminated). Cancel or reject the child budgets first.
 - **Data:** At least one cancellation reason is available for this model.
 - **Access:** User is in group _Analytic Budget / Validator_.
 

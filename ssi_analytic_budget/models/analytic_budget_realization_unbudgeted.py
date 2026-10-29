@@ -8,9 +8,11 @@ from odoo import fields, models, tools
 class AnalyticBudgetRealizationUnbudgeted(models.Model):
     """Report unbudgeted realizations of analytic budgets.
 
-    Read-only SQL view listing the realized amounts that match an
-    unbudgeted analytic account, account and product combination of a
-    budget, together with the realization date and company currency.
+    Read-only SQL view listing the realized amounts of the analytic
+    lines that do not match any detail line of their budget, inside the
+    date range of the budget when it has one. Matching follows the rules
+    of ``analytic_budget.realization_budgeted``: same account, the same
+    product or no product, and a period holding the date.
     """
 
     _name = "analytic_budget.realization_unbudgeted"
@@ -50,9 +52,8 @@ class AnalyticBudgetRealizationUnbudgeted(models.Model):
         """Return the ``SELECT`` clause of the report view.
 
         Builds the view columns: a generated row id, the budget,
-        analytic account, account and product from the helper view,
-        plus the date, currency and realized amount of the matching
-        realization.
+        analytic account, account, product, date, currency and
+        realized amount of the realization rows.
 
         :return: SQL ``SELECT`` fragment as a string
         """
@@ -63,53 +64,60 @@ class AnalyticBudgetRealizationUnbudgeted(models.Model):
             a.analytic_account_id AS analytic_account_id,
             a.account_id AS account_id,
             a.product_id,
-            b.date,
-            b.company_currency_id,
-            b.amount_realized AS amount_realized
+            a.date,
+            a.company_currency_id,
+            a.amount_realized AS amount_realized
         """
         return select_str
 
     def _from(self):
         """Return the ``FROM`` clause of the report view.
 
-        The data source is the unbudgeted realization helper view,
-        which lists the budget lines that have no budgeted amount.
+        The data source is the realization view, before any matching.
 
         :return: SQL table expression as a string
         """
         from_str = """
-        analytic_budget_realization_unbudgeted_helper AS a
+        analytic_budget_realization AS a
         """
         return from_str
 
     def _where(self):
         """Return the ``WHERE`` clause of the report view.
 
-        No extra criteria are applied; the rows are already limited by
-        the helper view and by the join conditions.
+        Keeps the realization rows that match no detail line of the
+        budget and that are dated inside the date range of the budget.
 
         :return: SQL ``WHERE`` fragment as a string
         """
         where_str = """
-        WHERE 1 = 1
+        WHERE 1 = 1 AND
+            NOT EXISTS (
+                SELECT  1
+                FROM analytic_budget_detail AS d
+                LEFT JOIN date_range AS p ON d.period_id = p.id
+                WHERE   d.budget_id = a.budget_id AND
+                        d.account_id = a.account_id AND
+                        (d.product_id IS NULL OR d.product_id = a.product_id) AND
+                        (
+                            d.period_id IS NULL OR
+                            (a.date >= p.date_start AND a.date <= p.date_end)
+                        )
+            ) AND
+            (b.date_start IS NULL OR a.date >= b.date_start) AND
+            (b.date_end IS NULL OR a.date <= b.date_end)
         """
         return where_str
 
     def _join(self):
         """Return the ``JOIN`` clause of the report view.
 
-        Joins the helper view to the realization view on budget,
-        analytic account, account and product. A missing product is
-        matched to a missing product through ``COALESCE``.
+        Joins the budget header, whose date range limits the rows.
 
         :return: SQL ``JOIN`` fragment as a string
         """
         join_str = """
-        JOIN analytic_budget_realization AS b ON
-            a.analytic_account_id = b.analytic_account_id AND
-            a.account_id = b.account_id AND
-            COALESCE(a.product_id, 0) = COALESCE(b.product_id, 0) AND
-            a.budget_id = b.budget_id
+        JOIN analytic_budget_budget AS b ON a.budget_id = b.id
         """
         return join_str
 

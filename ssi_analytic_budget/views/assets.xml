@@ -39,6 +39,10 @@
             />
             <script
                 type="text/javascript"
+                src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_recompute_realization_tour.js"
+            />
+            <script
+                type="text/javascript"
                 src="/ssi_analytic_budget/static/tests/tours/analytic_budget_budget_reject_tour.js"
             />
             <script

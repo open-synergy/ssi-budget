@@ -36,6 +36,7 @@
         "data/sequence_template_data.xml",
         "data/approval_template_data.xml",
         "data/policy_template_data.xml",
+        "data/ir_actions_server_data.xml",
         "menu.xml",
         "views/analytic_budget_type_views.xml",
         "views/analytic_budget_budget_views.xml",

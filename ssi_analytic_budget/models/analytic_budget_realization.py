@@ -9,9 +9,10 @@ class AnalyticBudgetRealization(models.Model):
     """Report the realized amount of each analytic budget.
 
     Read-only SQL view (``_auto = False``) that joins every analytic
-    budget with the posted analytic lines of its analytic account,
-    grouped by date, general account and product. Each row exposes the
-    amount realized against the budget.
+    budget with the posted analytic lines of its analytic account and
+    of all its descendant analytic accounts, grouped by date, analytic
+    account, general account and product. Each row exposes the amount
+    realized against the budget, without any date limit.
     """
 
     _name = "analytic_budget.realization"
@@ -94,12 +95,15 @@ class AnalyticBudgetRealization(models.Model):
     def _join(self):
         """Return the ``JOIN`` clause of the view query.
 
-        Join each budget to its analytic lines that belong to a journal
-        entry, summed by account, general account, product and date.
+        Join each budget to the analytic lines of its analytic account
+        and of the descendant accounts, found through ``parent_path``,
+        that belong to a journal entry, summed by account, general
+        account, product and date.
 
         :return: SQL ``JOIN`` fragment
         """
         join_str = """
+        JOIN account_analytic_account AS ab ON a.analytic_account_id = ab.id
         JOIN (
             SELECT  b1.account_id,
                     b1.general_account_id,
@@ -113,7 +117,15 @@ class AnalyticBudgetRealization(models.Model):
                         b1.product_id,
                         b1.date
 
-        ) AS b ON   a.analytic_account_id = b.account_id
+        ) AS b ON   EXISTS (
+            SELECT  1
+            FROM    account_analytic_account AS al
+            WHERE   al.id = b.account_id AND
+                    (
+                        al.id = ab.id OR
+                        al.parent_path LIKE ab.parent_path || '%'
+                    )
+        )
 
         """
         return join_str

@@ -16,8 +16,14 @@
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="type_id" />
                 <field name="analytic_account_id" />
+                <field name="parent_id" />
             </xpath>
             <xpath expr="//group[@name='group_by']" position="inside">
+                <filter
+                        name="grp_parent"
+                        string="Parent Budget"
+                        context="{'group_by':'parent_id'}"
+                    />
                 <filter
                         name="grp_type"
                         string="Type"
@@ -44,6 +50,7 @@
                 <field name="type_id" />
                 <field name="company_currency_id" invisible="1" />
                 <field name="analytic_account_id" />
+                <field name="parent_id" optional="show" />
                 <field
                         name="amount_planned_revenue"
                         optional="hide"
@@ -104,6 +111,10 @@
             <xpath expr="//group[@name='header_right']" position="inside">
                 <field name="type_id" />
                 <field name="analytic_account_id" />
+                <field name="analytic_account_parent_id" invisible="1" />
+                <field name="parent_id" />
+                <field name="date_start" />
+                <field name="date_end" />
             </xpath>
             <xpath expr="//page[1]" position="before">
                 <page name="detail" string="Budget Details">
@@ -120,10 +131,12 @@
                                 <field name="currency_id" invisible="1" />
                                 <field name="account_id" />
                                 <field name="product_id" />
+                                <field name="period_id" />
                                 <field name="price_unit" />
                                 <field name="uom_quantity" />
                                 <field name="uom_id" />
                                 <field name="price_subtotal" />
+                                <field name="amount_realized" />
                             </tree>
                             <form>
                                 <group name="revenue_item_form" colspan="4" col="2">
@@ -159,6 +172,8 @@
                                                 domain="['|',('id','in',allowed_product_ids),('categ_id','=',allowed_product_categ_ids)]"
                                                 attrs="{'required':[('product_required','=',True)]}"
                                             />
+                                        <field name="company_id" invisible="1" />
+                                        <field name="period_id" />
                                         <field name="name" />
                                     </group>
                                     <group
@@ -201,10 +216,12 @@
                                 <field name="currency_id" invisible="1" />
                                 <field name="account_id" />
                                 <field name="product_id" />
+                                <field name="period_id" />
                                 <field name="price_unit" />
                                 <field name="uom_quantity" />
                                 <field name="uom_id" />
                                 <field name="price_subtotal" />
+                                <field name="amount_realized" />
                             </tree>
                             <form>
                                 <group name="cost_item_form" colspan="4" col="2">
@@ -236,6 +253,8 @@
                                                 domain="['|',('id','in',allowed_product_ids),('categ_id','=',allowed_product_categ_ids)]"
                                                 attrs="{'required':[('product_required','=',True)]}"
                                             />
+                                        <field name="company_id" invisible="1" />
+                                        <field name="period_id" />
                                         <field name="name" />
                                     </group>
                                     <group name="cost_item_form_2" colspan="1" col="2">
@@ -293,6 +312,36 @@
                     <field name="unbudgeted_analytic_line_ids" />
                     <group name="exclude" string="Exclude" colspan="4" col="2" />
                     <field name="exclude_analytic_line_ids" />
+                </page>
+                <page
+                        name="child_budget"
+                        string="Child Budgets"
+                        attrs="{'invisible':[('child_ids','=',[])]}"
+                    >
+                    <field name="child_ids">
+                        <tree>
+                            <field name="name" />
+                            <field name="analytic_account_id" />
+                            <field name="company_currency_id" invisible="1" />
+                            <field name="amount_planned_revenue" />
+                            <field name="amount_planned_cost" />
+                            <field name="state" />
+                        </tree>
+                        <form>
+                            <group name="child_budget_form" colspan="4" col="2">
+                                <group name="child_budget_form_1" colspan="1" col="2">
+                                    <field name="name" />
+                                    <field name="analytic_account_id" />
+                                    <field name="state" />
+                                </group>
+                                <group name="child_budget_form_2" colspan="1" col="2">
+                                    <field name="company_currency_id" invisible="1" />
+                                    <field name="amount_planned_revenue" />
+                                    <field name="amount_planned_cost" />
+                                </group>
+                            </group>
+                        </form>
+                    </field>
                 </page>
             </xpath>
             <xpath expr="//group[@name='footer_left']" position="attributes">

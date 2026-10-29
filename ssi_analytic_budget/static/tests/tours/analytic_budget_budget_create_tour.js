@@ -80,7 +80,16 @@ odoo.define("ssi_analytic_budget.analytic_budget_budget_create_tour", function (
                 trigger: ".ui-autocomplete .ui-menu-item a:contains(TOUR AB CREATE)",
                 in_modal: false,
             },
-            // Flow 4 - Click Save.
+            // Flow 3 - Parent Budget is an optional header field; it stays empty.
+            {
+                content: "Parent Budget field is available and optional",
+                trigger: ".o_field_many2one[name='parent_id']",
+                extra_trigger: ".o_form_view.o_form_editable",
+                run: function () {
+                    // Assertion only; do not trigger the default click action.
+                },
+            },
+            // Flow 5 - Click Save.
             {
                 content: "Save the record",
                 trigger: ".o_form_button_save",

@@ -1,0 +1,2345 @@
+options:
+  auto_refresh: true
+scenarios:
+  - name: Realization budgeted - amount budgeted appears once per detail
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 01 Counterpart
+          code: XABP0100
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J01
+          code: XP01
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 01
+          code: ABPT01
+      - step: Create account Budgeted
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 01 Budgeted
+          code: XABP0101
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Shared
+        action: create
+        model: account.analytic.account
+        save_as: analytic
+        values:
+          name: AB Period 01 Shared
+      - step: Create budget 1 with one revenue detail
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_1
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 1000000.0
+                uom_quantity: 1.0
+        as_user: base.user_admin
+      - step: Create budget 2 on the same analytic account
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_2
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+        as_user: base.user_admin
+      - step: Create entry move_1
+        action: create
+        model: account.move
+        save_as: move_1
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-01-05"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 100.0
+                analytic_account_id: "REC: analytic.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 100.0
+                credit: 0.0
+      - step: Post entry move_1
+        action: call
+        target: move_1
+        method: action_post
+      - step: Create entry move_2
+        action: create
+        model: account.move
+        save_as: move_2
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-01-06"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 100.0
+                analytic_account_id: "REC: analytic.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 100.0
+                credit: 0.0
+      - step: Post entry move_2
+        action: call
+        target: move_2
+        method: action_post
+      - step: Create entry move_3
+        action: create
+        model: account.move
+        save_as: move_3
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-01-07"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 100.0
+                analytic_account_id: "REC: analytic.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 100.0
+                credit: 0.0
+      - step: Post entry move_3
+        action: call
+        target: move_3
+        method: action_post
+      - step: Flush pending writes
+        action: call
+        target: budget_1
+        method: flush
+      - step: Search realization_budgeted rows rows_1
+        action: search
+        model: analytic_budget.realization_budgeted
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_1.id"
+        save_as: rows_1
+        expect_count: 1
+      - step: Budgeted amount is not multiplied by the realization dates
+        action: assert
+        target: rows_1
+        asserts:
+          amount_budgeted:
+            type: value
+            expected: 1000000.0
+          amount_realized:
+            type: value
+            expected: 300.0
+      - step: Search realization_budgeted rows rows_2
+        action: search
+        model: analytic_budget.realization_budgeted
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_2.id"
+        save_as: rows_2
+        expect_count: 0
+  - name: Period - detail and header realization are limited to the period
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 02 Counterpart
+          code: XABP0200
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J02
+          code: XP02
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 02
+          code: ABPT02
+      - step: Create account No period
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 02 No period
+          code: XABP0201
+          user_type_id: "REC: acc_type.id"
+      - step: Create account Q1 period
+        action: create
+        model: account.account
+        save_as: acc_b
+        values:
+          name: AB Period 02 Q1 period
+          code: XABP0202
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Main
+        action: create
+        model: account.analytic.account
+        save_as: analytic
+        values:
+          name: AB Period 02 Main
+      - step: Create date range type
+        action: create
+        model: date.range.type
+        save_as: drt
+        values:
+          name: AB Period Type 02
+          allow_overlap: true
+      - step: Create period Q1 2027
+        action: create
+        model: date.range
+        save_as: q1
+        values:
+          name: AB Period 02 Q1 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-01-01"
+          date_end: "2027-03-31"
+      - step: Create budget budget
+        action: create
+        model: analytic_budget.budget
+        save_as: budget
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: No period
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 5000.0
+                uom_quantity: 1.0
+            - - 0
+              - 0
+              - name: Q1
+                direction: revenue
+                account_id: "REC: acc_b.id"
+                price_unit: 5000.0
+                uom_quantity: 1.0
+                period_id: "REC: q1.id"
+        as_user: base.user_admin
+      - step: Header range is the period of the details
+        action: assert
+        target: budget
+        asserts:
+          date_start:
+            type: value
+            expected: 2027-01-01
+          date_end:
+            type: value
+            expected: 2027-03-31
+      - step: Create entry move_1
+        action: create
+        model: account.move
+        save_as: move_1
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-01-10"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 100.0
+                analytic_account_id: "REC: analytic.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 100.0
+                credit: 0.0
+      - step: Post entry move_1
+        action: call
+        target: move_1
+        method: action_post
+      - step: Create entry move_2
+        action: create
+        model: account.move
+        save_as: move_2
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-06-10"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 50.0
+                analytic_account_id: "REC: analytic.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 50.0
+                credit: 0.0
+      - step: Post entry move_2
+        action: call
+        target: move_2
+        method: action_post
+      - step: Create entry move_3
+        action: create
+        model: account.move
+        save_as: move_3
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-02-10"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_b.id"
+                debit: 0.0
+                credit: 200.0
+                analytic_account_id: "REC: analytic.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 200.0
+                credit: 0.0
+      - step: Post entry move_3
+        action: call
+        target: move_3
+        method: action_post
+      - step: Create entry move_4
+        action: create
+        model: account.move
+        save_as: move_4
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-05-10"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_b.id"
+                debit: 0.0
+                credit: 70.0
+                analytic_account_id: "REC: analytic.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 70.0
+                credit: 0.0
+      - step: Post entry move_4
+        action: call
+        target: move_4
+        method: action_post
+      - step: Find detail detail_a
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget.id"
+          - - account_id
+            - "="
+            - "REC: acc_a.id"
+        save_as: detail_a
+        limit: 1
+        expect_count: 1
+      - step: Find detail detail_b
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget.id"
+          - - account_id
+            - "="
+            - "REC: acc_b.id"
+        save_as: detail_b
+        limit: 1
+        expect_count: 1
+      - step: Line without period counts every date
+        action: assert
+        target: detail_a
+        asserts:
+          amount_realized:
+            type: value
+            expected: 150.0
+      - step: Line with period counts only its range
+        action: assert
+        target: detail_b
+        asserts:
+          amount_realized:
+            type: value
+            expected: 200.0
+      - step: Header counts only the range of the budget
+        action: assert
+        target: budget
+        asserts:
+          amount_revenue_realization:
+            type: value
+            expected: 300.0
+          amount_cost_realization:
+            type: value
+            expected: 0.0
+      - step: Flush pending writes
+        action: call
+        target: budget
+        method: flush
+      - step: Search realization_unbudgeted rows unbudgeted
+        action: search
+        model: analytic_budget.realization_unbudgeted
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget.id"
+        save_as: unbudgeted
+        expect_count: 0
+  - name: Remainder rule - product line, no-product line and unbudgeted
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 03 Counterpart
+          code: XABP0300
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J03
+          code: XP03
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 03
+          code: ABPT03
+      - step: Create product prod_1
+        action: create
+        model: product.product
+        save_as: prod_1
+        values:
+          name: AB Period 03 prod_1
+          type: service
+      - step: Create product prod_2
+        action: create
+        model: product.product
+        save_as: prod_2
+        values:
+          name: AB Period 03 prod_2
+          type: service
+      - step: Create account Account A
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 03 Account A
+          code: XABP0301
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Main
+        action: create
+        model: account.analytic.account
+        save_as: analytic
+        values:
+          name: AB Period 03 Main
+      - step: Create budget 1 with product and no-product lines
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_1
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: With product
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 1000.0
+                uom_quantity: 1.0
+                product_id: "REC: prod_1.id"
+            - - 0
+              - 0
+              - name: No product
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 1000.0
+                uom_quantity: 1.0
+        as_user: base.user_admin
+      - step: Create budget 2 with the product line only
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_2
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: With product
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 1000.0
+                uom_quantity: 1.0
+                product_id: "REC: prod_1.id"
+        as_user: base.user_admin
+      - step: Create entry move_1
+        action: create
+        model: account.move
+        save_as: move_1
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-02-01"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 100.0
+                analytic_account_id: "REC: analytic.id"
+                product_id: "REC: prod_1.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 100.0
+                credit: 0.0
+      - step: Post entry move_1
+        action: call
+        target: move_1
+        method: action_post
+      - step: Create entry move_2
+        action: create
+        model: account.move
+        save_as: move_2
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-02-01"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 200.0
+                analytic_account_id: "REC: analytic.id"
+                product_id: "REC: prod_2.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 200.0
+                credit: 0.0
+      - step: Post entry move_2
+        action: call
+        target: move_2
+        method: action_post
+      - step: Create entry move_3
+        action: create
+        model: account.move
+        save_as: move_3
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-02-01"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 50.0
+                analytic_account_id: "REC: analytic.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 50.0
+                credit: 0.0
+      - step: Post entry move_3
+        action: call
+        target: move_3
+        method: action_post
+      - step: Find detail with product
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_1.id"
+          - - product_id
+            - "="
+            - "REC: prod_1.id"
+        save_as: detail_product
+        limit: 1
+        expect_count: 1
+      - step: Find detail without product
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_1.id"
+          - - product_id
+            - "="
+            - false
+        save_as: detail_plain
+        limit: 1
+        expect_count: 1
+      - step: Product line takes its own product only
+        action: assert
+        target: detail_product
+        asserts:
+          amount_realized:
+            type: value
+            expected: 100.0
+      - step: No-product line takes the other product and no product
+        action: assert
+        target: detail_plain
+        asserts:
+          amount_realized:
+            type: value
+            expected: 250.0
+      - step: Flush pending writes
+        action: call
+        target: budget_1
+        method: flush
+      - step: Search realization_unbudgeted rows unbudgeted_1
+        action: search
+        model: analytic_budget.realization_unbudgeted
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_1.id"
+        save_as: unbudgeted_1
+        expect_count: 0
+      - step: Search realization_unbudgeted rows unbudgeted_2
+        action: search
+        model: analytic_budget.realization_unbudgeted
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_2.id"
+          - - product_id
+            - "="
+            - "REC: prod_2.id"
+        save_as: unbudgeted_2
+        expect_count: 1
+      - step: Unmatched product line is unbudgeted
+        action: assert
+        target: unbudgeted_2
+        asserts:
+          amount_realized:
+            type: value
+            expected: 200.0
+  - name: Duplicate and overlapping lines are rejected
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 04 Counterpart
+          code: XABP0400
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J04
+          code: XP04
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 04
+          code: ABPT04
+      - step: Create product prod_1
+        action: create
+        model: product.product
+        save_as: prod_1
+        values:
+          name: AB Period 04 prod_1
+          type: service
+      - step: Create account Account A
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 04 Account A
+          code: XABP0401
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Main
+        action: create
+        model: account.analytic.account
+        save_as: analytic
+        values:
+          name: AB Period 04 Main
+      - step: Create date range type
+        action: create
+        model: date.range.type
+        save_as: drt
+        values:
+          name: AB Period Type 04
+          allow_overlap: true
+      - step: Create period Q1 2027
+        action: create
+        model: date.range
+        save_as: q1
+        values:
+          name: AB Period 04 Q1 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-01-01"
+          date_end: "2027-03-31"
+      - step: Create period Feb Apr 2027
+        action: create
+        model: date.range
+        save_as: feb_apr
+        values:
+          name: AB Period 04 Feb Apr 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-02-01"
+          date_end: "2027-04-30"
+      - step: Create period Q3 2027
+        action: create
+        model: date.range
+        save_as: q3
+        values:
+          name: AB Period 04 Q3 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-07-01"
+          date_end: "2027-09-30"
+      - step: Create budget with a product line in Q1
+        action: create
+        model: analytic_budget.budget
+        save_as: budget
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 1000.0
+                uom_quantity: 1.0
+                product_id: "REC: prod_1.id"
+                period_id: "REC: q1.id"
+        as_user: base.user_admin
+      - step: Exact duplicate account, product and period
+        action: create
+        model: analytic_budget.detail
+        values:
+          budget_id: "REC: budget.id"
+          name: Extra
+          direction: revenue
+          account_id: "REC: acc_a.id"
+          price_unit: 10.0
+          uom_quantity: 1.0
+          product_id: "REC: prod_1.id"
+          period_id: "REC: q1.id"
+        expect_error:
+          type: ValidationError
+          message_contains: overlapping period
+      - step: Overlapping periods of the same product
+        action: create
+        model: analytic_budget.detail
+        values:
+          budget_id: "REC: budget.id"
+          name: Extra
+          direction: revenue
+          account_id: "REC: acc_a.id"
+          price_unit: 10.0
+          uom_quantity: 1.0
+          product_id: "REC: prod_1.id"
+          period_id: "REC: feb_apr.id"
+        expect_error:
+          type: ValidationError
+          message_contains: overlapping period
+      - step: Same product without period overlaps every period
+        action: create
+        model: analytic_budget.detail
+        values:
+          budget_id: "REC: budget.id"
+          name: Extra
+          direction: revenue
+          account_id: "REC: acc_a.id"
+          price_unit: 10.0
+          uom_quantity: 1.0
+          product_id: "REC: prod_1.id"
+        expect_error:
+          type: ValidationError
+          message_contains: overlapping period
+      - step: Non overlapping period is accepted
+        action: create
+        model: analytic_budget.detail
+        save_as: detail_q3
+        values:
+          budget_id: "REC: budget.id"
+          name: Extra
+          direction: revenue
+          account_id: "REC: acc_a.id"
+          price_unit: 10.0
+          uom_quantity: 1.0
+          product_id: "REC: prod_1.id"
+          period_id: "REC: q3.id"
+      - step: Empty product is one value
+        action: create
+        model: analytic_budget.detail
+        save_as: detail_plain
+        values:
+          budget_id: "REC: budget.id"
+          name: Extra
+          direction: revenue
+          account_id: "REC: acc_a.id"
+          price_unit: 10.0
+          uom_quantity: 1.0
+      - step: Duplicate of the empty product and empty period
+        action: create
+        model: analytic_budget.detail
+        values:
+          budget_id: "REC: budget.id"
+          name: Extra
+          direction: revenue
+          account_id: "REC: acc_a.id"
+          price_unit: 10.0
+          uom_quantity: 1.0
+        expect_error:
+          type: ValidationError
+          message_contains: overlapping period
+  - name: Product required is enforced on create
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 05 Counterpart
+          code: XABP0500
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J05
+          code: XP05
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 05
+          code: ABPT05
+      - step: Create product prod_1
+        action: create
+        model: product.product
+        save_as: prod_1
+        values:
+          name: AB Period 05 prod_1
+          type: service
+      - step: Create account Account A
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 05 Account A
+          code: XABP0501
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Main
+        action: create
+        model: account.analytic.account
+        save_as: analytic
+        values:
+          name: AB Period 05 Main
+      - step: Account A requires a product in the type
+        action: create
+        model: analytic_budget.type_account
+        save_as: type_account
+        values:
+          type_id: "REC: budget_type.id"
+          direction: revenue
+          account_id: "REC: acc_a.id"
+      - step: Create budget without lines
+        action: create
+        model: analytic_budget.budget
+        save_as: budget
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+        as_user: base.user_admin
+      - step: Line without product is rejected
+        action: create
+        model: analytic_budget.detail
+        values:
+          budget_id: "REC: budget.id"
+          name: No product
+          direction: revenue
+          account_id: "REC: acc_a.id"
+          price_unit: 10.0
+          uom_quantity: 1.0
+        expect_error:
+          type: ValidationError
+          message_contains: Product is required
+      - step: Line with product is accepted
+        action: create
+        model: analytic_budget.detail
+        save_as: detail
+        values:
+          budget_id: "REC: budget.id"
+          name: With product
+          direction: revenue
+          account_id: "REC: acc_a.id"
+          product_id: "REC: prod_1.id"
+          price_unit: 10.0
+          uom_quantity: 1.0
+  - name: Parent budget must belong to the parent analytic account
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 06 Counterpart
+          code: XABP0600
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J06
+          code: XP06
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 06
+          code: ABPT06
+      - step: Create analytic account Parent X
+        action: create
+        model: account.analytic.account
+        save_as: acc_x
+        values:
+          name: AB Period 06 Parent X
+      - step: Create analytic account Child Y
+        action: create
+        model: account.analytic.account
+        save_as: acc_y
+        values:
+          name: AB Period 06 Child Y
+          parent_id: "REC: acc_x.id"
+      - step: Create analytic account Unrelated W
+        action: create
+        model: account.analytic.account
+        save_as: acc_w
+        values:
+          name: AB Period 06 Unrelated W
+      - step: Create budget of the parent account
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_x
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_x.id"
+        as_user: base.user_admin
+      - step: Create budget of an unrelated account
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_w
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_w.id"
+        as_user: base.user_admin
+      - step: Create budget under an unrelated parent
+        action: create
+        model: analytic_budget.budget
+        as_user: base.user_admin
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_y.id"
+          parent_id: "REC: budget_w.id"
+        expect_error:
+          type: ValidationError
+          message_contains: is not the parent
+      - step: Create budget under the parent account budget
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_y
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_y.id"
+          parent_id: "REC: budget_x.id"
+        as_user: base.user_admin
+      - step: Parent budget is linked
+        action: assert
+        target: budget_y
+        asserts:
+          parent_id:
+            type: m2o
+            expected: "REC: budget_x"
+  - name: Allocation - children stay inside the parent line
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 07 Counterpart
+          code: XABP0700
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J07
+          code: XP07
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 07
+          code: ABPT07
+      - step: Create account Account A
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 07 Account A
+          code: XABP0701
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Parent X
+        action: create
+        model: account.analytic.account
+        save_as: acc_x
+        values:
+          name: AB Period 07 Parent X
+      - step: Create analytic account Child Y1
+        action: create
+        model: account.analytic.account
+        save_as: acc_y1
+        values:
+          name: AB Period 07 Child Y1
+          parent_id: "REC: acc_x.id"
+      - step: Create analytic account Child Y2
+        action: create
+        model: account.analytic.account
+        save_as: acc_y2
+        values:
+          name: AB Period 07 Child Y2
+          parent_id: "REC: acc_x.id"
+      - step: Create date range type
+        action: create
+        model: date.range.type
+        save_as: drt
+        values:
+          name: AB Period Type 07
+          allow_overlap: true
+      - step: Create period Year 2027
+        action: create
+        model: date.range
+        save_as: year
+        values:
+          name: AB Period 07 Year 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-01-01"
+          date_end: "2027-12-31"
+      - step: Create period Jan 2027
+        action: create
+        model: date.range
+        save_as: jan
+        values:
+          name: AB Period 07 Jan 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-01-01"
+          date_end: "2027-01-31"
+      - step: Create period Feb 2027
+        action: create
+        model: date.range
+        save_as: feb
+        values:
+          name: AB Period 07 Feb 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-02-01"
+          date_end: "2027-02-28"
+      - step: Create period Mar 2027
+        action: create
+        model: date.range
+        save_as: mar
+        values:
+          name: AB Period 07 Mar 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-03-01"
+          date_end: "2027-03-31"
+      - step: Create budget parent with a yearly line
+        action: create
+        model: analytic_budget.budget
+        save_as: parent
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_x.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 1200000.0
+                uom_quantity: 1.0
+                period_id: "REC: year.id"
+        as_user: base.user_admin
+      - step: Create budget child 1 with monthly lines
+        action: create
+        model: analytic_budget.budget
+        save_as: child_1
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_y1.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Jan
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 600000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+            - - 0
+              - 0
+              - name: Feb
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 300000.0
+                uom_quantity: 1.0
+                period_id: "REC: feb.id"
+        as_user: base.user_admin
+      - step: Create budget child 2 above the remainder
+        action: create
+        model: analytic_budget.budget
+        as_user: base.user_admin
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_y2.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 400000.0
+                uom_quantity: 1.0
+                period_id: "REC: mar.id"
+        expect_error:
+          type: ValidationError
+          message_contains: exceed the amount
+      - step: Create budget child 2 within the remainder
+        action: create
+        model: analytic_budget.budget
+        save_as: child_2
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_y2.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 300000.0
+                uom_quantity: 1.0
+                period_id: "REC: mar.id"
+        as_user: base.user_admin
+      - step: Cancel child_1
+        action: call
+        target: child_1
+        method: action_cancel
+        context:
+          bypass_policy_check: true
+        asserts:
+          state:
+            type: value
+            expected: cancel
+      - step: Find detail detail_c2
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: child_2.id"
+          - - account_id
+            - "="
+            - "REC: acc_a.id"
+        save_as: detail_c2
+        limit: 1
+        expect_count: 1
+      - step: Raise child 2 while child 1 is cancelled
+        action: write
+        target: detail_c2
+        values:
+          price_unit: 1200000.0
+      - step: Restart child_1 rejected
+        action: call
+        target: child_1
+        method: action_restart
+        context:
+          bypass_policy_check: true
+        expect_error:
+          type: ValidationError
+          message_contains: exceed the amount
+      - step: Find detail detail_parent
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: parent.id"
+          - - account_id
+            - "="
+            - "REC: acc_a.id"
+        save_as: detail_parent
+        limit: 1
+        expect_count: 1
+      - step: Lower the parent line below the children
+        action: write
+        target: detail_parent
+        values:
+          price_unit: 1000000.0
+        expect_error:
+          type: ValidationError
+          message_contains: exceed the amount
+  - name: Allocation - child line outside the parent line
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 08 Counterpart
+          code: XABP0800
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J08
+          code: XP08
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 08
+          code: ABPT08
+      - step: Create account Account A
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 08 Account A
+          code: XABP0801
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Parent X
+        action: create
+        model: account.analytic.account
+        save_as: acc_x
+        values:
+          name: AB Period 08 Parent X
+      - step: Create analytic account Child Y
+        action: create
+        model: account.analytic.account
+        save_as: acc_y
+        values:
+          name: AB Period 08 Child Y
+          parent_id: "REC: acc_x.id"
+      - step: Create date range type
+        action: create
+        model: date.range.type
+        save_as: drt
+        values:
+          name: AB Period Type 08
+          allow_overlap: true
+      - step: Create period Year 2027
+        action: create
+        model: date.range
+        save_as: year
+        values:
+          name: AB Period 08 Year 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-01-01"
+          date_end: "2027-12-31"
+      - step: Create period Jan 2027
+        action: create
+        model: date.range
+        save_as: jan
+        values:
+          name: AB Period 08 Jan 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-01-01"
+          date_end: "2027-01-31"
+      - step: Create period Jan 2028
+        action: create
+        model: date.range
+        save_as: jan_next
+        values:
+          name: AB Period 08 Jan 2028
+          type_id: "REC: drt.id"
+          date_start: "2028-01-01"
+          date_end: "2028-01-31"
+      - step: Create budget parent with a yearly line
+        action: create
+        model: analytic_budget.budget
+        save_as: parent
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_x.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 1200000.0
+                uom_quantity: 1.0
+                period_id: "REC: year.id"
+        as_user: base.user_admin
+      - step: Create budget child outside the parent period
+        action: create
+        model: analytic_budget.budget
+        as_user: base.user_admin
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_y.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 1000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan_next.id"
+        expect_error:
+          type: ValidationError
+          message_contains: not inside any detail
+      - step: Create budget child inside the parent period
+        action: create
+        model: analytic_budget.budget
+        save_as: child
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_y.id"
+          parent_id: "REC: parent.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 600000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+        as_user: base.user_admin
+      - step: Find detail detail_parent
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: parent.id"
+          - - account_id
+            - "="
+            - "REC: acc_a.id"
+        save_as: detail_parent
+        limit: 1
+        expect_count: 1
+      - step: Delete the parent line
+        action: unlink
+        target: detail_parent
+      - step: Confirm child rejected
+        action: call
+        target: child
+        method: action_confirm
+        context:
+          bypass_policy_check: true
+        expect_error:
+          type: ValidationError
+          message_contains: not inside any detail
+  - name: Consolidation - grandchild lines count in the ancestor budget
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 09 Counterpart
+          code: XABP0900
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J09
+          code: XP09
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 09
+          code: ABPT09
+      - step: Create account Account A
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 09 Account A
+          code: XABP0901
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Level X
+        action: create
+        model: account.analytic.account
+        save_as: acc_x
+        values:
+          name: AB Period 09 Level X
+      - step: Create analytic account Level Y
+        action: create
+        model: account.analytic.account
+        save_as: acc_y
+        values:
+          name: AB Period 09 Level Y
+          parent_id: "REC: acc_x.id"
+      - step: Create analytic account Level Z
+        action: create
+        model: account.analytic.account
+        save_as: acc_z
+        values:
+          name: AB Period 09 Level Z
+          parent_id: "REC: acc_y.id"
+      - step: Create budget of the top account
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_x
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_x.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 5000.0
+                uom_quantity: 1.0
+        as_user: base.user_admin
+      - step: Create entry move_1
+        action: create
+        model: account.move
+        save_as: move_1
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-02-01"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 100.0
+                analytic_account_id: "REC: acc_z.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 100.0
+                credit: 0.0
+      - step: Post entry move_1
+        action: call
+        target: move_1
+        method: action_post
+      - step: Find detail detail_x
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_x.id"
+          - - account_id
+            - "="
+            - "REC: acc_a.id"
+        save_as: detail_x
+        limit: 1
+        expect_count: 1
+      - step: Detail of the ancestor budget counts the grandchild line
+        action: assert
+        target: detail_x
+        asserts:
+          amount_realized:
+            type: value
+            expected: 100.0
+      - step: Header of the ancestor budget counts the grandchild line
+        action: assert
+        target: budget_x
+        asserts:
+          amount_revenue_realization:
+            type: value
+            expected: 100.0
+      - step: Flush pending writes
+        action: call
+        target: budget_x
+        method: flush
+      - step: Search realization_budgeted rows rows
+        action: search
+        model: analytic_budget.realization_budgeted
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_x.id"
+        save_as: rows
+        expect_count: 1
+      - step: Stored detail amount equals the view amount
+        action: assert
+        target: rows
+        asserts:
+          amount_realized:
+            type: value
+            expected: 100.0
+      - step: Stored realization is searchable
+        action: search
+        model: analytic_budget.budget
+        domain:
+          - - id
+            - "="
+            - "REC: budget_x.id"
+          - - amount_revenue_realization
+            - ">"
+            - 0.0
+        save_as: found
+        expect_count: 1
+      - step: Recompute realization
+        action: call
+        target: budget_x
+        method: action_recompute_realization
+      - step: Recompute keeps a correct detail amount
+        action: assert
+        target: detail_x
+        asserts:
+          amount_realized:
+            type: value
+            expected: 100.0
+      - step: Recompute keeps a correct header amount
+        action: assert
+        target: budget_x
+        asserts:
+          amount_revenue_realization:
+            type: value
+            expected: 100.0
+  - name: Header realization - only lines inside the date range
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 10 Counterpart
+          code: XABP1000
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J10
+          code: XP10
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 10
+          code: ABPT10
+      - step: Create account Account A
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 10 Account A
+          code: XABP1001
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Main
+        action: create
+        model: account.analytic.account
+        save_as: analytic
+        values:
+          name: AB Period 10 Main
+      - step: Create date range type
+        action: create
+        model: date.range.type
+        save_as: drt
+        values:
+          name: AB Period Type 10
+          allow_overlap: true
+      - step: Create period Year 2027
+        action: create
+        model: date.range
+        save_as: year
+        values:
+          name: AB Period 10 Year 2027
+          type_id: "REC: drt.id"
+          date_start: "2027-01-01"
+          date_end: "2027-12-31"
+      - step: Create budget budget
+        action: create
+        model: analytic_budget.budget
+        save_as: budget
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 5000.0
+                uom_quantity: 1.0
+                period_id: "REC: year.id"
+        as_user: base.user_admin
+      - step: Create entry move_1
+        action: create
+        model: account.move
+        save_as: move_1
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2026-12-20"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 100.0
+                analytic_account_id: "REC: analytic.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 100.0
+                credit: 0.0
+      - step: Post entry move_1
+        action: call
+        target: move_1
+        method: action_post
+      - step: Create entry move_2
+        action: create
+        model: account.move
+        save_as: move_2
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-01-20"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 200.0
+                analytic_account_id: "REC: analytic.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 200.0
+                credit: 0.0
+      - step: Post entry move_2
+        action: call
+        target: move_2
+        method: action_post
+      - step: Only January 2027 is counted
+        action: assert
+        target: budget
+        asserts:
+          amount_revenue_realization:
+            type: value
+            expected: 200.0
+          amount_unbudgeted_revenue_realization:
+            type: value
+            expected: 200.0
+  - name: Parent guard - cancel and restart need cancelled children
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 11 Counterpart
+          code: XABP1100
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J11
+          code: XP11
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 11
+          code: ABPT11
+      - step: Create analytic account Parent X
+        action: create
+        model: account.analytic.account
+        save_as: acc_x
+        values:
+          name: AB Period 11 Parent X
+      - step: Create analytic account Child Y
+        action: create
+        model: account.analytic.account
+        save_as: acc_y
+        values:
+          name: AB Period 11 Child Y
+          parent_id: "REC: acc_x.id"
+      - step: Create analytic account Parent P
+        action: create
+        model: account.analytic.account
+        save_as: acc_p
+        values:
+          name: AB Period 11 Parent P
+      - step: Create analytic account Child Q
+        action: create
+        model: account.analytic.account
+        save_as: acc_q
+        values:
+          name: AB Period 11 Child Q
+          parent_id: "REC: acc_p.id"
+      - step: Create budget parent
+        action: create
+        model: analytic_budget.budget
+        save_as: parent
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_x.id"
+        as_user: base.user_admin
+      - step: Create budget child
+        action: create
+        model: analytic_budget.budget
+        save_as: child
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_y.id"
+          parent_id: "REC: parent.id"
+        as_user: base.user_admin
+      - step: Cancel parent rejected
+        action: call
+        target: parent
+        method: action_cancel
+        context:
+          bypass_policy_check: true
+        expect_error:
+          type: ValidationError
+          message_contains: still has child budgets
+      - step: Cancel child
+        action: call
+        target: child
+        method: action_cancel
+        context:
+          bypass_policy_check: true
+        asserts:
+          state:
+            type: value
+            expected: cancel
+      - step: Cancel parent
+        action: call
+        target: parent
+        method: action_cancel
+        context:
+          bypass_policy_check: true
+        asserts:
+          state:
+            type: value
+            expected: cancel
+      - step: Create budget second parent
+        action: create
+        model: analytic_budget.budget
+        save_as: parent_2
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_p.id"
+        as_user: base.user_admin
+      - step: Cancel parent_2
+        action: call
+        target: parent_2
+        method: action_cancel
+        context:
+          bypass_policy_check: true
+        asserts:
+          state:
+            type: value
+            expected: cancel
+      - step: Create budget child of a cancelled parent
+        action: create
+        model: analytic_budget.budget
+        save_as: child_2
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_q.id"
+          parent_id: "REC: parent_2.id"
+        as_user: base.user_admin
+      - step: Restart parent_2 rejected
+        action: call
+        target: parent_2
+        method: action_restart
+        context:
+          bypass_policy_check: true
+        expect_error:
+          type: ValidationError
+          message_contains: still has child budgets
+      - step: Cancel child_2
+        action: call
+        target: child_2
+        method: action_cancel
+        context:
+          bypass_policy_check: true
+        asserts:
+          state:
+            type: value
+            expected: cancel
+      - step: Restart parent_2
+        action: call
+        target: parent_2
+        method: action_restart
+        context:
+          bypass_policy_check: true
+        asserts:
+          state:
+            type: value
+            expected: draft
+  - name: Triggers - line create, change and delete refresh ancestors
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 12 Counterpart
+          code: XABP1200
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J12
+          code: XP12
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 12
+          code: ABPT12
+      - step: Create account Account A
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 12 Account A
+          code: XABP1201
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Level X
+        action: create
+        model: account.analytic.account
+        save_as: acc_x
+        values:
+          name: AB Period 12 Level X
+      - step: Create analytic account Level Y
+        action: create
+        model: account.analytic.account
+        save_as: acc_y
+        values:
+          name: AB Period 12 Level Y
+          parent_id: "REC: acc_x.id"
+      - step: Create analytic account Level Z
+        action: create
+        model: account.analytic.account
+        save_as: acc_z
+        values:
+          name: AB Period 12 Level Z
+          parent_id: "REC: acc_y.id"
+      - step: Create budget of X
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_x
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_x.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: cost
+                account_id: "REC: acc_a.id"
+                price_unit: 5000.0
+                uom_quantity: 1.0
+        as_user: base.user_admin
+      - step: Create budget of Y
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_y
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_y.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: cost
+                account_id: "REC: acc_a.id"
+                price_unit: 5000.0
+                uom_quantity: 1.0
+        as_user: base.user_admin
+      - step: Create entry move_1
+        action: create
+        model: account.move
+        save_as: move_1
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-02-01"
+          line_ids:
+            - - 0
+              - 0
+              - name: Debit
+                account_id: "REC: acc_a.id"
+                debit: 100.0
+                credit: 0.0
+                analytic_account_id: "REC: acc_z.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 0.0
+                credit: 100.0
+      - step: Post entry move_1
+        action: call
+        target: move_1
+        method: action_post
+      - step: Find detail detail_x
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_x.id"
+          - - account_id
+            - "="
+            - "REC: acc_a.id"
+        save_as: detail_x
+        limit: 1
+        expect_count: 1
+      - step: Find detail detail_y
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_y.id"
+          - - account_id
+            - "="
+            - "REC: acc_a.id"
+        save_as: detail_y
+        limit: 1
+        expect_count: 1
+      - step: Cost detail of X is positive
+        action: assert
+        target: detail_x
+        asserts:
+          amount_realized:
+            type: value
+            expected: 100.0
+      - step: Cost detail of Y is positive
+        action: assert
+        target: detail_y
+        asserts:
+          amount_realized:
+            type: value
+            expected: 100.0
+      - step: Header of X counts the cost
+        action: assert
+        target: budget_x
+        asserts:
+          amount_cost_realization:
+            type: value
+            expected: 100.0
+      - step: Header of Y counts the cost
+        action: assert
+        target: budget_y
+        asserts:
+          amount_cost_realization:
+            type: value
+            expected: 100.0
+      - step: Find the analytic line of Z
+        action: search
+        model: account.analytic.line
+        domain:
+          - - account_id
+            - "="
+            - "REC: acc_z.id"
+        save_as: line
+        limit: 1
+        expect_count: 1
+      - step: Change the line amount
+        action: write
+        target: line
+        values:
+          amount: -150.0
+      - step: Changed line refreshes X
+        action: assert
+        target: detail_x
+        asserts:
+          amount_realized:
+            type: value
+            expected: 150.0
+      - step: Changed line refreshes the header of Y
+        action: assert
+        target: budget_y
+        asserts:
+          amount_cost_realization:
+            type: value
+            expected: 150.0
+      - step: Reset the entry to draft
+        action: call
+        target: move_1
+        method: button_draft
+      - step: Deleted lines clear the detail of X
+        action: assert
+        target: detail_x
+        asserts:
+          amount_realized:
+            type: value
+            expected: 0.0
+      - step: Deleted lines clear the header of Y
+        action: assert
+        target: budget_y
+        asserts:
+          amount_cost_realization:
+            type: value
+            expected: 0.0
+      - step: Delete the entry
+        action: unlink
+        target: move_1
+        context:
+          force_delete: true
+  - name: Triggers - moving an analytic account refreshes old and new ancestors
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create account Counterpart
+        action: create
+        model: account.account
+        save_as: acc_cp
+        values:
+          name: AB Period 13 Counterpart
+          code: XABP1300
+          user_type_id: "REC: acc_type.id"
+      - step: Create miscellaneous journal
+        action: create
+        model: account.journal
+        save_as: journal
+        values:
+          name: AB Period J13
+          code: XP13
+          type: general
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Period Type 13
+          code: ABPT13
+      - step: Create account Account A
+        action: create
+        model: account.account
+        save_as: acc_a
+        values:
+          name: AB Period 13 Account A
+          code: XABP1301
+          user_type_id: "REC: acc_type.id"
+      - step: Create analytic account Old parent Y
+        action: create
+        model: account.analytic.account
+        save_as: acc_y
+        values:
+          name: AB Period 13 Old parent Y
+      - step: Create analytic account New parent W
+        action: create
+        model: account.analytic.account
+        save_as: acc_w
+        values:
+          name: AB Period 13 New parent W
+      - step: Create analytic account Moved Z
+        action: create
+        model: account.analytic.account
+        save_as: acc_z
+        values:
+          name: AB Period 13 Moved Z
+          parent_id: "REC: acc_y.id"
+      - step: Create budget of the old parent
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_y
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_y.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 5000.0
+                uom_quantity: 1.0
+        as_user: base.user_admin
+      - step: Create budget of the new parent
+        action: create
+        model: analytic_budget.budget
+        save_as: budget_w
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_w.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: Detail
+                direction: revenue
+                account_id: "REC: acc_a.id"
+                price_unit: 5000.0
+                uom_quantity: 1.0
+        as_user: base.user_admin
+      - step: Create entry move_1
+        action: create
+        model: account.move
+        save_as: move_1
+        values:
+          move_type: entry
+          journal_id: "REC: journal.id"
+          date: "2027-02-01"
+          line_ids:
+            - - 0
+              - 0
+              - name: Credit
+                account_id: "REC: acc_a.id"
+                debit: 0.0
+                credit: 100.0
+                analytic_account_id: "REC: acc_z.id"
+            - - 0
+              - 0
+              - name: Balance
+                account_id: "REC: acc_cp.id"
+                debit: 100.0
+                credit: 0.0
+      - step: Post entry move_1
+        action: call
+        target: move_1
+        method: action_post
+      - step: Find detail detail_y
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_y.id"
+          - - account_id
+            - "="
+            - "REC: acc_a.id"
+        save_as: detail_y
+        limit: 1
+        expect_count: 1
+      - step: Find detail detail_w
+        action: search
+        model: analytic_budget.detail
+        domain:
+          - - budget_id
+            - "="
+            - "REC: budget_w.id"
+          - - account_id
+            - "="
+            - "REC: acc_a.id"
+        save_as: detail_w
+        limit: 1
+        expect_count: 1
+      - step: Old parent counts the line
+        action: assert
+        target: budget_y
+        asserts:
+          amount_revenue_realization:
+            type: value
+            expected: 100.0
+      - step: New parent does not count it yet
+        action: assert
+        target: budget_w
+        asserts:
+          amount_revenue_realization:
+            type: value
+            expected: 0.0
+      - step: Move Z under W
+        action: write
+        target: acc_z
+        values:
+          parent_id: "REC: acc_w.id"
+      - step: Old parent loses the line
+        action: assert
+        target: budget_y
+        asserts:
+          amount_revenue_realization:
+            type: value
+            expected: 0.0
+      - step: Old parent detail loses the line
+        action: assert
+        target: detail_y
+        asserts:
+          amount_realized:
+            type: value
+            expected: 0.0
+      - step: New parent gains the line
+        action: assert
+        target: budget_w
+        asserts:
+          amount_revenue_realization:
+            type: value
+            expected: 100.0
+      - step: New parent detail gains the line
+        action: assert
+        target: detail_w
+        asserts:
+          amount_realized:
+            type: value
+            expected: 100.0

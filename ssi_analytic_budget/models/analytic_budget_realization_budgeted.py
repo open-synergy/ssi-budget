@@ -6,17 +6,22 @@ from odoo import fields, models, tools
 
 
 class AnalyticBudgetRealizationBudgeted(models.Model):
-    """Report on budgeted amount versus realization per analytic account.
+    """Report on budgeted amount versus realization per budget detail.
 
-    SQL view model (``_auto = False``). Each row combines a budget detail
-    line with the realization records matching its analytic account,
-    account and product, reporting the budgeted and realized amounts.
+    SQL view model (``_auto = False``) with one row per budget detail
+    line, whose ``id`` is the id of the line. Each analytic line of the
+    budget and of its descendant analytic accounts is matched to at most
+    one line of the same budget: first the line with the same account
+    and product, then the line with the same account and no product,
+    in both cases when its period holds the date of the analytic line
+    or when it has no period. The view is the single source of these
+    matching rules; the stored realized amount of the lines reads it.
     """
 
     _name = "analytic_budget.realization_budgeted"
     _description = "Analytic Budget Budgeted Realization"
     _auto = False
-    _order = "date"
+    _order = "budget_id, id"
 
     budget_id = fields.Many2one(
         string="# Budget",
@@ -26,8 +31,9 @@ class AnalyticBudgetRealizationBudgeted(models.Model):
         string="Company Currency",
         comodel_name="res.currency",
     )
-    date = fields.Date(
-        string="Date",
+    period_id = fields.Many2one(
+        string="Period",
+        comodel_name="date.range",
     )
     product_id = fields.Many2one(
         string="Product",
@@ -54,7 +60,9 @@ class AnalyticBudgetRealizationBudgeted(models.Model):
         """Build the SELECT clause of the report view.
 
         Budgeted amount is positive for revenue and negative for cost
-        lines; realized amount defaults to zero when absent.
+        lines. Realized amount follows the direction of the line, so it
+        is the sum of the matching analytic lines for revenue and the
+        opposite of that sum for cost; it defaults to zero when absent.
 
         :return: SQL SELECT fragment.
         :rtype: str
@@ -66,7 +74,7 @@ class AnalyticBudgetRealizationBudgeted(models.Model):
             b.analytic_account_id AS analytic_account_id,
             a.account_id AS account_id,
             a.product_id AS product_id,
-            c.date as date,
+            a.period_id AS period_id,
             b.company_currency_id,
             CASE
                 WHEN a.direction = 'revenue' THEN
@@ -74,7 +82,12 @@ class AnalyticBudgetRealizationBudgeted(models.Model):
                 WHEN a.direction = 'cost' THEN
                     -1.0 * a.price_subtotal
             END AS amount_budgeted,
-            COALESCE(c.amount_realized, 0.0) AS amount_realized
+            CASE
+                WHEN a.direction = 'cost' THEN
+                    -1.0 * COALESCE(c.amount, 0.0)
+                ELSE
+                    COALESCE(c.amount, 0.0)
+            END AS amount_realized
         """
         return select_str
 
@@ -107,18 +120,61 @@ class AnalyticBudgetRealizationBudgeted(models.Model):
     def _join(self):
         """Build the JOIN clauses of the report view.
 
-        Joins the budget header and matches realization records on
-        analytic account, account and product.
+        Joins the budget header and the total of the analytic lines
+        matched to each line by the rules in the class docstring.
 
         :return: SQL JOIN fragment.
         :rtype: str
         """
         join_str = """
         JOIN analytic_budget_budget AS b ON a.budget_id = b.id
-        RIGHT JOIN analytic_budget_realization AS c ON
-            b.analytic_account_id = c.analytic_account_id AND
-            a.account_id = c.account_id AND
-            COALESCE(a.product_id, 0) = COALESCE(c.product_id, 0)
+        LEFT JOIN (
+            SELECT  m.detail_id,
+                    SUM(m.amount) AS amount
+            FROM (
+                SELECT  COALESCE(s1.id, s2.id) AS detail_id,
+                        l.amount AS amount
+                FROM analytic_budget_budget AS mb
+                JOIN account_analytic_account AS mab ON
+                    mb.analytic_account_id = mab.id
+                JOIN account_analytic_account AS mal ON
+                    mal.id = mab.id OR
+                    mal.parent_path LIKE mab.parent_path || '%'
+                JOIN account_analytic_line AS l ON
+                    l.account_id = mal.id AND
+                    l.move_id IS NOT NULL
+                LEFT JOIN LATERAL (
+                    SELECT  d.id
+                    FROM analytic_budget_detail AS d
+                    LEFT JOIN date_range AS p ON d.period_id = p.id
+                    WHERE   d.budget_id = mb.id AND
+                            d.account_id = l.general_account_id AND
+                            d.product_id = l.product_id AND
+                            (
+                                d.period_id IS NULL OR
+                                (l.date >= p.date_start AND l.date <= p.date_end)
+                            )
+                    ORDER BY d.id
+                    LIMIT 1
+                ) AS s1 ON TRUE
+                LEFT JOIN LATERAL (
+                    SELECT  d.id
+                    FROM analytic_budget_detail AS d
+                    LEFT JOIN date_range AS p ON d.period_id = p.id
+                    WHERE   d.budget_id = mb.id AND
+                            d.account_id = l.general_account_id AND
+                            d.product_id IS NULL AND
+                            (
+                                d.period_id IS NULL OR
+                                (l.date >= p.date_start AND l.date <= p.date_end)
+                            )
+                    ORDER BY d.id
+                    LIMIT 1
+                ) AS s2 ON TRUE
+            ) AS m
+            WHERE m.detail_id IS NOT NULL
+            GROUP BY m.detail_id
+        ) AS c ON c.detail_id = a.id
         """
         return join_str
 

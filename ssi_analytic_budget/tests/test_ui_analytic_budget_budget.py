@@ -57,6 +57,10 @@ class TestUiAnalyticBudgetBudget(HttpSavepointCase):
             bypass_policy_check=True
         ).action_cancel()
 
+        # Recompute tour: a budget with one realized analytic line whose
+        # stored realization is made stale on purpose.
+        cls._prepare_recompute_budget("TOUR AB RECOMPUTE")
+
         # Restart-approval tour: the button is granted for any confirmed
         # record (the policy has no additional condition), so a plain
         # confirmed record is enough.
@@ -103,6 +107,103 @@ class TestUiAnalyticBudgetBudget(HttpSavepointCase):
         budget.with_context(bypass_policy_check=True).action_confirm()
         cls.env["analytic_budget.budget"].invalidate_cache()
         budget.with_user(cls.admin).action_approve_approval()
+        return budget
+
+    @classmethod
+    def _prepare_recompute_budget(cls, name):
+        """Create a draft budget with a realized line and stale totals.
+
+        A posted entry puts 100.0 of revenue on the analytic account of
+        the budget. The stored realization is then reset to zero in the
+        database, so only the Recompute Realization action can bring the
+        value back.
+
+        :param name: analytic account name used by the tour to find the record
+        :return: the new ``analytic_budget.budget`` record
+        """
+        account_type = cls.env.ref("account.data_account_type_expenses")
+        revenue_account = cls.env["account.account"].create(
+            {
+                "name": "TOUR AB RC REVENUE",
+                "code": "TOURABRC1",
+                "user_type_id": account_type.id,
+            }
+        )
+        counterpart_account = cls.env["account.account"].create(
+            {
+                "name": "TOUR AB RC COUNTER",
+                "code": "TOURABRC2",
+                "user_type_id": account_type.id,
+            }
+        )
+        journal = cls.env["account.journal"].create(
+            {"name": "TOUR AB RC JOURNAL", "code": "TOURABRC", "type": "general"}
+        )
+        account = cls._prepare_analytic_account(name)
+        budget = cls.env["analytic_budget.budget"].create(
+            {
+                "user_id": cls.admin.id,
+                "type_id": cls.budget_type.id,
+                "analytic_account_id": account.id,
+                "detail_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "TOUR AB RC DETAIL",
+                            "direction": "revenue",
+                            "account_id": revenue_account.id,
+                            "price_unit": 1000.0,
+                            "uom_quantity": 1.0,
+                        },
+                    )
+                ],
+            }
+        )
+        move = cls.env["account.move"].create(
+            {
+                "move_type": "entry",
+                "journal_id": journal.id,
+                "date": "2027-01-15",
+                "line_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "Debit",
+                            "account_id": counterpart_account.id,
+                            "debit": 100.0,
+                            "credit": 0.0,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "Credit",
+                            "account_id": revenue_account.id,
+                            "debit": 0.0,
+                            "credit": 100.0,
+                            "analytic_account_id": account.id,
+                        },
+                    ),
+                ],
+            }
+        )
+        move.action_post()
+        cls.env["analytic_budget.budget"].flush()
+        cls.env.cr.execute(
+            "UPDATE analytic_budget_budget SET amount_revenue_realization = 0.0 "
+            "WHERE id = %s",
+            (budget.id,),
+        )
+        cls.env.cr.execute(
+            "UPDATE analytic_budget_detail SET amount_realized = 0.0 "
+            "WHERE budget_id = %s",
+            (budget.id,),
+        )
+        cls.env["analytic_budget.budget"].invalidate_cache()
+        cls.env["analytic_budget.detail"].invalidate_cache()
         return budget
 
     def test_create(self):
@@ -223,5 +324,16 @@ class TestUiAnalyticBudgetBudget(HttpSavepointCase):
         self.start_tour(
             "/web",
             "ssi_analytic_budget_analytic_budget_budget_restart_approval",
+            login="admin",
+        )
+
+    def test_recompute_realization(self):
+        """Run the recompute realization tour.
+
+        IK: docs/analytic_budget_budget/15-recompute-realization.md
+        """
+        self.start_tour(
+            "/web",
+            "ssi_analytic_budget_analytic_budget_budget_recompute_realization",
             login="admin",
         )

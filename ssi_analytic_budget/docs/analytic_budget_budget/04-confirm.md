@@ -10,6 +10,9 @@
 ## Pre-Condition
 
 - **Record:** Status is **Draft**.
+- **Record:** If the budget has a **Parent Budget**, every line fits a line of the
+  parent budget with the same account and a period holding its period, and the total of
+  the child budgets stays inside the lines of the parent budget.
 - **Config:** An active `policy.template` for this model grants `confirm_ok` for state
   `draft` to the actor's group.
 - **Config:** An active `approval.template` for this model matches this record and has
