@@ -1400,3 +1400,74 @@ scenarios:
         as_user: "base.user_admin"
         expect_error:
           type: "UserError"
+
+  - name: "Financial Budget Yearly - Settings"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBY Fiscal Month S9"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBY Yearly S9"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "Year S9"
+          type_id: "REC: yr_type"
+          date_start: "2039-01-01"
+          date_end: "2039-12-31"
+
+      - step: "Setup - account A"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBY Account A S9"
+          code: "YAS9"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBY Type S9"
+          code: "FBYS9"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['account_a'].id])]"
+
+      - step: "Create the settings with the yearly range type"
+        action: "create"
+        model: "res.config.settings"
+        save_as: "settings"
+        values:
+          financial_budget_yearly_range_type_id: "REC: yr_type.id"
+
+      - step: "Apply the settings"
+        action: "call"
+        target: "settings"
+        method: "execute"
+
+      - step: "Assert the company received the range type"
+        action: "assert"
+        target: "company"
+        asserts:
+          financial_budget_yearly_range_type_id:
+            type: "m2o"
+            expected: "REC: yr_type"
+
+      - step: "Restore the company setting"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: false

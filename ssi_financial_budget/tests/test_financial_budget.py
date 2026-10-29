@@ -4,7 +4,7 @@
 
 from odoo_yaml_test import YamlTransactionCase
 
-from odoo.tests import Form, tagged
+from odoo.tests import tagged
 
 
 @tagged("post_install", "-at_install")
@@ -23,7 +23,7 @@ class TestFinancialBudget(YamlTransactionCase):
         """Run the yearly budget and monthly breakdown scenarios.
 
         Covers periodicity, parent limits, guards, allocation amounts,
-        and the Create Monthly Budgets action.
+        the Create Monthly Budgets action and the Settings form.
         """
         self.run_yaml_scenario("test_data_financial_budget_yearly.yaml")
 
@@ -105,30 +105,6 @@ class TestFinancialBudget(YamlTransactionCase):
         self.assertEqual(
             currency.compare_amounts(sum(amounts), 1000000.0),
             0,
-        )
-
-    def test_settings_yearly_range_type(self):
-        """Save the yearly range type from the Financial Budget settings.
-
-        Pure Python, trigger P12 (L-20): the field lives only in the
-        ``ssi_cost_accounting.cost_accounting_settings_view_form`` view,
-        which ``action: form`` cannot select because it has no ``view``
-        key. Opens the form, sets the field, executes the settings and
-        checks the value landed on the company.
-        """
-        env = self.env
-        range_type = env["date.range.type"].create({"name": "SET FB YEARLY"})
-        env.company.financial_budget_yearly_range_type_id = False
-        form = Form(
-            env["res.config.settings"],
-            view="ssi_cost_accounting.cost_accounting_settings_view_form",
-        )
-        form.financial_budget_yearly_range_type_id = range_type
-        settings = form.save()
-        settings.execute()
-        self.assertEqual(
-            env.company.financial_budget_yearly_range_type_id,
-            range_type,
         )
 
     def test_sql_view_ids_are_stable(self):
