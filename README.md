@@ -22,7 +22,7 @@ addon | version | maintainers | summary
 [ssi_analytic_budget_documenso_signing](ssi_analytic_budget_documenso_signing/) | 14.0.1.1.1 |  | Analytic Budget - Documenso Signing Integration
 [ssi_analytic_budget_operating_unit](ssi_analytic_budget_operating_unit/) | 14.0.1.0.2 |  | Analytic Budget + Operating Unit
 [ssi_analytic_budget_work_log](ssi_analytic_budget_work_log/) | 14.0.1.1.1 |  | Analytic Budget - Work Log Integration
-[ssi_financial_budget](ssi_financial_budget/) | 14.0.2.0.0 |  | Financial Budget
+[ssi_financial_budget](ssi_financial_budget/) | 14.0.3.0.0 |  | Financial Budget
 [ssi_financial_budget_documenso_signing](ssi_financial_budget_documenso_signing/) | 14.0.1.1.1 |  | Financial Budget - Documenso Signing Integration
 [ssi_financial_budget_operating_unit](ssi_financial_budget_operating_unit/) | 14.0.1.0.2 |  | Financial Budget + Operating Unit
 
