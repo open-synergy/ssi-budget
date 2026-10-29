@@ -83,7 +83,11 @@
                             >
                             <tree>
                                 <field name="company_currency_id" invisible="1" />
-                                <field name="account_id" />
+                                <field name="allowed_account_ids" invisible="1" />
+                                <field
+                                        name="account_id"
+                                        domain="[('id', 'in', allowed_account_ids)]"
+                                    />
                                 <field name="direction" />
                                 <field name="amount" />
                             </tree>
@@ -91,7 +95,11 @@
                                 <group name="detail_form" colspan="4" col="2">
                                     <field name="type_id" invisible="1" />
                                     <field name="company_currency_id" invisible="1" />
-                                    <field name="account_id" />
+                                    <field name="allowed_account_ids" invisible="1" />
+                                    <field
+                                            name="account_id"
+                                            domain="[('id', 'in', allowed_account_ids)]"
+                                        />
                                     <field name="direction" />
                                     <field name="amount" />
                                 </group>
@@ -113,12 +121,20 @@
                         </field>
                     </group>
                     <group name="detail_3" colspan="4" col="2">
-                        <group name="detail_3_1" colspan="1" col="2">
+                        <group name="detail_3_revenue" colspan="1" col="2">
+                            <field name="amount_planned_revenue" />
+                            <field name="amount_realized_revenue" />
+                            <field name="amount_diff_revenue" />
+                        </group>
+                        <group name="detail_3_cost" colspan="1" col="2">
+                            <field name="amount_planned_cost" />
+                            <field name="amount_realized_cost" />
+                            <field name="amount_diff_cost" />
+                        </group>
+                        <group name="detail_3_net" colspan="1" col="2">
                             <field name="amount_planned" />
                             <field name="amount_realized" />
                             <field name="amount_diff" />
-                        </group>
-                        <group name="detail_3_1" colspan="1" col="2">
                         </group>
                     </group>
                 </page>
@@ -182,6 +198,7 @@
                             <tree>
                                 <field name="currency_id" invisible="1" />
                                 <field name="account_id" />
+                                <field name="direction" />
                                 <field name="amount_planned" />
                                 <field name="amount_realized" />
                                 <field name="amount_diff" />

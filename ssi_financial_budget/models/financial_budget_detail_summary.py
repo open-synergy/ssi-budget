@@ -31,13 +31,14 @@ class FinancialBudgetDetailSummary(models.Model):
     def _select(self):
         """Return the ``SELECT`` clause of the report view.
 
-        Selects the budget, the account, and the summed line amount.
+        Selects the budget, the account, and the summed line amount. The
+        record id is derived from the budget and account pair.
 
         :return: SQL ``SELECT`` fragment
         """
         select_str = """
         SELECT
-            row_number() OVER() as id,
+            (a.budget_id::bigint * 10000000000 + a.account_id::bigint) AS id,
             a.budget_id AS budget_id,
             a.account_id AS account_id,
             SUM(a.amount) AS amount

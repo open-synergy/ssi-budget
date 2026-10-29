@@ -188,7 +188,7 @@ scenarios:
             type: "value"
             expected: "reject"
 
-  - name: "Financial Budget - Planned amount sums detail amounts"
+  - name: "Financial Budget - Planned amount is net of the detail amounts"
     steps:
       - step: "Setup - create date range type"
         action: "create"
@@ -234,6 +234,13 @@ scenarios:
           code: "TBBAMT"
           user_type_id: "REF: account.data_account_type_expenses"
 
+      - step: "Setup - allow accounts A and B on the budget type"
+        action: "write"
+        target: "budget_type"
+        values:
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_a'].id, registry['account_b'].id])]"
+
       - step: "Create financial budget"
         action: "create"
         model: "financial_budget.budget"
@@ -263,13 +270,13 @@ scenarios:
           direction: "cost"
           amount: 250000
 
-      - step: "Assert planned amount is the sum of the lines"
+      - step: "Assert planned amount is net revenue minus cost"
         action: "assert"
         target: "budget"
         asserts:
           amount_planned:
             type: "value"
-            expected: 1250000.0
+            expected: 750000.0
 
       - step: "Search summary line of account A"
         action: "search"
@@ -351,6 +358,13 @@ scenarios:
           code: "TBBEDT"
           user_type_id: "REF: account.data_account_type_expenses"
 
+      - step: "Setup - allow accounts A and B on the budget type"
+        action: "write"
+        target: "budget_type"
+        values:
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_a'].id, registry['account_b'].id])]"
+
       - step: "Create financial budget"
         action: "create"
         model: "financial_budget.budget"
@@ -392,7 +406,7 @@ scenarios:
         asserts:
           amount_planned:
             type: "value"
-            expected: 1750000.0
+            expected: 1250000.0
 
   - name: "Financial Budget - Detail line requires an account"
     steps:
@@ -440,6 +454,13 @@ scenarios:
           code: "TBBNEG"
           user_type_id: "REF: account.data_account_type_expenses"
 
+      - step: "Setup - allow accounts A and B on the budget type"
+        action: "write"
+        target: "budget_type"
+        values:
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_a'].id, registry['account_b'].id])]"
+
       - step: "Create financial budget"
         action: "create"
         model: "financial_budget.budget"
@@ -457,5 +478,962 @@ scenarios:
           message_contains: "is a required field"
         values:
           budget_id: "REC: budget"
+          direction: "revenue"
+          amount: 100.0
+
+  - name: "Financial Budget - Realization by direction"
+    steps:
+      - step: "Setup - create date range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "date_range_type"
+        values:
+          name: "Test Fiscal Month Type FB RLZ"
+          fiscal_month: true
+
+      - step: "Setup - create date range period"
+        action: "create"
+        model: "date.range"
+        save_as: "period"
+        values:
+          name: "Test Period FB RLZ"
+          type_id: "REC: date_range_type"
+          date_start: "2024-08-01"
+          date_end: "2024-08-28"
+
+      - step: "Setup - create revenue account R"
+        action: "create"
+        model: "account.account"
+        save_as: "account_r"
+        values:
+          name: "Test Budget Account R RLZ"
+          code: "TBRRLZ"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - create cost account C"
+        action: "create"
+        model: "account.account"
+        save_as: "account_c"
+        values:
+          name: "Test Budget Account C RLZ"
+          code: "TBCRLZ"
+          user_type_id: "REF: account.data_account_type_expenses"
+
+      - step: "Setup - create balancing account"
+        action: "create"
+        model: "account.account"
+        save_as: "account_bal"
+        values:
+          name: "Test Budget Account BAL RLZ"
+          code: "TBBRLZ"
+          user_type_id: "REF: account.data_account_type_current_assets"
+
+      - step: "Setup - create general journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Budget Journal RLZ"
+          code: "JRLZ"
+          type: "general"
+
+      - step: "Setup - create financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Financial Budget Type RLZ"
+          code: "TFBRLZ"
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_r'].id, registry['account_c'].id])]"
+
+      - step: "Setup - create financial budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type"
+          period_id: "REC: period"
+
+      - step: "Create detail line r"
+        action: "create"
+        model: "financial_budget.detail"
+        save_as: "detail_r"
+        values:
+          budget_id: "REC: budget.id"
+          account_id: "REC: account_r.id"
+          direction: "revenue"
+          amount: 1000000
+
+      - step: "Create detail line c"
+        action: "create"
+        model: "financial_budget.detail"
+        save_as: "detail_c"
+        values:
+          budget_id: "REC: budget.id"
+          account_id: "REC: account_c.id"
+          direction: "cost"
+          amount: 400000
+
+      - step: "Create journal entry r"
+        action: "create"
+        model: "account.move"
+        save_as: "move_r"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2024-08-15"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_r'].id",
+                  debit: 0.0,
+                  credit: 600000.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 600000.0,
+                  credit: 0.0,
+                },
+              ]
+
+      - step: "Post journal entry r"
+        action: "call"
+        target: "move_r"
+        method: "action_post"
+
+      - step: "Create journal entry c"
+        action: "create"
+        model: "account.move"
+        save_as: "move_c"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2024-08-16"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_c'].id",
+                  debit: 150000.0,
+                  credit: 0.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 0.0,
+                  credit: 150000.0,
+                },
+              ]
+
+      - step: "Post journal entry c"
+        action: "call"
+        target: "move_c"
+        method: "action_post"
+
+      - step: "Assert header totals by direction"
+        action: "assert"
+        target: "budget"
+        asserts:
+          amount_planned_revenue:
+            type: "value"
+            expected: 1000000.0
+          amount_realized_revenue:
+            type: "value"
+            expected: 600000.0
+          amount_diff_revenue:
+            type: "value"
+            expected: 400000.0
+          amount_planned_cost:
+            type: "value"
+            expected: 400000.0
+          amount_realized_cost:
+            type: "value"
+            expected: 150000.0
+          amount_diff_cost:
+            type: "value"
+            expected: 250000.0
+          amount_planned:
+            type: "value"
+            expected: 600000.0
+          amount_realized:
+            type: "value"
+            expected: 450000.0
+          amount_diff:
+            type: "value"
+            expected: 150000.0
+
+      - step: "Search summary line of revenue account"
+        action: "search"
+        model: "financial_budget.summary"
+        domain:
+          - ["budget_id", "=", "REC: budget.id"]
+          - ["account_id", "=", "REC: account_r.id"]
+        save_as: "summary_r"
+        expect_count: 1
+
+      - step: "Assert summary line of revenue account"
+        action: "assert"
+        target: "summary_r"
+        asserts:
+          direction:
+            type: "value"
+            expected: "revenue"
+          amount_planned:
+            type: "value"
+            expected: 1000000.0
+          amount_realized:
+            type: "value"
+            expected: 600000.0
+
+      - step: "Search summary line of cost account"
+        action: "search"
+        model: "financial_budget.summary"
+        domain:
+          - ["budget_id", "=", "REC: budget.id"]
+          - ["account_id", "=", "REC: account_c.id"]
+        save_as: "summary_c"
+        expect_count: 1
+
+      - step: "Assert summary line of cost account"
+        action: "assert"
+        target: "summary_c"
+        asserts:
+          direction:
+            type: "value"
+            expected: "cost"
+          amount_planned:
+            type: "value"
+            expected: 400000.0
+          amount_realized:
+            type: "value"
+            expected: 150000.0
+
+  - name: "Financial Budget - Direction falls back to account group"
+    steps:
+      - step: "Setup - create date range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "date_range_type"
+        values:
+          name: "Test Fiscal Month Type FB FBK"
+          fiscal_month: true
+
+      - step: "Setup - create date range period"
+        action: "create"
+        model: "date.range"
+        save_as: "period"
+        values:
+          name: "Test Period FB FBK"
+          type_id: "REC: date_range_type"
+          date_start: "2024-09-01"
+          date_end: "2024-09-28"
+
+      - step: "Setup - create revenue account R"
+        action: "create"
+        model: "account.account"
+        save_as: "account_r"
+        values:
+          name: "Test Budget Account R FBK"
+          code: "TBRFBK"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - create cost account C"
+        action: "create"
+        model: "account.account"
+        save_as: "account_c"
+        values:
+          name: "Test Budget Account C FBK"
+          code: "TBCFBK"
+          user_type_id: "REF: account.data_account_type_expenses"
+
+      - step: "Setup - create balancing account"
+        action: "create"
+        model: "account.account"
+        save_as: "account_bal"
+        values:
+          name: "Test Budget Account BAL FBK"
+          code: "TBBFBK"
+          user_type_id: "REF: account.data_account_type_current_assets"
+
+      - step: "Setup - create general journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Budget Journal FBK"
+          code: "JFBK"
+          type: "general"
+
+      - step: "Setup - create financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Financial Budget Type FBK"
+          code: "TFBFBK"
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_r'].id, registry['account_c'].id])]"
+
+      - step: "Setup - create financial budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type"
+          period_id: "REC: period"
+
+      - step: "Create journal entry r"
+        action: "create"
+        model: "account.move"
+        save_as: "move_r"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2024-09-10"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_r'].id",
+                  debit: 0.0,
+                  credit: 300000.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 300000.0,
+                  credit: 0.0,
+                },
+              ]
+
+      - step: "Post journal entry r"
+        action: "call"
+        target: "move_r"
+        method: "action_post"
+
+      - step: "Create journal entry c"
+        action: "create"
+        model: "account.move"
+        save_as: "move_c"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2024-09-11"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_c'].id",
+                  debit: 80000.0,
+                  credit: 0.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 0.0,
+                  credit: 80000.0,
+                },
+              ]
+
+      - step: "Post journal entry c"
+        action: "call"
+        target: "move_c"
+        method: "action_post"
+
+      - step: "Search move line of the income account"
+        action: "search"
+        model: "financial_budget.move_line"
+        domain:
+          - ["budget_id", "=", "REC: budget.id"]
+          - ["account_id", "=", "REC: account_r.id"]
+        save_as: "line_r"
+        expect_count: 1
+
+      - step: "Assert income account is revenue with positive amount"
+        action: "assert"
+        target: "line_r"
+        asserts:
+          direction:
+            type: "value"
+            expected: "revenue"
+          amount:
+            type: "value"
+            expected: 300000.0
+
+      - step: "Search move line of the expense account"
+        action: "search"
+        model: "financial_budget.move_line"
+        domain:
+          - ["budget_id", "=", "REC: budget.id"]
+          - ["account_id", "=", "REC: account_c.id"]
+        save_as: "line_c"
+        expect_count: 1
+
+      - step: "Assert expense account is cost with positive amount"
+        action: "assert"
+        target: "line_c"
+        asserts:
+          direction:
+            type: "value"
+            expected: "cost"
+          amount:
+            type: "value"
+            expected: 80000.0
+
+  - name: "Financial Budget - Out of scope journal items are ignored"
+    steps:
+      - step: "Setup - create date range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "date_range_type"
+        values:
+          name: "Test Fiscal Month Type FB NOT"
+          fiscal_month: true
+
+      - step: "Setup - create date range period"
+        action: "create"
+        model: "date.range"
+        save_as: "period"
+        values:
+          name: "Test Period FB NOT"
+          type_id: "REC: date_range_type"
+          date_start: "2024-10-01"
+          date_end: "2024-10-28"
+
+      - step: "Setup - create revenue account R"
+        action: "create"
+        model: "account.account"
+        save_as: "account_r"
+        values:
+          name: "Test Budget Account R NOT"
+          code: "TBRNOT"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - create cost account C"
+        action: "create"
+        model: "account.account"
+        save_as: "account_c"
+        values:
+          name: "Test Budget Account C NOT"
+          code: "TBCNOT"
+          user_type_id: "REF: account.data_account_type_expenses"
+
+      - step: "Setup - create balancing account"
+        action: "create"
+        model: "account.account"
+        save_as: "account_bal"
+        values:
+          name: "Test Budget Account BAL NOT"
+          code: "TBBNOT"
+          user_type_id: "REF: account.data_account_type_current_assets"
+
+      - step: "Setup - create general journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Budget Journal NOT"
+          code: "JNOT"
+          type: "general"
+
+      - step: "Setup - create second company"
+        action: "create"
+        model: "res.company"
+        save_as: "company2"
+        values:
+          name: "Test Budget Company 2 NOT"
+
+      - step: "Setup - create revenue account of second company"
+        action: "create"
+        model: "account.account"
+        save_as: "account_r2"
+        values:
+          name: "Test Budget Account R2 NOT"
+          code: "TBR2NOT"
+          company_id: "REC: company2.id"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - create balancing account of second company"
+        action: "create"
+        model: "account.account"
+        save_as: "account_bal2"
+        values:
+          name: "Test Budget Account BAL2 NOT"
+          code: "TBB2NOT"
+          company_id: "REC: company2.id"
+          user_type_id: "REF: account.data_account_type_current_assets"
+
+      - step: "Setup - create journal of second company"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal2"
+        values:
+          name: "Test Budget Journal 2 NOT"
+          code: "K2NOT"
+          type: "general"
+          company_id: "REC: company2.id"
+
+      - step: "Setup - create financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Financial Budget Type NOT"
+          code: "TFBNOT"
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_r'].id, registry['account_c'].id,
+            registry['account_r2'].id])]"
+
+      - step: "Setup - create financial budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type"
+          period_id: "REC: period"
+
+      - step: "Create journal entry in"
+        action: "create"
+        model: "account.move"
+        save_as: "move_in"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2024-10-15"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_r'].id",
+                  debit: 0.0,
+                  credit: 100000.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 100000.0,
+                  credit: 0.0,
+                },
+              ]
+
+      - step: "Post journal entry in"
+        action: "call"
+        target: "move_in"
+        method: "action_post"
+
+      - step: "Create journal entry early"
+        action: "create"
+        model: "account.move"
+        save_as: "move_early"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2024-09-30"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_r'].id",
+                  debit: 0.0,
+                  credit: 7000.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 7000.0,
+                  credit: 0.0,
+                },
+              ]
+
+      - step: "Post journal entry early"
+        action: "call"
+        target: "move_early"
+        method: "action_post"
+
+      - step: "Create journal entry late"
+        action: "create"
+        model: "account.move"
+        save_as: "move_late"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2024-10-29"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_r'].id",
+                  debit: 0.0,
+                  credit: 9000.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 9000.0,
+                  credit: 0.0,
+                },
+              ]
+
+      - step: "Post journal entry late"
+        action: "call"
+        target: "move_late"
+        method: "action_post"
+
+      - step: "Create journal entry draft"
+        action: "create"
+        model: "account.move"
+        save_as: "move_draft"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2024-10-20"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_r'].id",
+                  debit: 0.0,
+                  credit: 11000.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 11000.0,
+                  credit: 0.0,
+                },
+              ]
+
+      - step: "Create journal entry other"
+        action: "create"
+        model: "account.move"
+        save_as: "move_other"
+        values:
+          journal_id: "REC: journal2.id"
+          date: "2024-10-20"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_r2'].id",
+                  debit: 0.0,
+                  credit: 13000.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal2'].id",
+                  debit: 13000.0,
+                  credit: 0.0,
+                },
+              ]
+
+      - step: "Post journal entry other"
+        action: "call"
+        target: "move_other"
+        method: "action_post"
+
+      - step: "Assert only the in-scope posted entry counts"
+        action: "assert"
+        target: "budget"
+        asserts:
+          amount_realized_revenue:
+            type: "value"
+            expected: 100000.0
+          amount_realized:
+            type: "value"
+            expected: 100000.0
+
+  - name: "Financial Budget - Realization follows post and draft"
+    steps:
+      - step: "Setup - create date range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "date_range_type"
+        values:
+          name: "Test Fiscal Month Type FB PST"
+          fiscal_month: true
+
+      - step: "Setup - create date range period"
+        action: "create"
+        model: "date.range"
+        save_as: "period"
+        values:
+          name: "Test Period FB PST"
+          type_id: "REC: date_range_type"
+          date_start: "2024-11-01"
+          date_end: "2024-11-28"
+
+      - step: "Setup - create revenue account R"
+        action: "create"
+        model: "account.account"
+        save_as: "account_r"
+        values:
+          name: "Test Budget Account R PST"
+          code: "TBRPST"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - create cost account C"
+        action: "create"
+        model: "account.account"
+        save_as: "account_c"
+        values:
+          name: "Test Budget Account C PST"
+          code: "TBCPST"
+          user_type_id: "REF: account.data_account_type_expenses"
+
+      - step: "Setup - create balancing account"
+        action: "create"
+        model: "account.account"
+        save_as: "account_bal"
+        values:
+          name: "Test Budget Account BAL PST"
+          code: "TBBPST"
+          user_type_id: "REF: account.data_account_type_current_assets"
+
+      - step: "Setup - create general journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Budget Journal PST"
+          code: "JPST"
+          type: "general"
+
+      - step: "Setup - create financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Financial Budget Type PST"
+          code: "TFBPST"
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['account_r'].id, registry['account_c'].id])]"
+
+      - step: "Setup - create financial budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type"
+          period_id: "REC: period"
+
+      - step: "Create journal entry r"
+        action: "create"
+        model: "account.move"
+        save_as: "move_r"
+        values:
+          journal_id: "REC: journal.id"
+          date: "2024-11-15"
+          line_ids:
+            - [
+                0,
+                0,
+                {
+                  name: "Budget line",
+                  account_id: "EVAL: registry['account_r'].id",
+                  debit: 0.0,
+                  credit: 600000.0,
+                },
+              ]
+            - [
+                0,
+                0,
+                {
+                  name: "Balancing line",
+                  account_id: "EVAL: registry['account_bal'].id",
+                  debit: 600000.0,
+                  credit: 0.0,
+                },
+              ]
+
+      - step: "Assert nothing realized while the entry is draft"
+        action: "assert"
+        target: "budget"
+        asserts:
+          amount_realized:
+            type: "value"
+            expected: 0.0
+
+      - step: "Post the journal entry"
+        action: "call"
+        target: "move_r"
+        method: "action_post"
+
+      - step: "Assert realization rose after posting"
+        action: "assert"
+        target: "budget"
+        asserts:
+          amount_realized:
+            type: "value"
+            expected: 600000.0
+
+      - step: "Set the journal entry back to draft"
+        action: "call"
+        target: "move_r"
+        method: "button_draft"
+
+      - step: "Assert realization is back to the previous value"
+        action: "assert"
+        target: "budget"
+        asserts:
+          amount_realized:
+            type: "value"
+            expected: 0.0
+
+  - name: "Financial Budget - Detail account must be allowed and unique"
+    steps:
+      - step: "Setup - create date range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "date_range_type"
+        values:
+          name: "Test Fiscal Month Type FB DUP"
+          fiscal_month: true
+
+      - step: "Setup - create date range period"
+        action: "create"
+        model: "date.range"
+        save_as: "period"
+        values:
+          name: "Test Period FB DUP"
+          type_id: "REC: date_range_type"
+          date_start: "2024-12-01"
+          date_end: "2024-12-28"
+
+      - step: "Setup - create revenue account R"
+        action: "create"
+        model: "account.account"
+        save_as: "account_r"
+        values:
+          name: "Test Budget Account R DUP"
+          code: "TBRDUP"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - create cost account C"
+        action: "create"
+        model: "account.account"
+        save_as: "account_c"
+        values:
+          name: "Test Budget Account C DUP"
+          code: "TBCDUP"
+          user_type_id: "REF: account.data_account_type_expenses"
+
+      - step: "Setup - create balancing account"
+        action: "create"
+        model: "account.account"
+        save_as: "account_bal"
+        values:
+          name: "Test Budget Account BAL DUP"
+          code: "TBBDUP"
+          user_type_id: "REF: account.data_account_type_current_assets"
+
+      - step: "Setup - create general journal"
+        action: "create"
+        model: "account.journal"
+        save_as: "journal"
+        values:
+          name: "Test Budget Journal DUP"
+          code: "JDUP"
+          type: "general"
+
+      - step: "Setup - create financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "Test Financial Budget Type DUP"
+          code: "TFBDUP"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['account_r'].id])]"
+
+      - step: "Setup - create financial budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "budget"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type"
+          period_id: "REC: period"
+
+      - step: "Create detail line with an account outside the type"
+        action: "create"
+        model: "financial_budget.detail"
+        expect_error:
+          type: "ValidationError"
+        values:
+          budget_id: "REC: budget.id"
+          account_id: "REC: account_c.id"
+          direction: "cost"
+          amount: 100.0
+
+      - step: "Create detail line ok"
+        action: "create"
+        model: "financial_budget.detail"
+        save_as: "detail_ok"
+        values:
+          budget_id: "REC: budget.id"
+          account_id: "REC: account_r.id"
+          direction: "revenue"
+          amount: 500.0
+
+      - step: "Create second detail line with the same account"
+        action: "create"
+        model: "financial_budget.detail"
+        expect_error:
+          type: "ValidationError"
+        values:
+          budget_id: "REC: budget.id"
+          account_id: "REC: account_r.id"
           direction: "revenue"
           amount: 100.0

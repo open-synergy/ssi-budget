@@ -37,6 +37,13 @@ class FinancialBudgetMoveLine(models.Model):
         string="Journal",
         comodel_name="account.journal",
     )
+    direction = fields.Selection(
+        string="Direction",
+        selection=[
+            ("revenue", "Revenue"),
+            ("cost", "Cost"),
+        ],
+    )
     amount = fields.Float(
         string="Amount",
     )
@@ -44,27 +51,45 @@ class FinancialBudgetMoveLine(models.Model):
     def _select(self):
         """Build the SELECT clause of the view.
 
-        Computes the budget amount per journal item: debit minus credit for
-        asset and expense accounts, credit minus debit otherwise.
+        The effective direction is the direction of the budget detail of
+        the same account, or revenue for income accounts and cost for the
+        others when the account has no detail. The amount is credit minus
+        debit for revenue and debit minus credit for cost. The id is
+        derived from the budget and the journal item, so it is stable.
 
         :return: SQL SELECT fragment
         :rtype: str
         """
         select_str = """
         SELECT
-            row_number() OVER() as id,
+            (a.id::bigint * 10000000000 + e.id::bigint) AS id,
             a.id AS budget_id,
             e.account_id AS account_id,
             e.move_id AS move_id,
             a.period_id AS period_id,
             e.journal_id AS journal_id,
+            COALESCE(
+                dd.direction,
+                CASE
+                    WHEN g.internal_group = 'income'
+                    THEN 'revenue'
+                    ELSE 'cost'
+                END
+            ) AS direction,
             CASE
                 WHEN
-                    g.internal_group = 'asset' OR g.internal_group = 'expense'
+                    COALESCE(
+                        dd.direction,
+                        CASE
+                            WHEN g.internal_group = 'income'
+                            THEN 'revenue'
+                            ELSE 'cost'
+                        END
+                    ) = 'revenue'
                 THEN
-                    (e.debit - e.credit)
-                ELSE
                     (e.credit - e.debit)
+                ELSE
+                    (e.debit - e.credit)
             END AS amount
         """
         return select_str
@@ -100,7 +125,9 @@ class FinancialBudgetMoveLine(models.Model):
         """Build the JOIN clauses of the view.
 
         Links each budget to its type, the accounts mapped to that type,
-        its period, and the journal items dated within that period.
+        its period, and the journal items of the budget company dated
+        within that period. Budget details are joined aggregated per
+        budget and account so that a journal item is never duplicated.
 
         :return: SQL JOIN fragment
         :rtype: str
@@ -109,12 +136,18 @@ class FinancialBudgetMoveLine(models.Model):
         JOIN financial_budget_type AS b ON a.type_id = b.id
         JOIN rel_financial_budget_type_2_account AS c ON b.id = c.type_id
         JOIN date_range AS d ON a.period_id = d.id
-        JOIN account_move_line AS e ON  d.date_start >= e.date AND
-                                        d.date_end <= e.date AND
+        JOIN account_move_line AS e ON  e.date >= d.date_start AND
+                                        e.date <= d.date_end AND
+                                        e.company_id = a.company_id AND
                                         c.account_id = e.account_id
         JOIN account_move AS f ON e.move_id = f.id
         JOIN account_account AS g ON e.account_id = g.id
         JOIN account_account_type AS h ON g.user_type_id = h.id
+        LEFT JOIN (
+            SELECT budget_id, account_id, MIN(direction) AS direction
+            FROM financial_budget_detail
+            GROUP BY budget_id, account_id
+        ) AS dd ON dd.budget_id = a.id AND dd.account_id = e.account_id
         """
         return join_str
 

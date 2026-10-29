@@ -28,6 +28,13 @@ class FinancialBudgetSummary(models.Model):
         string="Account",
         comodel_name="account.account",
     )
+    direction = fields.Selection(
+        string="Direction",
+        selection=[
+            ("revenue", "Revenue"),
+            ("cost", "Cost"),
+        ],
+    )
     amount_planned = fields.Monetary(
         string="Planned Amount",
         currency_field="currency_id",
@@ -45,7 +52,10 @@ class FinancialBudgetSummary(models.Model):
         """Build the SELECT clause of the report view.
 
         Planned and realized amounts default to zero when the account
-        has no matching detail or move line summary.
+        has no matching detail or move line summary. The direction is the
+        direction of the budget detail of the account, or revenue for
+        income accounts and cost for the others when there is no detail.
+        The realized amount is signed by that direction.
 
         :return: SQL SELECT fragment
         :rtype: str
@@ -56,6 +66,14 @@ class FinancialBudgetSummary(models.Model):
             a.budget_id AS budget_id,
             a.account_id AS account_id,
             d.company_currency_id AS currency_id,
+            COALESCE(
+                dd.direction,
+                CASE
+                    WHEN g.internal_group = 'income'
+                    THEN 'revenue'
+                    ELSE 'cost'
+                END
+            ) AS direction,
             CASE
                 WHEN
                     b.amount IS NOT NULL
@@ -109,7 +127,8 @@ class FinancialBudgetSummary(models.Model):
         """Build the JOIN clauses for amounts and budget currency.
 
         Planned and realized summaries are joined by budget and account,
-        and the budget provides the company currency.
+        the budget provides the company currency and the account its
+        group, used to derive the direction when there is no detail.
 
         :return: SQL JOIN fragment
         :rtype: str
@@ -121,6 +140,12 @@ class FinancialBudgetSummary(models.Model):
             a.budget_id = c.budget_id AND
             a.account_id = c.account_id
         JOIN financial_budget_budget AS d ON a.budget_id = d.id
+        JOIN account_account AS g ON a.account_id = g.id
+        LEFT JOIN (
+            SELECT budget_id, account_id, MIN(direction) AS direction
+            FROM financial_budget_detail
+            GROUP BY budget_id, account_id
+        ) AS dd ON dd.budget_id = a.budget_id AND dd.account_id = a.account_id
         """
         return join_str
 
