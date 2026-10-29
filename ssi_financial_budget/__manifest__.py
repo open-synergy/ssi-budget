@@ -17,7 +17,6 @@
         "ssi_financial_accounting",
         "ssi_cost_accounting",
         "ssi_master_data_mixin",
-        "ssi_product_line_price_mixin",
         "ssi_transaction_confirm_mixin",
         "ssi_transaction_open_mixin",
         "ssi_transaction_done_mixin",

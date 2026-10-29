@@ -8,7 +8,7 @@ from odoo import fields, models, tools
 class FinancialBudgetDetailSummary(models.Model):
     """Report the budget amount grouped by budget and account.
 
-    SQL view model (``_auto = False``) that sums the subtotal of the
+    SQL view model (``_auto = False``) that sums the amount of the
     ``financial_budget.detail`` lines per budget and per account.
     """
 
@@ -31,7 +31,7 @@ class FinancialBudgetDetailSummary(models.Model):
     def _select(self):
         """Return the ``SELECT`` clause of the report view.
 
-        Selects the budget, the account, and the summed line subtotal.
+        Selects the budget, the account, and the summed line amount.
 
         :return: SQL ``SELECT`` fragment
         """
@@ -40,7 +40,7 @@ class FinancialBudgetDetailSummary(models.Model):
             row_number() OVER() as id,
             a.budget_id AS budget_id,
             a.account_id AS account_id,
-            SUM(a.price_subtotal) AS amount
+            SUM(a.amount) AS amount
         """
         return select_str
 
