@@ -19,6 +19,16 @@ minus debit for revenue, debit minus credit for cost. An account
 without a detail line is revenue when it is an income account and cost
 otherwise.
 
+A budget is either *Yearly* or *Monthly*. A monthly budget uses a fiscal
+month period. A yearly budget uses a period of the *Yearly Range Type*
+configured per company in the Financial Budget settings. A yearly budget
+can be broken down into monthly budgets, set as the *Parent Budget* of
+each monthly budget. For each account and direction, the monthly budgets
+that are not cancelled or rejected cannot exceed the amount of the
+parent budget. The *Create Monthly Budgets* button of an open yearly
+budget creates one draft monthly budget per fiscal month and divides
+the amounts equally.
+
 The budget header shows the planned, realized and difference amounts of
 revenue and cost separately. The plain *Planned Amount*, *Realized
 Amount* and *Diff Amount* are net: revenue minus cost.
@@ -54,6 +64,7 @@ Work Instruction
 * `Terminate Financial Budget <docs/financial_budget_budget/11-terminate.html>`_
 * `Restart Financial Budget <docs/financial_budget_budget/12-restart.html>`_
 * `Restart Approval Process of Financial Budget <docs/financial_budget_budget/14-restart-approval.html>`_
+* `Create Monthly Budgets of Financial Budget <docs/financial_budget_budget/15-create-monthly-budgets.html>`_
 
 Credits
 =======

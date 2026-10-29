@@ -11,6 +11,9 @@
 
 - **Record:** Status is **Draft**, **Waiting for Approval**, **In Progress**, or
   **Done**.
+- **Record:** For a yearly budget, none of its monthly budgets is in status **Draft**,
+  **Waiting for Approval**, **In Progress**, **Done**, or **Terminated**. Cancelled and
+  rejected monthly budgets do not count.
 - **Config:** An active `policy.template` for this model grants `cancel_ok` for that
   state to the actor's group.
 - **Data:** At least one cancellation reason is available for this model.

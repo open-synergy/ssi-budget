@@ -3,7 +3,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError, ValidationError
 
 from odoo.addons.ssi_decorator import ssi_decorator
 
@@ -90,19 +91,61 @@ class FinancialBudgetBudget(models.Model):
             ],
         },
     )
-    period_id = fields.Many2one(
-        string="Period",
-        comodel_name="date.range",
-        required=True,
-        readonly=True,
-        domain=[
-            ("type_id.fiscal_month", "=", True),
+    periodicity = fields.Selection(
+        string="Periodicity",
+        selection=[
+            ("yearly", "Yearly"),
+            ("monthly", "Monthly"),
         ],
+        required=True,
+        default="monthly",
+        readonly=True,
         states={
             "draft": [
                 ("readonly", False),
             ],
         },
+        help="Yearly budgets use the yearly range type configured on the "
+        "company. Monthly budgets use fiscal month periods and can be "
+        "limited by a yearly parent budget.",
+    )
+    period_id = fields.Many2one(
+        string="Period",
+        comodel_name="date.range",
+        required=True,
+        readonly=True,
+        states={
+            "draft": [
+                ("readonly", False),
+            ],
+        },
+    )
+    allowed_period_ids = fields.Many2many(
+        string="Allowed Periods",
+        comodel_name="date.range",
+        compute="_compute_allowed_period_ids",
+        compute_sudo=True,
+        store=False,
+        help="Periods that match the periodicity of the budget.",
+    )
+    parent_id = fields.Many2one(
+        string="Parent Budget",
+        comodel_name="financial_budget.budget",
+        ondelete="restrict",
+        readonly=True,
+        states={
+            "draft": [
+                ("readonly", False),
+            ],
+        },
+        help="Yearly budget that limits the amount of this monthly budget "
+        "per account.",
+    )
+    child_ids = fields.One2many(
+        string="Monthly Budgets",
+        comodel_name="financial_budget.budget",
+        inverse_name="parent_id",
+        readonly=True,
     )
     date_start = fields.Date(
         string="Date Start",
@@ -294,6 +337,310 @@ class FinancialBudgetBudget(models.Model):
             ("terminate", "Terminate"),
         ],
     )
+
+    @api.depends(
+        "periodicity",
+        "company_id",
+        "company_id.financial_budget_yearly_range_type_id",
+    )
+    def _compute_allowed_period_ids(self):
+        """Compute the periods that match the periodicity of the budget.
+
+        Used to restrict the ``period_id`` selection on the form view.
+        """
+        for record in self:
+            record.allowed_period_ids = self.env["date.range"].search(
+                record._get_period_domain()
+            )
+
+    def _get_period_domain(self):
+        """Build the domain of the periods allowed for the budget.
+
+        Monthly budgets accept fiscal month periods. Yearly budgets
+        accept the periods of the yearly range type of the company,
+        and none when the company has not configured one.
+
+        :return: domain on ``date.range``
+        :rtype: list
+        """
+        self.ensure_one()
+        if self.periodicity == "yearly":
+            range_type = self.company_id.financial_budget_yearly_range_type_id
+            if not range_type:
+                return [("id", "=", False)]
+            return [("type_id", "=", range_type.id)]
+        return [("type_id.fiscal_month", "=", True)]
+
+    @api.model
+    def _get_allocation_child_states(self):
+        """Return the states of monthly budgets counted in an allocation.
+
+        Public extension point: glue modules may extend the result.
+
+        :return: states of child budgets counted against the parent
+        :rtype: list
+        """
+        return ["draft", "confirm", "open", "done", "terminate"]
+
+    @api.onchange("periodicity")
+    def onchange_period_id(self):
+        """Clear the period when the periodicity changes."""
+        self.period_id = False
+
+    @api.onchange("periodicity")
+    def onchange_parent_id(self):
+        """Clear the parent when the periodicity changes."""
+        self.parent_id = False
+
+    @api.constrains("periodicity", "period_id", "company_id")
+    def _check_period_periodicity(self):
+        """Validate that the period matches the periodicity.
+
+        :raises ValidationError: if the period does not match the rule
+            of the periodicity, including a yearly budget while the
+            company has no yearly range type configured
+        """
+        for record in self.filtered(lambda r: r.period_id):
+            domain = record._get_period_domain() + [
+                ("id", "=", record.period_id.id),
+            ]
+            if not self.env["date.range"].sudo().search_count(domain):
+                error_message = (
+                    _(
+                        """
+Context: Save financial budget
+Database ID: %s
+Problem: Period does not match the periodicity of the budget
+Solution: Choose a fiscal month period for a monthly budget, or a period \
+of the company yearly range type for a yearly budget
+"""
+                    )
+                    % (record.id)
+                )
+                raise ValidationError(error_message)
+
+    @api.constrains("parent_id", "periodicity", "type_id", "company_id", "period_id")
+    def _check_parent_consistency(self):
+        """Validate the link between a monthly budget and its parent.
+
+        The parent must be yearly with the same type and company, and
+        the period of the monthly budget must lie inside the period of
+        the parent. Then the amounts of the details must respect the
+        allocation limit of the parent.
+
+        :raises ValidationError: if the parent is not consistent
+        """
+        for record in self:
+            if record.periodicity == "yearly" and record.parent_id:
+                record._raise_parent_error("A yearly budget cannot have a parent")
+            if not record.parent_id:
+                continue
+            parent = record.parent_id
+            if parent.periodicity != "yearly":
+                record._raise_parent_error("The parent budget must be yearly")
+            if parent.type_id != record.type_id:
+                record._raise_parent_error("The parent has a different type")
+            if parent.company_id != record.company_id:
+                record._raise_parent_error("The parent has a different company")
+            if (
+                not record.period_id
+                or record.date_start < parent.date_start
+                or record.date_end > parent.date_end
+            ):
+                record._raise_parent_error("The period is outside the parent period")
+            for detail in record.detail_ids:
+                detail._check_parent_detail()
+                if record.state in self._get_allocation_child_states():
+                    detail._check_parent_allocation()
+
+    def _raise_parent_error(self, problem):
+        """Raise the structured error of an invalid parent link.
+
+        :param problem: description of the problem
+        :raises ValidationError: always
+        """
+        self.ensure_one()
+        error_message = (
+            _(
+                """
+Context: Save financial budget
+Database ID: %s
+Problem: %s
+Solution: Choose an open yearly budget of the same type and company \
+whose period contains the period of this budget
+"""
+            )
+            % (self.id, problem)
+        )
+        raise ValidationError(error_message)
+
+    def _get_counted_children(self):
+        """Return the child budgets counted in the allocation.
+
+        :return: child budgets whose state is an allocation state
+        :rtype: recordset
+        """
+        self.ensure_one()
+        states = self._get_allocation_child_states()
+        return self.sudo().child_ids.filtered(lambda r: r.state in states)
+
+    def _check_no_counted_children(self, context):
+        """Reject the action while counted monthly budgets exist.
+
+        :param context: name of the action, used in the message
+        :raises ValidationError: if a counted child budget exists
+        """
+        self.ensure_one()
+        if self.periodicity == "yearly" and self._get_counted_children():
+            error_message = (
+                _(
+                    """
+Context: %s financial budget
+Database ID: %s
+Problem: The yearly budget still has monthly budgets in progress
+Solution: Cancel or reject the monthly budgets first
+"""
+                )
+                % (context, self.id)
+            )
+            raise ValidationError(error_message)
+
+    @ssi_decorator.pre_restart_check()
+    def _10_check_children_restart(self):
+        """Reject restarting a yearly budget with counted children.
+
+        Runs on the ``pre_restart_check`` slot.
+
+        :raises ValidationError: if a counted child budget exists
+        """
+        self.ensure_one()
+        self._check_no_counted_children("Restart")
+
+    @ssi_decorator.pre_restart_check()
+    def _20_check_allocation_restart(self):
+        """Reject restarting a monthly budget that exceeds its parent.
+
+        Runs on the ``pre_restart_check`` slot, counting this budget
+        itself in the allocation it would join again.
+
+        :raises ValidationError: if the allocation limit is exceeded
+        """
+        self.ensure_one()
+        if self.parent_id:
+            for detail in self.detail_ids:
+                detail._check_parent_allocation()
+
+    @ssi_decorator.pre_cancel_check()
+    def _10_check_children_cancel(self):
+        """Reject cancelling a yearly budget with counted children.
+
+        Runs on the ``pre_cancel_check`` slot.
+
+        :raises ValidationError: if a counted child budget exists
+        """
+        self.ensure_one()
+        self._check_no_counted_children("Cancel")
+
+    def action_create_monthly_budgets(self):
+        """Create one draft monthly budget per fiscal month of the year.
+
+        Every fiscal month range inside the period of this yearly open
+        budget gets a monthly budget linked to it. The amount of each
+        account is divided equally and the last month takes the
+        rounding remainder so that the total equals the yearly amount.
+
+        :raises UserError: if the budget is not yearly and open, already
+            has counted monthly budgets, or has no usable fiscal months
+        """
+        self.ensure_one()
+        if self.periodicity != "yearly" or self.state != "open":
+            self._raise_create_error("The budget must be yearly and in progress")
+        if self._get_counted_children():
+            self._raise_create_error("The budget already has monthly budgets")
+        ranges = self._get_monthly_ranges()
+        if not ranges:
+            self._raise_create_error("There is no fiscal month in the period")
+        for previous, current in zip(ranges, ranges[1:]):
+            if current.date_start <= previous.date_end:
+                self._raise_create_error("The fiscal months overlap")
+        for date_range in ranges:
+            self.create(self._prepare_monthly_budget(date_range, ranges))
+
+    def _raise_create_error(self, problem):
+        """Raise the structured error of the monthly budget generation.
+
+        :param problem: description of the problem
+        :raises UserError: always
+        """
+        self.ensure_one()
+        error_message = (
+            _(
+                """
+Context: Create monthly budgets
+Database ID: %s
+Problem: %s
+Solution: Use a yearly budget in progress without monthly budgets, whose \
+period contains separate fiscal month ranges
+"""
+            )
+            % (self.id, problem)
+        )
+        raise UserError(error_message)
+
+    def _get_monthly_ranges(self):
+        """Find the fiscal month ranges inside the period of the budget.
+
+        :return: fiscal month ranges ordered by start date
+        :rtype: recordset
+        """
+        self.ensure_one()
+        return self.env["date.range"].search(
+            [
+                ("type_id.fiscal_month", "=", True),
+                ("company_id", "in", [self.company_id.id, False]),
+                ("date_start", ">=", self.date_start),
+                ("date_end", "<=", self.date_end),
+            ],
+            order="date_start",
+        )
+
+    def _prepare_monthly_budget(self, date_range, ranges):
+        """Prepare the values of one monthly budget.
+
+        :param date_range: fiscal month range of the monthly budget
+        :param ranges: all ranges that receive a monthly budget
+        :return: values for ``create``
+        :rtype: dict
+        """
+        self.ensure_one()
+        count = len(ranges)
+        is_last = date_range == ranges[-1]
+        currency = self.company_currency_id
+        details = []
+        for detail in self.detail_ids:
+            share = currency.round(detail.amount / count)
+            amount = share
+            if is_last:
+                amount = currency.round(detail.amount - share * (count - 1))
+            details.append(
+                (
+                    0,
+                    0,
+                    {
+                        "account_id": detail.account_id.id,
+                        "direction": detail.direction,
+                        "amount": amount,
+                    },
+                )
+            )
+        return {
+            "type_id": self.type_id.id,
+            "company_id": self.company_id.id,
+            "periodicity": "monthly",
+            "period_id": date_range.id,
+            "parent_id": self.id,
+            "detail_ids": details,
+        }
 
     @ssi_decorator.insert_on_form_view()
     def _insert_form_element(self, view_arch):

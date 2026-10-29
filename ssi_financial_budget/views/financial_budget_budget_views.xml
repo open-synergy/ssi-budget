@@ -16,6 +16,19 @@
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="type_id" />
                 <field name="period_id" />
+                <field name="parent_id" />
+            </xpath>
+            <xpath expr="//group[@name='group_by']" position="before">
+                <filter
+                        name="filter_yearly"
+                        string="Yearly"
+                        domain="[('periodicity', '=', 'yearly')]"
+                    />
+                <filter
+                        name="filter_monthly"
+                        string="Monthly"
+                        domain="[('periodicity', '=', 'monthly')]"
+                    />
             </xpath>
             <xpath expr="//group[@name='group_by']" position="inside">
                 <filter
@@ -27,6 +40,16 @@
                         name="grp_period"
                         string="Period"
                         context="{'group_by':'period_id'}"
+                    />
+                <filter
+                        name="grp_periodicity"
+                        string="Periodicity"
+                        context="{'group_by':'periodicity'}"
+                    />
+                <filter
+                        name="grp_parent"
+                        string="Parent Budget"
+                        context="{'group_by':'parent_id'}"
                     />
                 <filter
                         name="grp_date_start"
@@ -48,6 +71,8 @@
             <xpath expr="//field[@name='company_id']" position="after">
                 <field name="type_id" />
                 <field name="company_currency_id" invisible="1" />
+                <field name="periodicity" />
+                <field name="parent_id" optional="show" />
                 <field name="period_id" />
                 <field name="date_start" optional="hide" />
                 <field name="date_end" optional="hide" />
@@ -66,9 +91,24 @@
             <xpath expr="//field[@name='company_id']" position="after">
                 <field name="company_currency_id" />
             </xpath>
+            <xpath expr="//header" position="inside">
+                <button
+                        name="action_create_monthly_budgets"
+                        type="object"
+                        string="Create Monthly Budgets"
+                        attrs="{'invisible': ['|', ('periodicity', '!=', 'yearly'), ('state', '!=', 'open')]}"
+                    />
+            </xpath>
             <xpath expr="//group[@name='header_right']" position="inside">
                 <field name="type_id" />
-                <field name="period_id" />
+                <field name="periodicity" />
+                <field name="allowed_period_ids" invisible="1" />
+                <field name="period_id" domain="[('id', 'in', allowed_period_ids)]" />
+                <field
+                        name="parent_id"
+                        attrs="{'invisible': [('periodicity', '!=', 'monthly')]}"
+                        domain="[('periodicity', '=', 'yearly'), ('state', '=', 'open'), ('type_id', '=', type_id), ('company_id', '=', company_id), ('date_start', '&lt;=', date_start), ('date_end', '&gt;=', date_end)]"
+                    />
                 <field name="date_start" />
                 <field name="date_end" />
             </xpath>
@@ -90,6 +130,14 @@
                                     />
                                 <field name="direction" />
                                 <field name="amount" />
+                                <field
+                                        name="amount_allocated"
+                                        attrs="{'column_invisible': [('parent.periodicity', '!=', 'yearly')]}"
+                                    />
+                                <field
+                                        name="amount_unallocated"
+                                        attrs="{'column_invisible': [('parent.periodicity', '!=', 'yearly')]}"
+                                    />
                             </tree>
                             <form>
                                 <group name="detail_form" colspan="4" col="2">
@@ -137,6 +185,26 @@
                             <field name="amount_diff" />
                         </group>
                     </group>
+                </page>
+                <page
+                        name="monthly_budget"
+                        string="Monthly Budgets"
+                        attrs="{'invisible': [('periodicity', '!=', 'yearly')]}"
+                    >
+                    <field name="child_ids">
+                        <tree>
+                            <field name="name" />
+                            <field name="period_id" />
+                            <field name="state" />
+                        </tree>
+                        <form>
+                            <group name="monthly_budget_form" colspan="4" col="2">
+                                <field name="name" />
+                                <field name="period_id" />
+                                <field name="state" />
+                            </group>
+                        </form>
+                    </field>
                 </page>
                 <page name="account" string="Accounts">
                     <field name="detail_account_ids">

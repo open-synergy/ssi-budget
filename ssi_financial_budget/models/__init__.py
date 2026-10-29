@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl-3.0-standalone.html).
 
 from . import (
+    res_company,
     res_config_settings,
     financial_budget_type,
     financial_budget_budget,

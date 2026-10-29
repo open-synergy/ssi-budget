@@ -4,6 +4,7 @@
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.tools import float_compare
 
 
 class FinancialBudgetDetail(models.Model):
@@ -85,6 +86,141 @@ class FinancialBudgetDetail(models.Model):
         currency_field="company_currency_id",
         help="Planned amount of this account and direction.",
     )
+
+    @api.depends(
+        "amount",
+        "account_id",
+        "budget_id.child_ids.state",
+        "budget_id.child_ids.detail_ids.amount",
+        "budget_id.child_ids.detail_ids.account_id",
+    )
+    def _compute_allocation(self):
+        """Compute the allocated and unallocated amounts of the line.
+
+        The allocated amount is the sum of the matching detail lines of
+        the monthly budgets counted against this budget. Lines of a
+        budget without monthly budgets have nothing allocated.
+        """
+        for record in self:
+            allocated = 0.0
+            if isinstance(record.id, int) and record.account_id:
+                children = self.search(record._get_allocation_criteria())
+                allocated = sum(children.mapped("amount"))
+            record.amount_allocated = allocated
+            record.amount_unallocated = record.amount - allocated
+
+    amount_allocated = fields.Monetary(
+        string="Allocated Amount",
+        compute="_compute_allocation",
+        compute_sudo=True,
+        store=False,
+        currency_field="company_currency_id",
+        help="Sum of the same account in the monthly budgets counted "
+        "against this budget.",
+    )
+    amount_unallocated = fields.Monetary(
+        string="Unallocated Amount",
+        compute="_compute_allocation",
+        compute_sudo=True,
+        store=False,
+        currency_field="company_currency_id",
+        help="Planned amount minus the allocated amount.",
+    )
+
+    def _get_allocation_criteria(self):
+        """Build the criteria of the monthly lines counted against this line.
+
+        Public extension point: called on a line of the parent budget.
+
+        :return: domain matching the lines of the counted child budgets
+        :rtype: list
+        """
+        self.ensure_one()
+        states = self.env["financial_budget.budget"]._get_allocation_child_states()
+        return [
+            ("budget_id.parent_id", "=", self.budget_id.id),
+            ("budget_id.state", "in", states),
+            ("account_id", "=", self.account_id.id),
+        ]
+
+    @api.constrains("budget_id", "account_id", "direction", "amount")
+    def _constrains_allocation(self):
+        """Validate the lines of a monthly budget against its parent.
+
+        The account must exist in the parent budget with the same
+        direction, and the lines of all counted monthly budgets must not
+        exceed the amount of the parent line.
+
+        :raises ValidationError: if a rule is violated
+        """
+        states = self.env["financial_budget.budget"]._get_allocation_child_states()
+        for record in self.filtered(lambda r: r.budget_id.parent_id and r.account_id):
+            record._check_parent_detail()
+            if record.budget_id.state in states:
+                record._check_parent_allocation()
+
+    def _get_parent_detail(self):
+        """Find the line of the parent budget with the same account.
+
+        :return: matching line of the parent budget, may be empty
+        :rtype: recordset
+        """
+        self.ensure_one()
+        return self.sudo().budget_id.parent_id.detail_ids.filtered(
+            lambda r: r.account_id == self.account_id and r.direction == self.direction
+        )
+
+    def _check_parent_detail(self):
+        """Check that the parent budget has the account and direction.
+
+        :raises ValidationError: if the parent has no matching line
+        """
+        self.ensure_one()
+        if not self._get_parent_detail():
+            error_message = (
+                _(
+                    """
+Context: Save budget detail line
+Database ID: %s
+Problem: Account and direction are not in the parent budget
+Solution: Use an account and direction planned in the parent budget
+"""
+                )
+                % (self.id)
+            )
+            raise ValidationError(error_message)
+
+    def _check_parent_allocation(self):
+        """Check the allocation limit of the parent line.
+
+        The line itself is always counted, whatever the state of its
+        budget, so the check also serves a budget about to be restarted.
+
+        :raises ValidationError: if the total exceeds the parent line
+        """
+        self.ensure_one()
+        parent_detail = self._get_parent_detail()
+        if not parent_detail:
+            return
+        parent_detail.ensure_one()
+        children = self.sudo().search(parent_detail._get_allocation_criteria())
+        others = children.filtered(lambda r: r.budget_id != self.budget_id)
+        total = sum(others.mapped("amount")) + self.amount
+        rounding = self.company_currency_id.rounding
+        if float_compare(total, parent_detail.amount, precision_rounding=rounding) > 0:
+            error_message = (
+                _(
+                    """
+Context: Save budget detail line
+Database ID: %s
+Problem: Monthly budgets exceed the amount of the parent budget
+Solution: Reduce the amount so the monthly budgets of the account do not \
+exceed the amount of the parent budget
+"""
+                )
+                % (self.id)
+            )
+            raise ValidationError(error_message)
 
     @api.constrains("budget_id", "account_id")
     def _constrains_account_id(self):

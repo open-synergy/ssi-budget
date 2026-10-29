@@ -27,6 +27,10 @@
             />
             <script
                 type="text/javascript"
+                src="/ssi_financial_budget/static/tests/tours/financial_budget_budget_create_monthly_budgets_tour.js"
+            />
+            <script
+                type="text/javascript"
                 src="/ssi_financial_budget/static/tests/tours/financial_budget_budget_delete_tour.js"
             />
             <script

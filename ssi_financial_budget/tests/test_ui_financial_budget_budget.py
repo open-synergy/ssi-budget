@@ -67,12 +67,80 @@ class TestUiFinancialBudgetBudget(HttpSavepointCase):
             bypass_policy_check=True
         ).action_cancel()
 
+        # Create-monthly-budgets tour: an open yearly budget whose year
+        # holds three fiscal months and nothing else.
+        cls._prepare_yearly_fixture()
+
         # Restart-approval tour: the button is granted for any confirmed
         # record (the policy has no additional condition), so a plain
         # confirmed record is enough.
         cls._prepare_budget("TOUR FB RELOAD APPROVAL").with_context(
             bypass_policy_check=True
         ).action_confirm()
+
+    @classmethod
+    def _prepare_yearly_fixture(cls):
+        """Create an open yearly budget and the fiscal months of its year.
+
+        The yearly range type is set on the company. The year 2060 is
+        far from the periods of the other tours, so only the three
+        fiscal months created here fall inside it.
+        """
+        yearly_type = cls.env["date.range.type"].create({"name": "TOUR FB YEARLY TYPE"})
+        cls.env.company.financial_budget_yearly_range_type_id = yearly_type
+        year = cls.env["date.range"].create(
+            {
+                "name": "TOUR FB YEAR",
+                "type_id": yearly_type.id,
+                "date_start": "2060-01-01",
+                "date_end": "2060-12-31",
+            }
+        )
+        for month in (1, 2, 3):
+            cls.env["date.range"].create(
+                {
+                    "name": "TOUR FB MONTH %s" % month,
+                    "type_id": cls.period_type.id,
+                    "date_start": "2060-%02d-01" % month,
+                    "date_end": "2060-%02d-28" % month,
+                }
+            )
+        account = cls.env["account.account"].create(
+            {
+                "name": "TOUR FB REVENUE",
+                "code": "TOURFBR",
+                "user_type_id": cls.env.ref("account.data_account_type_revenue").id,
+            }
+        )
+        yearly_budget_type = cls.env["financial_budget.type"].create(
+            {
+                "name": "TOUR FB YEARLY BUDGET TYPE",
+                "code": "TOURFBYT",
+                "allowed_account_ids": [(6, 0, [account.id])],
+            }
+        )
+        budget = cls.env["financial_budget.budget"].create(
+            {
+                "user_id": cls.admin.id,
+                "type_id": yearly_budget_type.id,
+                "periodicity": "yearly",
+                "period_id": year.id,
+                "detail_ids": [
+                    (
+                        0,
+                        0,
+                        {
+                            "account_id": account.id,
+                            "direction": "revenue",
+                            "amount": 300000.0,
+                        },
+                    )
+                ],
+            }
+        )
+        budget.with_context(bypass_policy_check=True).action_confirm()
+        cls.env["financial_budget.budget"].invalidate_cache()
+        budget.with_user(cls.admin).action_approve_approval()
 
     @classmethod
     def _prepare_period(cls, name):
@@ -133,6 +201,17 @@ class TestUiFinancialBudgetBudget(HttpSavepointCase):
         self.start_tour(
             "/web",
             "ssi_financial_budget_financial_budget_budget_create",
+            login="admin",
+        )
+
+    def test_create_monthly_budgets(self):
+        """Run the create monthly budgets tour.
+
+        IK: docs/financial_budget_budget/15-create-monthly-budgets.md
+        """
+        self.start_tour(
+            "/web",
+            "ssi_financial_budget_financial_budget_budget_create_monthly_budgets",
             login="admin",
         )
 
