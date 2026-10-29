@@ -161,14 +161,14 @@ class FinancialBudgetBudget(models.Model):
     def _compute_amount(self):
         """Compute the planned, realized and difference amounts.
 
-        Planned is the sum of ``price_subtotal`` of the detail lines,
+        Planned is the sum of ``amount`` of the detail lines,
         realized is the sum of ``amount`` of the realization move
         lines, and difference is planned minus realized.
         """
         for record in self:
             amount_planned = amount_realized = amount_diff = 0.0
             for detail in record.detail_ids:
-                amount_planned += detail.price_subtotal
+                amount_planned += detail.amount
 
             for ml in record.move_line_ids:
                 amount_realized += ml.amount

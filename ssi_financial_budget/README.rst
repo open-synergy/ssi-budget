@@ -6,7 +6,9 @@
 Financial Budget
 ================
 
-
+Plan a financial budget per account. Each budget detail line only holds
+an account, a direction (revenue or cost) and an amount; the planned
+amount of the budget is the sum of the amount of its detail lines.
 
 Installation
 ============

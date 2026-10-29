@@ -8,15 +8,12 @@ from odoo import fields, models
 class FinancialBudgetDetail(models.Model):
     """Planned line of a financial budget.
 
-    Holds the product, price and quantity planned for one account
-    and direction (revenue or cost) of a financial budget.
+    Holds the planned amount for one account and direction (revenue
+    or cost) of a financial budget.
     """
 
     _name = "financial_budget.detail"
     _description = "Financial Budget Detail"
-    _inherit = [
-        "mixin.product_line_price",
-    ]
 
     budget_id = fields.Many2one(
         string="# Budget",
@@ -63,4 +60,19 @@ class FinancialBudgetDetail(models.Model):
         ],
         required=True,
         default="revenue",
+    )
+    company_currency_id = fields.Many2one(
+        string="Company Currency",
+        comodel_name="res.currency",
+        related="budget_id.company_currency_id",
+        store=False,
+        help="Currency of the budget company. Only supports the "
+        "currency of the amount field.",
+    )
+    amount = fields.Monetary(
+        string="Amount",
+        required=True,
+        default=0.0,
+        currency_field="company_currency_id",
+        help="Planned amount of this account and direction.",
     )
