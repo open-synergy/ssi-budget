@@ -14,6 +14,39 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: ssi_financial_budget
+#: code:addons/ssi_financial_budget/models/financial_budget_budget.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: %s financial budget\n"
+"Database ID: %s\n"
+"Problem: The yearly budget still has monthly budgets in progress\n"
+"Solution: Cancel or reject the monthly budgets first\n"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: code:addons/ssi_financial_budget/models/financial_budget_budget.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Create monthly budgets\n"
+"Database ID: %s\n"
+"Problem: %s\n"
+"Solution: Use a yearly budget in progress without monthly budgets, whose period contains separate fiscal month ranges\n"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: code:addons/ssi_financial_budget/models/financial_budget_detail.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Save budget detail line\n"
+"Database ID: %s\n"
+"Problem: Account and direction are not in the parent budget\n"
+"Solution: Use an account and direction planned in the parent budget\n"
+msgstr ""
+
+#. module: ssi_financial_budget
 #: code:addons/ssi_financial_budget/models/financial_budget_detail.py:0
 #, python-format
 msgid ""
@@ -33,6 +66,39 @@ msgid ""
 "Database ID: %s\n"
 "Problem: Account is used more than once in the same budget\n"
 "Solution: Use one detail line per account in a budget\n"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: code:addons/ssi_financial_budget/models/financial_budget_detail.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Save budget detail line\n"
+"Database ID: %s\n"
+"Problem: Monthly budgets exceed the amount of the parent budget\n"
+"Solution: Reduce the amount so the monthly budgets of the account do not exceed the amount of the parent budget\n"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: code:addons/ssi_financial_budget/models/financial_budget_budget.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Save financial budget\n"
+"Database ID: %s\n"
+"Problem: %s\n"
+"Solution: Choose an open yearly budget of the same type and company whose period contains the period of this budget\n"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: code:addons/ssi_financial_budget/models/financial_budget_budget.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Save financial budget\n"
+"Database ID: %s\n"
+"Problem: Period does not match the periodicity of the budget\n"
+"Solution: Choose a fiscal month period for a monthly budget, or a period of the company yearly range type for a yearly budget\n"
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -131,9 +197,19 @@ msgid "All"
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__amount_allocated
+msgid "Allocated Amount"
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__allowed_account_ids
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__allowed_account_ids
 msgid "Allowed Accounts"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__allowed_period_ids
+msgid "Allowed Periods"
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -277,6 +353,11 @@ msgid "Code"
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model,name:ssi_financial_budget.model_res_company
+msgid "Companies"
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__company_id
 #: model:res.groups,name:ssi_financial_budget.financial_budget_company_group
 msgid "Company"
@@ -329,6 +410,11 @@ msgid "Cost"
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_form
+msgid "Create Monthly Budgets"
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__create_uid
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__create_uid
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__create_uid
@@ -369,6 +455,25 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__date_start
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__date_start
 msgid "Date Start"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Date range type used as the period of yearly budgets"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_res_config_settings__financial_budget_yearly_range_type_id
+msgid ""
+"Date range type whose ranges are the periods of yearly financial budgets of "
+"the company."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_res_company__financial_budget_yearly_range_type_id
+msgid ""
+"Date range type whose ranges are the periods of yearly financial budgets of "
+"this company."
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -423,6 +528,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary__display_name
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__display_name
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__display_name
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_company__display_name
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings__display_name
 msgid "Display Name"
 msgstr ""
@@ -529,6 +635,12 @@ msgid "Financial Budget Types"
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_company__financial_budget_yearly_range_type_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings__financial_budget_yearly_range_type_id
+msgid "Financial Budget Yearly Range Type"
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.actions.act_window,name:ssi_financial_budget.financial_budget_budget_action
 #: model:ir.ui.menu,name:ssi_financial_budget.financial_budget_budget_menu
 msgid "Financial Budgets"
@@ -567,6 +679,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary__id
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__id
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_company__id
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings__id
 msgid "ID"
 msgstr ""
@@ -627,6 +740,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary____last_update
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary____last_update
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type____last_update
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_res_company____last_update
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_res_config_settings____last_update
 msgid "Last Modified on"
 msgstr ""
@@ -691,6 +805,18 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_ids
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_ids
 msgid "Messages"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_budget__periodicity__monthly
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_search
+msgid "Monthly"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__child_ids
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_form
+msgid "Monthly Budgets"
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -794,11 +920,28 @@ msgid "Optional Feature"
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__parent_id
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_search
+msgid "Parent Budget"
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__period_id
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__period_id
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__period_id
 #: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_search
 msgid "Period"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__periodicity
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_search
+msgid "Periodicity"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__allowed_period_ids
+msgid "Periods that match the periodicity of the budget."
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -815,6 +958,11 @@ msgstr ""
 #. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_planned_revenue
 msgid "Planned Revenue"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_detail__amount_unallocated
+msgid "Planned amount minus the allocated amount."
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -986,6 +1134,12 @@ msgid "Sum of the planned amount of revenue accounts."
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_detail__amount_allocated
+msgid ""
+"Sum of the same account in the monthly budgets counted against this budget."
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_form
 msgid "Summary"
 msgstr ""
@@ -1031,6 +1185,11 @@ msgstr ""
 #: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__activity_exception_decoration
 #: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__activity_exception_decoration
 msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__amount_unallocated
+msgid "Unallocated Amount"
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -1118,4 +1277,34 @@ msgstr ""
 #: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__website_message_ids
 #: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_type__website_message_ids
 msgid "Website communication history"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_budget__periodicity__yearly
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_search
+msgid "Yearly"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Yearly Budget"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
+msgid "Yearly Range Type"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__parent_id
+msgid ""
+"Yearly budget that limits the amount of this monthly budget per account."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__periodicity
+msgid ""
+"Yearly budgets use the yearly range type configured on the company. Monthly "
+"budgets use fiscal month periods and can be limited by a yearly parent "
+"budget."
 msgstr ""
