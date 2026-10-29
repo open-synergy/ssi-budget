@@ -39,6 +39,7 @@ Work Instruction
 * `Terminate Analytic Budget <docs/analytic_budget_budget/11-terminate.html>`_
 * `Restart Analytic Budget <docs/analytic_budget_budget/12-restart.html>`_
 * `Restart Approval Process of Analytic Budget <docs/analytic_budget_budget/14-restart-approval.html>`_
+* `Recompute Realization of Analytic Budget <docs/analytic_budget_budget/15-recompute-realization.html>`_
 
 Credits
 =======
