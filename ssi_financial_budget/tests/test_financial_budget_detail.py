@@ -71,18 +71,22 @@ class TestFinancialBudgetDetail(YamlTransactionCase):
                 "date_end": "2024-07-31",
             }
         )
-        budget_type = self.env["financial_budget.type"].create(
-            {"name": "MIG FB TYPE", "code": "MIGFBT"}
-        )
-        budget = self.env["financial_budget.budget"].create(
-            {"type_id": budget_type.id, "period_id": period.id}
-        )
         account = self.env["account.account"].create(
             {
                 "name": "MIG FB ACCOUNT",
                 "code": "MIGFBA",
                 "user_type_id": self.env.ref("account.data_account_type_revenue").id,
             }
+        )
+        budget_type = self.env["financial_budget.type"].create(
+            {
+                "name": "MIG FB TYPE",
+                "code": "MIGFBT",
+                "allowed_account_ids": [(6, 0, [account.id])],
+            }
+        )
+        budget = self.env["financial_budget.budget"].create(
+            {"type_id": budget_type.id, "period_id": period.id}
         )
         return self.env["financial_budget.detail"].create(
             {

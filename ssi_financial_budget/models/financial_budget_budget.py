@@ -158,26 +158,54 @@ class FinancialBudgetBudget(models.Model):
         readonly=True,
     )
 
+    @api.depends(
+        "detail_ids.amount",
+        "detail_ids.account_id",
+        "detail_ids.direction",
+    )
     def _compute_amount(self):
         """Compute the planned, realized and difference amounts.
 
-        Planned is the sum of ``amount`` of the detail lines,
-        realized is the sum of ``amount`` of the realization move
-        lines, and difference is planned minus realized.
+        Reads the live ``financial_budget.summary`` view once, grouped by
+        budget and direction. Revenue and cost are exposed separately and
+        the plain amounts are net: revenue minus cost. The difference of
+        each pair is planned minus realized. The realization is live and
+        does not depend on the state of the budget.
         """
+        fields_amount = ["amount_planned", "amount_realized"]
+        data = {}
+        budget_ids = [rec.id for rec in self if isinstance(rec.id, int)]
+        if budget_ids:
+            groups = (
+                self.env["financial_budget.summary"]
+                .sudo()
+                .read_group(
+                    [("budget_id", "in", budget_ids)],
+                    fields_amount,
+                    ["budget_id", "direction"],
+                    lazy=False,
+                )
+            )
+            for group in groups:
+                key = (group["budget_id"][0], group["direction"])
+                data[key] = (group["amount_planned"], group["amount_realized"])
         for record in self:
-            amount_planned = amount_realized = amount_diff = 0.0
-            for detail in record.detail_ids:
-                amount_planned += detail.amount
-
-            for ml in record.move_line_ids:
-                amount_realized += ml.amount
-
-            amount_diff = amount_planned - amount_realized
-
-            record.amount_planned = amount_planned
-            record.amount_realized = amount_realized
-            record.amount_diff = amount_diff
+            planned_revenue, realized_revenue = data.get((record.id, "revenue"), (0, 0))
+            planned_cost, realized_cost = data.get((record.id, "cost"), (0, 0))
+            planned = planned_revenue - planned_cost
+            realized = realized_revenue - realized_cost
+            values = {
+                "amount_planned_revenue": planned_revenue,
+                "amount_realized_revenue": realized_revenue,
+                "amount_diff_revenue": planned_revenue - realized_revenue,
+                "amount_planned_cost": planned_cost,
+                "amount_realized_cost": realized_cost,
+                "amount_diff_cost": planned_cost - realized_cost,
+                "amount_planned": planned,
+                "amount_realized": realized,
+                "amount_diff": planned - realized,
+            }
+            record.update(values)
 
     amount_planned = fields.Monetary(
         string="Planned Amount",
@@ -185,6 +213,7 @@ class FinancialBudgetBudget(models.Model):
         compute_sudo=True,
         store=False,
         currency_field="company_currency_id",
+        help="Net planned amount: planned revenue minus planned cost.",
     )
     amount_realized = fields.Monetary(
         string="Realized Amount",
@@ -192,6 +221,7 @@ class FinancialBudgetBudget(models.Model):
         compute_sudo=True,
         store=False,
         currency_field="company_currency_id",
+        help="Net realized amount: realized revenue minus realized cost.",
     )
     amount_diff = fields.Monetary(
         string="Diff Amount",
@@ -199,6 +229,55 @@ class FinancialBudgetBudget(models.Model):
         compute_sudo=True,
         store=False,
         currency_field="company_currency_id",
+        help="Net planned amount minus net realized amount.",
+    )
+    amount_planned_revenue = fields.Monetary(
+        string="Planned Revenue",
+        compute="_compute_amount",
+        compute_sudo=True,
+        store=False,
+        currency_field="company_currency_id",
+        help="Sum of the planned amount of revenue accounts.",
+    )
+    amount_realized_revenue = fields.Monetary(
+        string="Realized Revenue",
+        compute="_compute_amount",
+        compute_sudo=True,
+        store=False,
+        currency_field="company_currency_id",
+        help="Posted journal items of revenue accounts in the period.",
+    )
+    amount_diff_revenue = fields.Monetary(
+        string="Diff Revenue",
+        compute="_compute_amount",
+        compute_sudo=True,
+        store=False,
+        currency_field="company_currency_id",
+        help="Planned revenue minus realized revenue.",
+    )
+    amount_planned_cost = fields.Monetary(
+        string="Planned Cost",
+        compute="_compute_amount",
+        compute_sudo=True,
+        store=False,
+        currency_field="company_currency_id",
+        help="Sum of the planned amount of cost accounts.",
+    )
+    amount_realized_cost = fields.Monetary(
+        string="Realized Cost",
+        compute="_compute_amount",
+        compute_sudo=True,
+        store=False,
+        currency_field="company_currency_id",
+        help="Posted journal items of cost accounts in the period.",
+    )
+    amount_diff_cost = fields.Monetary(
+        string="Diff Cost",
+        compute="_compute_amount",
+        compute_sudo=True,
+        store=False,
+        currency_field="company_currency_id",
+        help="Planned cost minus realized cost.",
     )
     state = fields.Selection(
         string="State",

@@ -7,8 +7,21 @@ Financial Budget
 ================
 
 Plan a financial budget per account. Each budget detail line only holds
-an account, a direction (revenue or cost) and an amount; the planned
-amount of the budget is the sum of the amount of its detail lines.
+an account, a direction (revenue or cost) and an amount. The account
+must be one of the allowed accounts of the budget type and can be used
+only once per budget.
+
+The realization is the sum of the posted journal items of the budget
+accounts, dated within the budget period and belonging to the budget
+company. It is always live and does not depend on the state of the
+budget. Each item is signed by the direction of the account: credit
+minus debit for revenue, debit minus credit for cost. An account
+without a detail line is revenue when it is an income account and cost
+otherwise.
+
+The budget header shows the planned, realized and difference amounts of
+revenue and cost separately. The plain *Planned Amount*, *Realized
+Amount* and *Diff Amount* are net: revenue minus cost.
 
 Installation
 ============

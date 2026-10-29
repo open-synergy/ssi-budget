@@ -25,6 +25,13 @@ class FinancialBudgetMoveLineSummary(models.Model):
         string="Account",
         comodel_name="account.account",
     )
+    direction = fields.Selection(
+        string="Direction",
+        selection=[
+            ("revenue", "Revenue"),
+            ("cost", "Cost"),
+        ],
+    )
     amount = fields.Float(
         string="Amount",
     )
@@ -32,17 +39,19 @@ class FinancialBudgetMoveLineSummary(models.Model):
     def _select(self):
         """Build the ``SELECT`` clause of the view query.
 
-        Returns a generated row id plus the budget, the account and
-        the summed amount of the budget move lines.
+        Returns a row id derived from the budget and account pair plus
+        the budget, the account, the direction and the summed amount of
+        the budget move lines.
         Extension point: override to add columns.
 
         :return: SQL ``SELECT`` fragment as a string
         """
         select_str = """
         SELECT
-            row_number() OVER() as id,
+            (a.budget_id::bigint * 10000000000 + a.account_id::bigint) AS id,
             a.budget_id AS budget_id,
             a.account_id AS account_id,
+            a.direction AS direction,
             SUM(a.amount) AS amount
         """
         return select_str
@@ -88,14 +97,15 @@ class FinancialBudgetMoveLineSummary(models.Model):
     def _group_by(self):
         """Build the ``GROUP BY`` clause of the view query.
 
-        Groups the amounts by budget and account.
+        Groups the amounts by budget, account and direction.
         Extension point: override together with ``_select``.
 
         :return: SQL ``GROUP BY`` fragment as a string
         """
         group_str = """
         GROUP BY    a.budget_id,
-                    a.account_id
+                    a.account_id,
+                    a.direction
         """
         return group_str
 

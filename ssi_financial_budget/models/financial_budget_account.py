@@ -28,14 +28,14 @@ class FinancialBudgetAccount(models.Model):
     def _select(self):
         """Return the SELECT clause of the view query.
 
-        Builds one row per budget and account pair, with a generated
-        row number as the record id.
+        Builds one row per budget and account pair; the record id is
+        derived from the pair, so it is stable between queries.
 
         :return: SQL ``SELECT`` fragment
         """
         select_str = """
         SELECT
-            row_number() OVER() as id,
+            (a.id::bigint * 10000000000 + c.account_id::bigint) AS id,
             a.id AS budget_id,
             c.account_id AS account_id
         """
