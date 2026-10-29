@@ -14,6 +14,28 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: ssi_financial_budget
+#: code:addons/ssi_financial_budget/models/financial_budget_detail.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Save budget detail line\n"
+"Database ID: %s\n"
+"Problem: Account is not allowed by the budget type\n"
+"Solution: Choose an account listed in the allowed accounts of the type\n"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: code:addons/ssi_financial_budget/models/financial_budget_detail.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Save budget detail line\n"
+"Database ID: %s\n"
+"Problem: Account is used more than once in the same budget\n"
+"Solution: Use one detail line per account in a budget\n"
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_account__budget_id
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__budget_id
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail_summary__budget_id
@@ -46,6 +68,11 @@ msgstr ""
 #. module: ssi_financial_budget
 #: model_terms:ir.ui.view,arch_db:ssi_financial_budget.financial_budget_budget_view_form
 msgid "Accounts"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_detail__allowed_account_ids
+msgid "Accounts permitted by the type of the budget."
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -104,6 +131,7 @@ msgid "All"
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__allowed_account_ids
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__allowed_account_ids
 msgid "Allowed Accounts"
 msgstr ""
@@ -294,6 +322,9 @@ msgstr ""
 
 #. module: ssi_financial_budget
 #: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_detail__direction__cost
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_move_line__direction__cost
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_move_line_summary__direction__cost
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_summary__direction__cost
 msgid "Cost"
 msgstr ""
 
@@ -361,12 +392,25 @@ msgid "Diff Amount"
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_diff_cost
+msgid "Diff Cost"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_diff_revenue
+msgid "Diff Revenue"
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__amount_diff
 msgid "Diff. Amount"
 msgstr ""
 
 #. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__direction
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__direction
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary__direction
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__direction
 msgid "Direction"
 msgstr ""
 
@@ -671,6 +715,21 @@ msgid "Need Validation"
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__amount_diff
+msgid "Net planned amount minus net realized amount."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__amount_planned
+msgid "Net planned amount: planned revenue minus planned cost."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__amount_realized
+msgid "Net realized amount: realized revenue minus realized cost."
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__activity_date_deadline
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__activity_date_deadline
 msgid "Next Activity Deadline"
@@ -749,13 +808,43 @@ msgid "Planned Amount"
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_planned_cost
+msgid "Planned Cost"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_planned_revenue
+msgid "Planned Revenue"
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_detail__amount
 msgid "Planned amount of this account and direction."
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__amount_diff_cost
+msgid "Planned cost minus realized cost."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__amount_diff_revenue
+msgid "Planned revenue minus realized revenue."
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__policy_template_id
 msgid "Policy Template"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__amount_realized_cost
+msgid "Posted journal items of cost accounts in the period."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__amount_realized_revenue
+msgid "Posted journal items of revenue accounts in the period."
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -772,6 +861,16 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_realized
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__amount_realized
 msgid "Realized Amount"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_realized_cost
+msgid "Realized Cost"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__amount_realized_revenue
+msgid "Realized Revenue"
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -822,6 +921,9 @@ msgstr ""
 
 #. module: ssi_financial_budget
 #: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_detail__direction__revenue
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_move_line__direction__revenue
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_move_line_summary__direction__revenue
+#: model:ir.model.fields.selection,name:ssi_financial_budget.selection__financial_budget_summary__direction__revenue
 msgid "Revenue"
 msgstr ""
 
@@ -871,6 +973,16 @@ msgid ""
 "Overdue: Due date is already passed\n"
 "Today: Activity date is today\n"
 "Planned: Future activities."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__amount_planned_cost
+msgid "Sum of the planned amount of cost accounts."
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_budget__amount_planned_revenue
+msgid "Sum of the planned amount of revenue accounts."
 msgstr ""
 
 #. module: ssi_financial_budget
