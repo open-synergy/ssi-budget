@@ -114,16 +114,7 @@ msgid "Allowed Policy Templates"
 msgstr ""
 
 #. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__allowed_pricelist_ids
-msgid "Allowed Pricelists"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__allowed_uom_ids
-msgid "Allowed UoMs"
-msgstr ""
-
-#. module: ssi_financial_budget
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__amount
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail_summary__amount
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line__amount
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_move_line_summary__amount
@@ -265,6 +256,7 @@ msgstr ""
 
 #. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__company_currency_id
+#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__company_currency_id
 msgid "Company Currency"
 msgstr ""
 
@@ -320,9 +312,15 @@ msgid "Created on"
 msgstr ""
 
 #. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__currency_id
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_summary__currency_id
 msgid "Currency"
+msgstr ""
+
+#. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_detail__company_currency_id
+msgid ""
+"Currency of the budget company. Only supports the currency of the amount "
+"field."
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -340,11 +338,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__date_start
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__date_start
 msgid "Date Start"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__name
-msgid "Description"
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -702,7 +695,6 @@ msgstr ""
 
 #. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__note
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__note
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__note
 msgid "Note"
 msgstr ""
@@ -757,43 +749,18 @@ msgid "Planned Amount"
 msgstr ""
 
 #. module: ssi_financial_budget
+#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_detail__amount
+msgid "Planned amount of this account and direction."
+msgstr ""
+
+#. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__policy_template_id
 msgid "Policy Template"
 msgstr ""
 
 #. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__price_subtotal
-msgid "Price Subtotal"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__price_unit
-msgid "Price Unit"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__pricelist_id
-msgid "Pricelist"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__product_id
-msgid "Product"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__product_category_id
-msgid "Product Category"
-msgstr ""
-
-#. module: ssi_financial_budget
 #: model_terms:ir.ui.view,arch_db:ssi_financial_budget.res_config_settings_view_form
 msgid "QR Code"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__quantity
-msgid "Quantity"
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -866,36 +833,6 @@ msgstr ""
 #. module: ssi_financial_budget
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__reviewer_id
 msgid "Reviewer"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,help:ssi_financial_budget.field_financial_budget_detail__product_category_id
-msgid "Select category for the current product"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__sequence
-msgid "Sequence"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__standard_price_subtotal
-msgid "Standard Price Subtotal"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__standard_price_subtotal_diff
-msgid "Standard Price Subtotal Diff."
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__standard_price_unit
-msgid "Standard Price Unit"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__standard_price_unit_diff
-msgid "Standard Price Unit Diff."
 msgstr ""
 
 #. module: ssi_financial_budget
@@ -994,16 +931,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_budget__message_unread_counter
 #: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_type__message_unread_counter
 msgid "Unread Messages Counter"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__uom_id
-msgid "UoM"
-msgstr ""
-
-#. module: ssi_financial_budget
-#: model:ir.model.fields,field_description:ssi_financial_budget.field_financial_budget_detail__uom_quantity
-msgid "UoM Quantity"
 msgstr ""
 
 #. module: ssi_financial_budget
