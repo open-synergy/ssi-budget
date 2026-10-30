@@ -1,0 +1,73 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* ssi_financial_analytic_budget
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 14.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: ssi_financial_analytic_budget
+#: code:addons/ssi_financial_analytic_budget/models/analytic_budget_detail.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: %s\n"
+"Database ID: %s\n"
+"Problem: Analytic budget allocation exceeds the financial budget amount\n"
+"Solution: Reduce the analytic budget lines or raise the amount of the financial budget for the same account, direction and period\n"
+msgstr ""
+
+#. module: ssi_financial_analytic_budget
+#: model:ir.model.fields,field_description:ssi_financial_analytic_budget.field_financial_budget_detail__amount_allocated_analytic
+msgid "Allocated Analytic Amount"
+msgstr ""
+
+#. module: ssi_financial_analytic_budget
+#: model:ir.model,name:ssi_financial_analytic_budget.model_analytic_budget_budget
+msgid "Analytic Budget"
+msgstr ""
+
+#. module: ssi_financial_analytic_budget
+#: model:ir.model,name:ssi_financial_analytic_budget.model_analytic_budget_detail
+msgid "Analytic Budget Detail"
+msgstr ""
+
+#. module: ssi_financial_analytic_budget
+#: model:ir.model.fields,field_description:ssi_financial_analytic_budget.field_analytic_budget_budget__display_name
+#: model:ir.model.fields,field_description:ssi_financial_analytic_budget.field_analytic_budget_detail__display_name
+#: model:ir.model.fields,field_description:ssi_financial_analytic_budget.field_financial_budget_detail__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: ssi_financial_analytic_budget
+#: model:ir.model,name:ssi_financial_analytic_budget.model_financial_budget_detail
+msgid "Financial Budget Detail"
+msgstr ""
+
+#. module: ssi_financial_analytic_budget
+#: model:ir.model.fields,field_description:ssi_financial_analytic_budget.field_analytic_budget_budget__id
+#: model:ir.model.fields,field_description:ssi_financial_analytic_budget.field_analytic_budget_detail__id
+#: model:ir.model.fields,field_description:ssi_financial_analytic_budget.field_financial_budget_detail__id
+msgid "ID"
+msgstr ""
+
+#. module: ssi_financial_analytic_budget
+#: model:ir.model.fields,field_description:ssi_financial_analytic_budget.field_analytic_budget_budget____last_update
+#: model:ir.model.fields,field_description:ssi_financial_analytic_budget.field_analytic_budget_detail____last_update
+#: model:ir.model.fields,field_description:ssi_financial_analytic_budget.field_financial_budget_detail____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: ssi_financial_analytic_budget
+#: model:ir.model.fields,help:ssi_financial_analytic_budget.field_financial_budget_detail__amount_allocated_analytic
+msgid ""
+"Total of the analytic budget lines of top level analytic accounts with the "
+"same account and direction inside the period of this budget."
+msgstr ""
