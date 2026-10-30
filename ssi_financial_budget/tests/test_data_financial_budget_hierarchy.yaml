@@ -1,0 +1,311 @@
+options:
+  auto_refresh: true
+
+scenarios:
+  - name: "Financial Budget Hierarchy - View and action"
+    steps:
+      - step: "The hierarchy view exists exactly once"
+        action: "search"
+        model: "ir.ui.view"
+        save_as: "hierarchy_view"
+        domain:
+          - ["model", "=", "financial_budget.budget"]
+          - ["type", "=", "hierarchy"]
+        expect_count: 1
+
+      - step: "Get the Financial Budgets action"
+        action: "ref"
+        xml_id: "ssi_financial_budget.financial_budget_budget_action"
+        save_as: "budget_action"
+
+      - step: "Assert the action opens the hierarchy view"
+        action: "assert"
+        target: "budget_action"
+        asserts:
+          view_mode:
+            type: "value"
+            expected: "tree,form,hierarchy"
+
+  - name: "Financial Budget Hierarchy - Roots and children"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBH Fiscal Month S2"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBH Yearly S2"
+
+      - step: "Setup - set the yearly range type on the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "FBH Year S2"
+          type_id: "REC: yr_type"
+          date_start: "2052-01-01"
+          date_end: "2052-12-31"
+
+      - step: "Setup - range month 1"
+        action: "create"
+        model: "date.range"
+        save_as: "month1"
+        values:
+          name: "FBH M1 S2"
+          type_id: "REC: fm_type"
+          date_start: "2052-01-01"
+          date_end: "2052-01-28"
+
+      - step: "Setup - range month 2"
+        action: "create"
+        model: "date.range"
+        save_as: "month2"
+        values:
+          name: "FBH M2 S2"
+          type_id: "REC: fm_type"
+          date_start: "2052-02-01"
+          date_end: "2052-02-28"
+
+      - step: "Setup - range month 3"
+        action: "create"
+        model: "date.range"
+        save_as: "month3"
+        values:
+          name: "FBH M3 S2"
+          type_id: "REC: fm_type"
+          date_start: "2052-03-01"
+          date_end: "2052-03-28"
+
+      - step: "Setup - account"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBH Account S2"
+          code: "FBHS2"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBH Type S2"
+          code: "FBHT2"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['account_a'].id])]"
+
+      - step: "Setup - yearly budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "yearly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+
+      - step: "Setup - first monthly budget under the yearly budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "child1"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: month1.id"
+          parent_id: "REC: yearly.id"
+
+      - step: "Setup - second monthly budget under the yearly budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "child2"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: month2.id"
+          parent_id: "REC: yearly.id"
+
+      - step: "Setup - orphan monthly budget without a parent"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "orphan"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: month3.id"
+
+      - step: "Roots hold the yearly budget and the orphan monthly budget"
+        action: "search"
+        model: "financial_budget.budget"
+        save_as: "roots"
+        domain:
+          - ["parent_id", "=", false]
+          - ["id", "in", "EVAL: [registry['yearly'].id, registry['orphan'].id]"]
+        expect_count: 2
+
+      - step: "Assert the yearly budget children"
+        action: "assert"
+        target: "yearly"
+        asserts:
+          child_ids:
+            type: "o2m"
+            check: "exact"
+            expected_records:
+              - "REC: child1"
+              - "REC: child2"
+
+  - name: "Financial Budget Hierarchy - Monthly budgets are not roots"
+    steps:
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FBH Fiscal Month S3"
+          fiscal_month: true
+
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FBH Yearly S3"
+
+      - step: "Setup - set the yearly range type on the company"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+
+      - step: "Setup - range Year"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "FBH Year S3"
+          type_id: "REC: yr_type"
+          date_start: "2053-01-01"
+          date_end: "2053-12-31"
+
+      - step: "Setup - range month 1"
+        action: "create"
+        model: "date.range"
+        save_as: "month1"
+        values:
+          name: "FBH M1 S3"
+          type_id: "REC: fm_type"
+          date_start: "2053-01-01"
+          date_end: "2053-01-28"
+
+      - step: "Setup - range month 2"
+        action: "create"
+        model: "date.range"
+        save_as: "month2"
+        values:
+          name: "FBH M2 S3"
+          type_id: "REC: fm_type"
+          date_start: "2053-02-01"
+          date_end: "2053-02-28"
+
+      - step: "Setup - range month 3"
+        action: "create"
+        model: "date.range"
+        save_as: "month3"
+        values:
+          name: "FBH M3 S3"
+          type_id: "REC: fm_type"
+          date_start: "2053-03-01"
+          date_end: "2053-03-28"
+
+      - step: "Setup - account"
+        action: "create"
+        model: "account.account"
+        save_as: "account_a"
+        values:
+          name: "FBH Account S3"
+          code: "FBHS3"
+          user_type_id: "REF: account.data_account_type_revenue"
+
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "budget_type"
+        values:
+          name: "FBH Type S3"
+          code: "FBHT3"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['account_a'].id])]"
+
+      - step: "Setup - yearly budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "yearly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+
+      - step: "Setup - first monthly budget under the yearly budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "child1"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: month1.id"
+          parent_id: "REC: yearly.id"
+
+      - step: "Setup - second monthly budget under the yearly budget"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "child2"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: month2.id"
+          parent_id: "REC: yearly.id"
+
+      - step: "Setup - orphan monthly budget without a parent"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "orphan"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: budget_type.id"
+          periodicity: "monthly"
+          period_id: "REC: month3.id"
+
+      - step: "Monthly budgets with a parent are never roots"
+        action: "search"
+        model: "financial_budget.budget"
+        save_as: "child_roots"
+        domain:
+          - ["parent_id", "=", false]
+          - ["id", "in", "EVAL: [registry['child1'].id, registry['child2'].id]"]
+        expect_count: 0
+
+      - step: "Assert the orphan monthly budget has no children"
+        action: "assert"
+        target: "orphan"
+        asserts:
+          child_ids:
+            type: "o2m"
+            check: "count"
+            expected_count: 0

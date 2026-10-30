@@ -10,3 +10,4 @@ oca-currency https://github.com/OCA/currency.git 14.0
 oca-reporting-engine https://github.com/OCA/reporting-engine.git 14.0
 oca-account-financial-reporting https://github.com/OCA/account-financial-reporting.git 14.0
 oca-account-financial-tools https://github.com/OCA/account-financial-tools.git 14.0
+ssi-web https://github.com/open-synergy/ssi-web.git 14.0

@@ -292,11 +292,31 @@
     </field>
 </record>
 
+<record id="financial_budget_budget_view_hierarchy" model="ir.ui.view">
+    <field name="name">financial_budget.budget - hierarchy</field>
+    <field name="model">financial_budget.budget</field>
+    <field name="arch" type="xml">
+        <hierarchy
+                string="Financial Budgets"
+                parent_field="parent_id"
+                child_field="child_ids"
+            >
+            <field name="name" />
+            <field name="type_id" />
+            <field name="period_id" />
+            <field name="state" />
+            <field name="amount_planned" />
+            <field name="amount_realized" />
+            <field name="amount_diff" />
+        </hierarchy>
+    </field>
+</record>
+
 <record id="financial_budget_budget_action" model="ir.actions.act_window">
     <field name="name">Financial Budgets</field>
     <field name="type">ir.actions.act_window</field>
     <field name="res_model">financial_budget.budget</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">tree,form,hierarchy</field>
     <field name="search_view_id" ref="financial_budget_budget_view_search" />
 </record>
 
