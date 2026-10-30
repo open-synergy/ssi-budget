@@ -6,6 +6,13 @@
 Analytic Budget
 ===============
 
+The Analytic Budgets list can also be opened as a tree using the
+*Hierarchy* view: a budget without a parent is a root row that can be
+expanded to show its child budgets. The tree has no total row because
+the planned amounts of a parent budget are the ceiling allocated to its
+child budgets, so summing them would count the same amount twice. The
+profit realization of a parent budget already consolidates the analytic
+accounts below it and is not summed either.
 
 
 Installation
