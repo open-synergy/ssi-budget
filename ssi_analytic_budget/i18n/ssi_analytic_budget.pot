@@ -358,6 +358,7 @@ msgstr ""
 #. module: ssi_analytic_budget
 #: model:ir.actions.act_window,name:ssi_analytic_budget.analytic_budget_budget_action
 #: model:ir.ui.menu,name:ssi_analytic_budget.analytic_budget_budget_menu
+#: model_terms:ir.ui.view,arch_db:ssi_analytic_budget.analytic_budget_budget_view_hierarchy
 msgid "Analytic Budgets"
 msgstr ""
 
