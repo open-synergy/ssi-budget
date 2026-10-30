@@ -39,6 +39,12 @@
      the range are realized against the line. Leave it empty for a line without date
      limit.
    - Fill in the price, quantity and unit of measure.
+   - **Multipliers**: Optionally open the **Multipliers** tab of the line and add one
+     row per factor (for example persons, days, times). In each row fill in the **Name**
+     _(required)_, the **Factor** _(required, greater than zero)_ and optionally the
+     **UoM**. When the line has at least one factor, the **Quantity** becomes read-only
+     and shows the product of all factors; the **Subtotal** is the price times that
+     quantity. Leave the tab empty to type the quantity manually.
 5. Click **Save**.
 
 ## Post-Condition

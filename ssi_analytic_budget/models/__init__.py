@@ -8,6 +8,7 @@ from . import (
     analytic_budget_budget,
     analytic_budget_realization,
     analytic_budget_detail,
+    analytic_budget_detail_multiplier,
     analytic_budget_realization_budgeted,
     analytic_budget_realization_unbudgeted,
     analytic_budget_realization_unbudgeted_helper,

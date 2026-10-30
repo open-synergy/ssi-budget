@@ -89,6 +89,8 @@ odoo.define("ssi_analytic_budget.analytic_budget_budget_create_tour", function (
                     // Assertion only; do not trigger the default click action.
                 },
             },
+            // Flow 4 - The planned lines, including their optional
+            // multiplier factors, are optional and not exercised here.
             // Flow 5 - Click Save.
             {
                 content: "Save the record",
