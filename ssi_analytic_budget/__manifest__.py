@@ -26,6 +26,7 @@
         "ssi_company_currency_mixin",
         "account_fiscal_month",
         "web_tour",
+        "ssi_web_hierarchy_view",
     ],
     "data": [
         "security/ir_module_category_data.xml",

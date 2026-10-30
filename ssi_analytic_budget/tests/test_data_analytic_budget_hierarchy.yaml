@@ -1,0 +1,111 @@
+options:
+  auto_refresh: true
+scenarios:
+  - name: Analytic Budget Hierarchy - View and action
+    steps:
+      - step: The hierarchy view exists exactly once
+        action: search
+        model: ir.ui.view
+        save_as: hierarchy_view
+        domain:
+          - - model
+            - "="
+            - analytic_budget.budget
+          - - type
+            - "="
+            - hierarchy
+        expect_count: 1
+      - step: Get the Analytic Budgets action
+        action: ref
+        xml_id: ssi_analytic_budget.analytic_budget_budget_action
+        save_as: budget_action
+      - step: Assert the action opens the hierarchy view
+        action: assert
+        target: budget_action
+        asserts:
+          view_mode:
+            type: value
+            expected: "tree,form,hierarchy"
+  - name: Analytic Budget Hierarchy - Roots and children
+    steps:
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Hier Type 02
+          code: ABHT02
+      - step: Create analytic account Parent
+        action: create
+        model: account.analytic.account
+        save_as: acc_parent
+        values:
+          name: AB Hier 02 Parent
+      - step: Create analytic account Child
+        action: create
+        model: account.analytic.account
+        save_as: acc_child
+        values:
+          name: AB Hier 02 Child
+          parent_id: "REC: acc_parent.id"
+      - step: Create analytic account Orphan
+        action: create
+        model: account.analytic.account
+        save_as: acc_orphan
+        values:
+          name: AB Hier 02 Orphan
+      - step: Create the parent budget
+        action: create
+        model: analytic_budget.budget
+        save_as: parent
+        as_user: base.user_admin
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_parent.id"
+      - step: Create the child budget
+        action: create
+        model: analytic_budget.budget
+        save_as: child
+        as_user: base.user_admin
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_child.id"
+          parent_id: "REC: parent.id"
+      - step: Create the budget without a parent
+        action: create
+        model: analytic_budget.budget
+        save_as: orphan
+        as_user: base.user_admin
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: acc_orphan.id"
+      - step: Roots hold the parent budget and the budget without a parent
+        action: search
+        model: analytic_budget.budget
+        save_as: roots
+        domain:
+          - - parent_id
+            - "="
+            - false
+          - - id
+            - in
+            - "EVAL: [registry['parent'].id, registry['child'].id,
+              registry['orphan'].id]"
+        expect_count: 2
+      - step: Assert the parent budget children
+        action: assert
+        target: parent
+        asserts:
+          child_ids:
+            type: o2m
+            check: exact
+            expected_records:
+              - "REC: child"
+      - step: Assert the budget without a parent has no children
+        action: assert
+        target: orphan
+        asserts:
+          child_ids:
+            type: o2m
+            check: count
+            expected_count: 0

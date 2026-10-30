@@ -439,11 +439,31 @@
     </field>
 </record>
 
+<record id="analytic_budget_budget_view_hierarchy" model="ir.ui.view">
+    <field name="name">analytic_budget.budget - hierarchy</field>
+    <field name="model">analytic_budget.budget</field>
+    <field name="arch" type="xml">
+        <hierarchy
+                string="Analytic Budgets"
+                parent_field="parent_id"
+                child_field="child_ids"
+            >
+            <field name="name" />
+            <field name="analytic_account_id" />
+            <field name="state" />
+            <field name="amount_planned_revenue" />
+            <field name="amount_planned_cost" />
+            <field name="amount_planned_pl" />
+            <field name="amount_profit_realization" />
+        </hierarchy>
+    </field>
+</record>
+
 <record id="analytic_budget_budget_action" model="ir.actions.act_window">
     <field name="name">Analytic Budgets</field>
     <field name="type">ir.actions.act_window</field>
     <field name="res_model">analytic_budget.budget</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">tree,form,hierarchy</field>
     <field name="search_view_id" ref="analytic_budget_budget_view_search" />
 </record>
 
