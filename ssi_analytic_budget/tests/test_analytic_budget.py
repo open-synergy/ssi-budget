@@ -18,3 +18,7 @@ class TestAnalyticBudget(YamlTransactionCase):
     def test_analytic_budget_period(self):
         """Run the period, remainder rule, hierarchy and realization scenarios."""
         self.run_yaml_scenario("test_data_analytic_budget_period.yaml")
+
+    def test_analytic_budget_multiplier(self):
+        """Run the multiplier factor and line quantity scenarios."""
+        self.run_yaml_scenario("test_data_analytic_budget_multiplier.yaml")

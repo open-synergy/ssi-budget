@@ -9,8 +9,9 @@ from odoo.exceptions import ValidationError
 class AnalyticBudgetDetail(models.Model):
     """Planned revenue or cost line of an analytic budget.
 
-    Each line is priced through the product line price mixin and
-    is restricted to the accounts and products allowed by the
+    Each line is priced through the product line price multiplier
+    mixin, so its quantity may be the product of several factors,
+    and is restricted to the accounts and products allowed by the
     budget type. A line may be bound to a date range, so one budget
     can cover several periods. The realized amount of a line is
     stored and read from the ``realization_budgeted`` SQL view, which
@@ -20,7 +21,7 @@ class AnalyticBudgetDetail(models.Model):
     _name = "analytic_budget.detail"
     _description = "Analytic Budget Detail"
     _inherit = [
-        "mixin.product_line_price",
+        "mixin.product_line_price_multiplier",
     ]
 
     @api.depends(
@@ -285,6 +286,14 @@ Solution: Select a product on the line
             budget._check_children_allocation()
         return result
 
+    multiplier_ids = fields.One2many(
+        string="Multipliers",
+        comodel_name="analytic_budget.detail_multiplier",
+        inverse_name="line_id",
+        copy=True,
+        help="Factors whose product is the quantity of the line. "
+        "Without factors the quantity is typed manually.",
+    )
     budget_id = fields.Many2one(
         string="# Budget",
         comodel_name="analytic_budget.budget",

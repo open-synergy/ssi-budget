@@ -20,6 +20,14 @@ To install this module, you need to:
 5.  Search For *Analytic Budget*
 6.  Install the module
 
+.. note::
+
+   The multiplier factors of a budget line need
+   ``ssi_product_line_mixin`` 14.0.1.4.0 or newer and
+   ``ssi_product_line_price_mixin`` 14.0.1.5.0 or newer. Upgrade both
+   modules before, or together with, this module on an existing
+   database.
+
 Work Instruction
 ================
 

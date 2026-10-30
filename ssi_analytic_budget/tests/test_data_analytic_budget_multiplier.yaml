@@ -1,0 +1,292 @@
+options:
+  auto_refresh: true
+scenarios:
+  - name: Multiplier - quantity and subtotal follow the factors
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create cost account
+        action: create
+        model: account.account
+        save_as: acc
+        values:
+          name: AB Multiplier 1 Cost
+          code: XABM01
+          user_type_id: "REC: acc_type.id"
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Multiplier Type 1
+          code: ABMT01
+      - step: Create analytic account
+        action: create
+        model: account.analytic.account
+        save_as: analytic
+        values:
+          name: AB Multiplier 1 Analytic
+      - step: Create budget
+        action: create
+        model: analytic_budget.budget
+        save_as: budget
+        as_user: base.user_admin
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+      - step: Create cost line with factors 2 and 3
+        action: create
+        model: analytic_budget.detail
+        save_as: detail
+        as_user: base.user_admin
+        values:
+          budget_id: "REC: budget.id"
+          name: Line
+          direction: cost
+          account_id: "REC: acc.id"
+          price_unit: 1000.0
+          multiplier_ids:
+            - - 0
+              - 0
+              - name: Persons
+                factor: 2.0
+            - - 0
+              - 0
+              - name: Days
+                factor: 3.0
+      - step: Quantity is the product of the factors
+        action: assert
+        target: detail
+        asserts:
+          uom_quantity:
+            type: value
+            expected: 6.0
+          price_subtotal:
+            type: value
+            expected: 6000.0
+      - step: Planned cost of the budget follows the subtotal
+        action: assert
+        target: budget
+        asserts:
+          amount_planned_cost:
+            type: value
+            expected: 6000.0
+      - step: Find the factor 3
+        action: search
+        model: analytic_budget.detail_multiplier
+        domain:
+          - - line_id
+            - "="
+            - "REC: detail.id"
+          - - factor
+            - "="
+            - 3.0
+        save_as: factor_days
+        expect_count: 1
+      - step: Change the factor 3 into 5
+        action: write
+        target: factor_days
+        values:
+          factor: 5.0
+      - step: Quantity and subtotal are recomputed
+        action: assert
+        target: detail
+        asserts:
+          uom_quantity:
+            type: value
+            expected: 10.0
+          price_subtotal:
+            type: value
+            expected: 10000.0
+  - name: Multiplier - a line without factors keeps the manual quantity
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create cost account
+        action: create
+        model: account.account
+        save_as: acc
+        values:
+          name: AB Multiplier 2 Cost
+          code: XABM02
+          user_type_id: "REC: acc_type.id"
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Multiplier Type 2
+          code: ABMT02
+      - step: Create analytic account
+        action: create
+        model: account.analytic.account
+        save_as: analytic
+        values:
+          name: AB Multiplier 2 Analytic
+      - step: Create budget
+        action: create
+        model: analytic_budget.budget
+        save_as: budget
+        as_user: base.user_admin
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+      - step: Create cost line with a manual quantity
+        action: create
+        model: analytic_budget.detail
+        save_as: detail
+        as_user: base.user_admin
+        values:
+          budget_id: "REC: budget.id"
+          name: Line
+          direction: cost
+          account_id: "REC: acc.id"
+          price_unit: 250.0
+          uom_quantity: 4.0
+      - step: Manual quantity is kept
+        action: assert
+        target: detail
+        asserts:
+          uom_quantity:
+            type: value
+            expected: 4.0
+          price_subtotal:
+            type: value
+            expected: 1000.0
+  - name: Multiplier - deleting a line deletes its factors
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create cost account
+        action: create
+        model: account.account
+        save_as: acc
+        values:
+          name: AB Multiplier 3 Cost
+          code: XABM03
+          user_type_id: "REC: acc_type.id"
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Multiplier Type 3
+          code: ABMT03
+      - step: Create analytic account
+        action: create
+        model: account.analytic.account
+        save_as: analytic
+        values:
+          name: AB Multiplier 3 Analytic
+      - step: Create budget
+        action: create
+        model: analytic_budget.budget
+        save_as: budget
+        as_user: base.user_admin
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+      - step: Create cost line with two factors
+        action: create
+        model: analytic_budget.detail
+        save_as: detail
+        as_user: base.user_admin
+        values:
+          budget_id: "REC: budget.id"
+          name: Line
+          direction: cost
+          account_id: "REC: acc.id"
+          price_unit: 100.0
+          multiplier_ids:
+            - - 0
+              - 0
+              - name: Persons
+                factor: 2.0
+            - - 0
+              - 0
+              - name: Days
+                factor: 3.0
+      - step: The line owns two factors
+        action: search
+        model: analytic_budget.detail_multiplier
+        domain:
+          - - line_id
+            - "="
+            - "REC: detail.id"
+        save_as: factors
+        expect_count: 2
+      - step: Delete the line
+        action: unlink
+        target: detail
+      - step: No factor of the deleted line remains
+        action: search
+        model: analytic_budget.detail_multiplier
+        domain:
+          - - id
+            - in
+            - "EVAL: registry['factors'].ids"
+        save_as: remaining
+        expect_count: 0
+  - name: Multiplier - a factor of zero is rejected
+    steps:
+      - step: Get expenses account type
+        action: ref
+        xml_id: account.data_account_type_expenses
+        save_as: acc_type
+      - step: Create cost account
+        action: create
+        model: account.account
+        save_as: acc
+        values:
+          name: AB Multiplier 4 Cost
+          code: XABM04
+          user_type_id: "REC: acc_type.id"
+      - step: Create budget type
+        action: create
+        model: analytic_budget.type
+        save_as: budget_type
+        values:
+          name: AB Multiplier Type 4
+          code: ABMT04
+      - step: Create analytic account
+        action: create
+        model: account.analytic.account
+        save_as: analytic
+        values:
+          name: AB Multiplier 4 Analytic
+      - step: Create budget
+        action: create
+        model: analytic_budget.budget
+        save_as: budget
+        as_user: base.user_admin
+        values:
+          type_id: "REC: budget_type.id"
+          analytic_account_id: "REC: analytic.id"
+      - step: Create cost line without factors
+        action: create
+        model: analytic_budget.detail
+        save_as: detail
+        as_user: base.user_admin
+        values:
+          budget_id: "REC: budget.id"
+          name: Line
+          direction: cost
+          account_id: "REC: acc.id"
+          price_unit: 100.0
+          uom_quantity: 1.0
+      - step: Factor of zero is rejected
+        action: create
+        model: analytic_budget.detail_multiplier
+        values:
+          line_id: "REC: detail.id"
+          name: Zero
+          factor: 0.0
+        expect_error:
+          type: ValidationError
+          message_contains: greater than zero

@@ -1,3 +1,5 @@
+odoo14-addon-ssi-product-line-mixin>=14.0.1.4.0
+odoo14-addon-ssi-product-line-price-mixin>=14.0.1.5.0
 odoo14-addon-ssi-work-log-mixin
 odoo-yaml-test
 openupgradelib
