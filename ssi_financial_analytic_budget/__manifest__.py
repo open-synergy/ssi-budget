@@ -4,7 +4,7 @@
 # pylint: disable=C8101
 {
     "name": "Financial Budget - Analytic Budget Integration",
-    "version": "14.0.1.0.1",
+    "version": "14.0.1.0.2",
     "website": "https://simetri-sinergi.id",
     "author": "OpenSynergy Indonesia, PT. Simetri Sinergi Indonesia",
     "contributors": [
