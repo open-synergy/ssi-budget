@@ -14,6 +14,72 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: ssi_analytic_budget
+#: code:addons/ssi_analytic_budget/models/analytic_budget_budget.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: %s analytic budget\n"
+"Database ID: %s\n"
+"Problem: The budget still has child budgets that are not cancelled or rejected\n"
+"Solution: Cancel or reject the child budgets first\n"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: code:addons/ssi_analytic_budget/models/analytic_budget_budget.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Check analytic budget allocation\n"
+"Database ID: %s\n"
+"Problem: A detail is not inside any detail of the parent budget with the same account and a period holding its period\n"
+"Solution: Plan the account in the parent budget, or use a period inside the period of the parent detail\n"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: code:addons/ssi_analytic_budget/models/analytic_budget_budget.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Check analytic budget allocation\n"
+"Database ID: %s\n"
+"Problem: The child budgets exceed the amount of the parent budget\n"
+"Solution: Reduce the child details so the total of an account and period does not exceed the parent detail\n"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: code:addons/ssi_analytic_budget/models/analytic_budget_budget.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Save analytic budget\n"
+"Database ID: %s\n"
+"Problem: The analytic account of the parent budget is not the parent of the analytic account of this budget\n"
+"Solution: Choose the budget of the parent analytic account\n"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: code:addons/ssi_analytic_budget/models/analytic_budget_detail.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Save analytic budget detail\n"
+"Database ID: %s\n"
+"Problem: Account and product are already planned in an overlapping period\n"
+"Solution: Use another period, or remove the overlapping line of the budget\n"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: code:addons/ssi_analytic_budget/models/analytic_budget_detail.py:0
+#, python-format
+msgid ""
+"\n"
+"Context: Save analytic budget detail\n"
+"Database ID: %s\n"
+"Problem: Product is required for this account\n"
+"Solution: Select a product on the line\n"
+msgstr ""
+
+#. module: ssi_analytic_budget
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_cost_summary_account__budget_id
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_detail__budget_id
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_realization__budget_id
@@ -180,6 +246,7 @@ msgid "Amount Realized"
 msgstr ""
 
 #. module: ssi_analytic_budget
+#: model:ir.model,name:ssi_analytic_budget.model_account_analytic_account
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget__analytic_account_id
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_detail__analytic_account_id
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_realization_budgeted__analytic_account_id
@@ -285,6 +352,11 @@ msgid "Analytic Budgets"
 msgstr ""
 
 #. module: ssi_analytic_budget
+#: model:ir.model,name:ssi_analytic_budget.model_account_analytic_line
+msgid "Analytic Line"
+msgstr ""
+
+#. module: ssi_analytic_budget
 #: model_terms:ir.ui.view,arch_db:ssi_analytic_budget.analytic_budget_budget_view_form
 msgid "Analytic Lines"
 msgstr ""
@@ -326,6 +398,13 @@ msgstr ""
 #. module: ssi_analytic_budget
 #: model_terms:ir.ui.view,arch_db:ssi_analytic_budget.analytic_budget_budget_view_form
 msgid "Budget Details"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: model:ir.model.fields,help:ssi_analytic_budget.field_analytic_budget_budget__parent_id
+msgid ""
+"Budget of the parent analytic account. The details of this budget may not "
+"exceed the matching details of the parent budget."
 msgstr ""
 
 #. module: ssi_analytic_budget
@@ -432,12 +511,19 @@ msgid ""
 msgstr ""
 
 #. module: ssi_analytic_budget
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget__child_ids
+#: model_terms:ir.ui.view,arch_db:ssi_analytic_budget.analytic_budget_budget_view_form
+msgid "Child Budgets"
+msgstr ""
+
+#. module: ssi_analytic_budget
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_type__code
 msgid "Code"
 msgstr ""
 
 #. module: ssi_analytic_budget
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget__company_id
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_detail__company_id
 #: model:res.groups,name:ssi_analytic_budget.analytic_budget_company_group
 msgid "Company"
 msgstr ""
@@ -463,6 +549,7 @@ msgstr ""
 
 #. module: ssi_analytic_budget
 #: model:ir.model.fields,help:ssi_analytic_budget.field_analytic_budget_budget__company_id
+#: model:ir.model.fields,help:ssi_analytic_budget.field_analytic_budget_detail__company_id
 msgid ""
 "Company that own the document\n"
 "\n"
@@ -538,9 +625,25 @@ msgstr ""
 
 #. module: ssi_analytic_budget
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_realization__date
-#: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_realization_budgeted__date
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_realization_unbudgeted__date
 msgid "Date"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget__date_end
+msgid "Date End"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget__date_start
+msgid "Date Start"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: model:ir.model.fields,help:ssi_analytic_budget.field_analytic_budget_detail__period_id
+msgid ""
+"Date range of the line. Only the analytic lines dated inside the range are "
+"realized against this line. Empty means no date limit."
 msgstr ""
 
 #. module: ssi_analytic_budget
@@ -570,6 +673,8 @@ msgid "Direction"
 msgstr ""
 
 #. module: ssi_analytic_budget
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_account_analytic_account__display_name
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_account_analytic_line__display_name
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget__display_name
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_cost_summary_account__display_name
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_detail__display_name
@@ -599,6 +704,13 @@ msgstr ""
 #. module: ssi_analytic_budget
 #: model:ir.model.fields.selection,name:ssi_analytic_budget.selection__analytic_budget_budget__state__draft
 msgid "Draft"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: model:ir.model.fields,help:ssi_analytic_budget.field_analytic_budget_budget__date_start
+msgid ""
+"Earliest start date of the periods of the details. Empty when no detail has "
+"a period."
 msgstr ""
 
 #. module: ssi_analytic_budget
@@ -642,6 +754,8 @@ msgid "Font awesome icon e.g. fa-tasks"
 msgstr ""
 
 #. module: ssi_analytic_budget
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_account_analytic_account__id
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_account_analytic_line__id
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget__id
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_cost_summary_account__id
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_detail__id
@@ -698,6 +812,8 @@ msgid "Is Follower"
 msgstr ""
 
 #. module: ssi_analytic_budget
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_account_analytic_account____last_update
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_account_analytic_line____last_update
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget____last_update
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_cost_summary_account____last_update
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_detail____last_update
@@ -725,6 +841,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_type__write_date
 #: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_type_account__write_date
 msgid "Last Updated on"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: model:ir.model.fields,help:ssi_analytic_budget.field_analytic_budget_budget__date_end
+msgid ""
+"Latest end date of the periods of the details. Empty when no detail has a "
+"period."
 msgstr ""
 
 #. module: ssi_analytic_budget
@@ -857,6 +980,23 @@ msgid "P/L"
 msgstr ""
 
 #. module: ssi_analytic_budget
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget__analytic_account_parent_id
+msgid "Parent Analytic Account"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_budget__parent_id
+#: model_terms:ir.ui.view,arch_db:ssi_analytic_budget.analytic_budget_budget_view_search
+msgid "Parent Budget"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_detail__period_id
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_realization_budgeted__period_id
+msgid "Period"
+msgstr ""
+
+#. module: ssi_analytic_budget
 #: model_terms:ir.ui.view,arch_db:ssi_analytic_budget.analytic_budget_budget_view_form
 msgid "Planned"
 msgstr ""
@@ -946,6 +1086,16 @@ msgid "Realization Lines"
 msgstr ""
 
 #. module: ssi_analytic_budget
+#: model:ir.model.fields,field_description:ssi_analytic_budget.field_analytic_budget_detail__amount_realized
+msgid "Realized"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: model:ir.actions.server,name:ssi_analytic_budget.analytic_budget_budget_action_recompute_realization
+msgid "Recompute Realization"
+msgstr ""
+
+#. module: ssi_analytic_budget
 #: model:ir.model.fields,help:ssi_analytic_budget.field_analytic_budget_budget__reject_ok
 msgid ""
 "Reject policy\n"
@@ -1011,6 +1161,14 @@ msgstr ""
 #. module: ssi_analytic_budget
 #: model_terms:ir.ui.view,arch_db:ssi_analytic_budget.analytic_budget_type_view_form
 msgid "Revenue Settings"
+msgstr ""
+
+#. module: ssi_analytic_budget
+#: model:ir.model.fields,help:ssi_analytic_budget.field_analytic_budget_detail__amount_realized
+msgid ""
+"Revenue or cost realized against this line. Revenue is the sum of the "
+"matching analytic lines, cost is the opposite of that sum, so a normal "
+"realization is positive."
 msgstr ""
 
 #. module: ssi_analytic_budget
