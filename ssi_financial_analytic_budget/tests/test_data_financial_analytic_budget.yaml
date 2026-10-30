@@ -1,0 +1,1210 @@
+options:
+  auto_refresh: true
+
+scenarios:
+  - name: "Ceiling - total up to the financial amount passes, above it fails"
+    steps:
+      - step: "Setup - expenses account type"
+        action: "ref"
+        xml_id: "account.data_account_type_expenses"
+        save_as: "acc_type"
+      - step: "Setup - account X"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_x"
+        values:
+          name: "FAB 1 Account X"
+          code: "FAB1X"
+          user_type_id: "REC: acc_type.id"
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "fin_type"
+        values:
+          name: "FAB 1 Financial Type"
+          code: "FABF1"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['acc_x'].id])]"
+      - step: "Setup - analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "an_type"
+        values:
+          name: "FAB 1 Analytic Type"
+          code: "FABA1"
+      - step: "Setup - top level analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "an_acc"
+        values:
+          name: "FAB 1 Analytic Account"
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FAB 1 Yearly"
+      - step: "Setup - company yearly range type"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+      - step: "Setup - yearly range"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "FAB 1 Year"
+          type_id: "REC: yr_type"
+          date_start: "2041-01-01"
+          date_end: "2041-12-31"
+      - step: "Setup - analytic period range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "an_drt"
+        values:
+          name: "FAB 1 Analytic Periods"
+          allow_overlap: true
+      - step: "Setup - analytic period jan"
+        action: "create"
+        model: "date.range"
+        save_as: "jan"
+        values:
+          name: "FAB 1 jan"
+          type_id: "REC: an_drt"
+          date_start: "2041-01-01"
+          date_end: "2041-01-31"
+      - step: "Setup - analytic period q2"
+        action: "create"
+        model: "date.range"
+        save_as: "q2"
+        values:
+          name: "FAB 1 q2"
+          type_id: "REC: an_drt"
+          date_start: "2041-04-01"
+          date_end: "2041-06-30"
+      - step: "Setup - analytic period mar"
+        action: "create"
+        model: "date.range"
+        save_as: "mar"
+        values:
+          name: "FAB 1 mar"
+          type_id: "REC: an_drt"
+          date_start: "2041-03-01"
+          date_end: "2041-03-31"
+      - step: "Create financial budget fin_yearly"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "fin_yearly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: fin_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          detail_ids:
+            - - 0
+              - 0
+              - account_id: "REC: acc_x.id"
+                direction: "cost"
+                amount: 1000000.0
+      - step: "Create analytic budget up to the ceiling"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "an_1"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Jan"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 600000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+            - - 0
+              - 0
+              - name: "Q2"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 400000.0
+                uom_quantity: 1.0
+                period_id: "REC: q2.id"
+      - step: "Find financial detail fin_detail"
+        action: "search"
+        model: "financial_budget.detail"
+        save_as: "fin_detail"
+        limit: 1
+        expect_count: 1
+        domain:
+          - - "budget_id"
+            - "="
+            - "REC: fin_yearly.id"
+          - - "account_id"
+            - "="
+            - "REC: acc_x.id"
+      - step: "Assert allocated analytic amount"
+        action: "assert"
+        target: "fin_detail"
+        asserts:
+          amount_allocated_analytic:
+            type: "value"
+            expected: 1000000.0
+      - step: "Add a line above the ceiling"
+        action: "create"
+        model: "analytic_budget.detail"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        expect_error:
+          type: "ValidationError"
+          message_contains: "exceeds the financial budget"
+        values:
+          budget_id: "REC: an_1.id"
+          name: "Mar"
+          direction: "cost"
+          account_id: "REC: acc_x.id"
+          price_unit: 1.0
+          uom_quantity: 1.0
+          period_id: "REC: mar.id"
+
+  - name:
+      "Ceiling - monthly period is checked against the monthly and the yearly budget"
+    steps:
+      - step: "Setup - expenses account type"
+        action: "ref"
+        xml_id: "account.data_account_type_expenses"
+        save_as: "acc_type"
+      - step: "Setup - account X"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_x"
+        values:
+          name: "FAB 2 Account X"
+          code: "FAB2X"
+          user_type_id: "REC: acc_type.id"
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "fin_type"
+        values:
+          name: "FAB 2 Financial Type"
+          code: "FABF2"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['acc_x'].id])]"
+      - step: "Setup - analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "an_type"
+        values:
+          name: "FAB 2 Analytic Type"
+          code: "FABA2"
+      - step: "Setup - top level analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "an_acc"
+        values:
+          name: "FAB 2 Analytic Account"
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FAB 2 Yearly"
+      - step: "Setup - company yearly range type"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+      - step: "Setup - yearly range"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "FAB 2 Year"
+          type_id: "REC: yr_type"
+          date_start: "2042-01-01"
+          date_end: "2042-12-31"
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FAB 2 Fiscal Month"
+          fiscal_month: true
+      - step: "Setup - fiscal month January"
+        action: "create"
+        model: "date.range"
+        save_as: "fm_jan"
+        values:
+          name: "FAB 2 FM Jan"
+          type_id: "REC: fm_type"
+          date_start: "2042-01-01"
+          date_end: "2042-01-31"
+      - step: "Setup - analytic period range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "an_drt"
+        values:
+          name: "FAB 2 Analytic Periods"
+          allow_overlap: true
+      - step: "Setup - analytic period jan"
+        action: "create"
+        model: "date.range"
+        save_as: "jan"
+        values:
+          name: "FAB 2 jan"
+          type_id: "REC: an_drt"
+          date_start: "2042-01-01"
+          date_end: "2042-01-31"
+      - step: "Create financial budget fin_yearly"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "fin_yearly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: fin_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          detail_ids:
+            - - 0
+              - 0
+              - account_id: "REC: acc_x.id"
+                direction: "cost"
+                amount: 1000000.0
+      - step: "Create financial budget fin_monthly"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "fin_monthly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: fin_type.id"
+          periodicity: "monthly"
+          period_id: "REC: fm_jan.id"
+          detail_ids:
+            - - 0
+              - 0
+              - account_id: "REC: acc_x.id"
+                direction: "cost"
+                amount: 300000.0
+      - step: "Create analytic budget above the monthly ceiling"
+        action: "create"
+        model: "analytic_budget.budget"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        expect_error:
+          type: "ValidationError"
+          message_contains: "exceeds the financial budget"
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Jan"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 400000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+      - step: "Create analytic budget at the monthly ceiling"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "an_1"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Jan"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 300000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+
+  - name: "Ceiling - no ceiling period or no financial account means a ceiling of zero"
+    steps:
+      - step: "Setup - expenses account type"
+        action: "ref"
+        xml_id: "account.data_account_type_expenses"
+        save_as: "acc_type"
+      - step: "Setup - account X"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_x"
+        values:
+          name: "FAB 3 Account X"
+          code: "FAB3X"
+          user_type_id: "REC: acc_type.id"
+      - step: "Setup - account Y"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_y"
+        values:
+          name: "FAB 3 Account Y"
+          code: "FAB3Y"
+          user_type_id: "REC: acc_type.id"
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "fin_type"
+        values:
+          name: "FAB 3 Financial Type"
+          code: "FABF3"
+          allowed_account_ids:
+            "EVAL: [(6, 0, [registry['acc_x'].id, registry['acc_y'].id])]"
+      - step: "Setup - analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "an_type"
+        values:
+          name: "FAB 3 Analytic Type"
+          code: "FABA3"
+      - step: "Setup - top level analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "an_acc"
+        values:
+          name: "FAB 3 Analytic Account"
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FAB 3 Yearly"
+      - step: "Setup - company yearly range type"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+      - step: "Setup - yearly range"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "FAB 3 Year"
+          type_id: "REC: yr_type"
+          date_start: "2043-01-01"
+          date_end: "2043-12-31"
+      - step: "Setup - fiscal month range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "fm_type"
+        values:
+          name: "FAB 3 Fiscal Month"
+          fiscal_month: true
+      - step: "Setup - fiscal month January"
+        action: "create"
+        model: "date.range"
+        save_as: "fm_jan"
+        values:
+          name: "FAB 3 FM Jan"
+          type_id: "REC: fm_type"
+          date_start: "2043-01-01"
+          date_end: "2043-01-31"
+      - step: "Setup - analytic period range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "an_drt"
+        values:
+          name: "FAB 3 Analytic Periods"
+          allow_overlap: true
+      - step: "Setup - analytic period jan"
+        action: "create"
+        model: "date.range"
+        save_as: "jan"
+        values:
+          name: "FAB 3 jan"
+          type_id: "REC: an_drt"
+          date_start: "2043-01-01"
+          date_end: "2043-01-31"
+      - step: "Setup - analytic period jan_mar"
+        action: "create"
+        model: "date.range"
+        save_as: "jan_mar"
+        values:
+          name: "FAB 3 jan_mar"
+          type_id: "REC: an_drt"
+          date_start: "2043-01-01"
+          date_end: "2043-03-31"
+      - step: "Setup - analytic period feb"
+        action: "create"
+        model: "date.range"
+        save_as: "feb"
+        values:
+          name: "FAB 3 feb"
+          type_id: "REC: an_drt"
+          date_start: "2043-02-01"
+          date_end: "2043-02-28"
+      - step: "Create financial budget fin_monthly"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "fin_monthly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: fin_type.id"
+          periodicity: "monthly"
+          period_id: "REC: fm_jan.id"
+          detail_ids:
+            - - 0
+              - 0
+              - account_id: "REC: acc_x.id"
+                direction: "cost"
+                amount: 300000.0
+      - step: "Create analytic budget in a period without financial budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        expect_error:
+          type: "ValidationError"
+          message_contains: "exceeds the financial budget"
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Feb"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 1000.0
+                uom_quantity: 1.0
+                period_id: "REC: feb.id"
+      - step: "Create analytic budget spanning more than the financial period"
+        action: "create"
+        model: "analytic_budget.budget"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        expect_error:
+          type: "ValidationError"
+          message_contains: "exceeds the financial budget"
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Q1"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 1000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan_mar.id"
+      - step: "Create analytic budget on an account not in the financial budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        expect_error:
+          type: "ValidationError"
+          message_contains: "exceeds the financial budget"
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Jan"
+                direction: "cost"
+                account_id: "REC: acc_y.id"
+                price_unit: 1000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+      - step: "Create analytic budget on the other direction"
+        action: "create"
+        model: "analytic_budget.budget"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        expect_error:
+          type: "ValidationError"
+          message_contains: "exceeds the financial budget"
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Jan"
+                direction: "revenue"
+                account_id: "REC: acc_x.id"
+                price_unit: 1000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+
+  - name: "Ceiling - child analytic account and line without period are not checked"
+    steps:
+      - step: "Setup - expenses account type"
+        action: "ref"
+        xml_id: "account.data_account_type_expenses"
+        save_as: "acc_type"
+      - step: "Setup - account X"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_x"
+        values:
+          name: "FAB 4 Account X"
+          code: "FAB4X"
+          user_type_id: "REC: acc_type.id"
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "fin_type"
+        values:
+          name: "FAB 4 Financial Type"
+          code: "FABF4"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['acc_x'].id])]"
+      - step: "Setup - analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "an_type"
+        values:
+          name: "FAB 4 Analytic Type"
+          code: "FABA4"
+      - step: "Setup - top level analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "an_acc"
+        values:
+          name: "FAB 4 Analytic Account"
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FAB 4 Yearly"
+      - step: "Setup - company yearly range type"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+      - step: "Setup - yearly range"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "FAB 4 Year"
+          type_id: "REC: yr_type"
+          date_start: "2044-01-01"
+          date_end: "2044-12-31"
+      - step: "Setup - analytic period range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "an_drt"
+        values:
+          name: "FAB 4 Analytic Periods"
+          allow_overlap: true
+      - step: "Setup - analytic period jan"
+        action: "create"
+        model: "date.range"
+        save_as: "jan"
+        values:
+          name: "FAB 4 jan"
+          type_id: "REC: an_drt"
+          date_start: "2044-01-01"
+          date_end: "2044-01-31"
+      - step: "Create child analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "an_child"
+        values:
+          name: "FAB 4 Child Analytic Account"
+          parent_id: "REC: an_acc.id"
+      - step: "Create child analytic budget above any ceiling"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "child_budget"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_child.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Jan"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 5000000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+      - step: "Create top level budget with a line without period"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "top_budget"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "No period"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 5000000.0
+                uom_quantity: 1.0
+
+  - name: "Ceiling - financial amount cannot go below the analytic allocation"
+    steps:
+      - step: "Setup - expenses account type"
+        action: "ref"
+        xml_id: "account.data_account_type_expenses"
+        save_as: "acc_type"
+      - step: "Setup - account X"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_x"
+        values:
+          name: "FAB 5 Account X"
+          code: "FAB5X"
+          user_type_id: "REC: acc_type.id"
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "fin_type"
+        values:
+          name: "FAB 5 Financial Type"
+          code: "FABF5"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['acc_x'].id])]"
+      - step: "Setup - analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "an_type"
+        values:
+          name: "FAB 5 Analytic Type"
+          code: "FABA5"
+      - step: "Setup - top level analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "an_acc"
+        values:
+          name: "FAB 5 Analytic Account"
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FAB 5 Yearly"
+      - step: "Setup - company yearly range type"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+      - step: "Setup - yearly range"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "FAB 5 Year"
+          type_id: "REC: yr_type"
+          date_start: "2045-01-01"
+          date_end: "2045-12-31"
+      - step: "Setup - analytic period range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "an_drt"
+        values:
+          name: "FAB 5 Analytic Periods"
+          allow_overlap: true
+      - step: "Setup - analytic period jan"
+        action: "create"
+        model: "date.range"
+        save_as: "jan"
+        values:
+          name: "FAB 5 jan"
+          type_id: "REC: an_drt"
+          date_start: "2045-01-01"
+          date_end: "2045-01-31"
+      - step: "Create financial budget fin_yearly"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "fin_yearly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: fin_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          detail_ids:
+            - - 0
+              - 0
+              - account_id: "REC: acc_x.id"
+                direction: "cost"
+                amount: 1000000.0
+      - step: "Create analytic budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "an_1"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Jan"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 900000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+      - step: "Find financial detail fin_detail"
+        action: "search"
+        model: "financial_budget.detail"
+        save_as: "fin_detail"
+        limit: 1
+        expect_count: 1
+        domain:
+          - - "budget_id"
+            - "="
+            - "REC: fin_yearly.id"
+          - - "account_id"
+            - "="
+            - "REC: acc_x.id"
+      - step: "Lower the financial amount below the allocation"
+        action: "write"
+        target: "fin_detail"
+        context:
+          test_financial_analytic_budget: true
+        expect_error:
+          type: "ValidationError"
+          message_contains: "exceeds the financial budget"
+        values:
+          amount: 800000.0
+      - step: "Lower the financial amount to the allocation"
+        action: "write"
+        target: "fin_detail"
+        context:
+          test_financial_analytic_budget: true
+        values:
+          amount: 900000.0
+      - step: "Delete the financial line"
+        action: "unlink"
+        target: "fin_detail"
+        context:
+          test_financial_analytic_budget: true
+        expect_error:
+          type: "ValidationError"
+          message_contains: "exceeds the financial budget"
+
+  - name: "Ceiling - confirm rechecks a draft budget after the financial amount dropped"
+    steps:
+      - step: "Setup - expenses account type"
+        action: "ref"
+        xml_id: "account.data_account_type_expenses"
+        save_as: "acc_type"
+      - step: "Setup - account X"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_x"
+        values:
+          name: "FAB 6 Account X"
+          code: "FAB6X"
+          user_type_id: "REC: acc_type.id"
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "fin_type"
+        values:
+          name: "FAB 6 Financial Type"
+          code: "FABF6"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['acc_x'].id])]"
+      - step: "Setup - analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "an_type"
+        values:
+          name: "FAB 6 Analytic Type"
+          code: "FABA6"
+      - step: "Setup - top level analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "an_acc"
+        values:
+          name: "FAB 6 Analytic Account"
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FAB 6 Yearly"
+      - step: "Setup - company yearly range type"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+      - step: "Setup - yearly range"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "FAB 6 Year"
+          type_id: "REC: yr_type"
+          date_start: "2046-01-01"
+          date_end: "2046-12-31"
+      - step: "Setup - analytic period range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "an_drt"
+        values:
+          name: "FAB 6 Analytic Periods"
+          allow_overlap: true
+      - step: "Setup - analytic period jan"
+        action: "create"
+        model: "date.range"
+        save_as: "jan"
+        values:
+          name: "FAB 6 jan"
+          type_id: "REC: an_drt"
+          date_start: "2046-01-01"
+          date_end: "2046-01-31"
+      - step: "Setup - analytic period feb"
+        action: "create"
+        model: "date.range"
+        save_as: "feb"
+        values:
+          name: "FAB 6 feb"
+          type_id: "REC: an_drt"
+          date_start: "2046-02-01"
+          date_end: "2046-02-28"
+      - step: "Create financial budget fin_yearly"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "fin_yearly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: fin_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          detail_ids:
+            - - 0
+              - 0
+              - account_id: "REC: acc_x.id"
+                direction: "cost"
+                amount: 1000000.0
+      - step: "Create first analytic budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "an_1"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Jan"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 600000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+      - step: "Create second analytic budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "an_2"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Feb"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 400000.0
+                uom_quantity: 1.0
+                period_id: "REC: feb.id"
+      - step: "Find financial detail fin_detail"
+        action: "search"
+        model: "financial_budget.detail"
+        save_as: "fin_detail"
+        limit: 1
+        expect_count: 1
+        domain:
+          - - "budget_id"
+            - "="
+            - "REC: fin_yearly.id"
+          - - "account_id"
+            - "="
+            - "REC: acc_x.id"
+      - step: "Lower the financial amount without the check"
+        action: "write"
+        target: "fin_detail"
+        values:
+          amount: 800000.0
+      - step: "Confirm the second analytic budget"
+        action: "call"
+        target: "an_2"
+        method: "action_confirm"
+        context:
+          test_financial_analytic_budget: true
+          bypass_policy_check: true
+        expect_error:
+          type: "ValidationError"
+          message_contains: "exceeds the financial budget"
+
+  - name:
+      "Ceiling - cancelled analytic budget is not counted and its restart is checked"
+    steps:
+      - step: "Setup - expenses account type"
+        action: "ref"
+        xml_id: "account.data_account_type_expenses"
+        save_as: "acc_type"
+      - step: "Setup - account X"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_x"
+        values:
+          name: "FAB 7 Account X"
+          code: "FAB7X"
+          user_type_id: "REC: acc_type.id"
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "fin_type"
+        values:
+          name: "FAB 7 Financial Type"
+          code: "FABF7"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['acc_x'].id])]"
+      - step: "Setup - analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "an_type"
+        values:
+          name: "FAB 7 Analytic Type"
+          code: "FABA7"
+      - step: "Setup - top level analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "an_acc"
+        values:
+          name: "FAB 7 Analytic Account"
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FAB 7 Yearly"
+      - step: "Setup - company yearly range type"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+      - step: "Setup - yearly range"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "FAB 7 Year"
+          type_id: "REC: yr_type"
+          date_start: "2047-01-01"
+          date_end: "2047-12-31"
+      - step: "Setup - analytic period range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "an_drt"
+        values:
+          name: "FAB 7 Analytic Periods"
+          allow_overlap: true
+      - step: "Setup - analytic period jan"
+        action: "create"
+        model: "date.range"
+        save_as: "jan"
+        values:
+          name: "FAB 7 jan"
+          type_id: "REC: an_drt"
+          date_start: "2047-01-01"
+          date_end: "2047-01-31"
+      - step: "Create financial budget fin_yearly"
+        action: "create"
+        model: "financial_budget.budget"
+        save_as: "fin_yearly"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: fin_type.id"
+          periodicity: "yearly"
+          period_id: "REC: year.id"
+          detail_ids:
+            - - 0
+              - 0
+              - account_id: "REC: acc_x.id"
+                direction: "cost"
+                amount: 1000000.0
+      - step: "Create analytic budget"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "an_1"
+        as_user: "base.user_admin"
+        context:
+          test_financial_analytic_budget: true
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Jan"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 900000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
+      - step: "Cancel the analytic budget"
+        action: "call"
+        target: "an_1"
+        method: "action_cancel"
+        context:
+          bypass_policy_check: true
+        asserts:
+          state:
+            type: "value"
+            expected: "cancel"
+      - step: "Find financial detail fin_detail"
+        action: "search"
+        model: "financial_budget.detail"
+        save_as: "fin_detail"
+        limit: 1
+        expect_count: 1
+        domain:
+          - - "budget_id"
+            - "="
+            - "REC: fin_yearly.id"
+          - - "account_id"
+            - "="
+            - "REC: acc_x.id"
+      - step: "Assert nothing is allocated"
+        action: "assert"
+        target: "fin_detail"
+        asserts:
+          amount_allocated_analytic:
+            type: "value"
+            expected: 0.0
+      - step: "Lower the financial amount"
+        action: "write"
+        target: "fin_detail"
+        context:
+          test_financial_analytic_budget: true
+        values:
+          amount: 500000.0
+      - step: "Restart the analytic budget"
+        action: "call"
+        target: "an_1"
+        method: "action_restart"
+        context:
+          test_financial_analytic_budget: true
+          bypass_policy_check: true
+        expect_error:
+          type: "ValidationError"
+          message_contains: "exceeds the financial budget"
+
+  - name: "Ceiling - check is skipped in tests without the opt-in context"
+    steps:
+      - step: "Setup - expenses account type"
+        action: "ref"
+        xml_id: "account.data_account_type_expenses"
+        save_as: "acc_type"
+      - step: "Setup - account X"
+        action: "create"
+        model: "account.account"
+        save_as: "acc_x"
+        values:
+          name: "FAB 8 Account X"
+          code: "FAB8X"
+          user_type_id: "REC: acc_type.id"
+      - step: "Setup - financial budget type"
+        action: "create"
+        model: "financial_budget.type"
+        save_as: "fin_type"
+        values:
+          name: "FAB 8 Financial Type"
+          code: "FABF8"
+          allowed_account_ids: "EVAL: [(6, 0, [registry['acc_x'].id])]"
+      - step: "Setup - analytic budget type"
+        action: "create"
+        model: "analytic_budget.type"
+        save_as: "an_type"
+        values:
+          name: "FAB 8 Analytic Type"
+          code: "FABA8"
+      - step: "Setup - top level analytic account"
+        action: "create"
+        model: "account.analytic.account"
+        save_as: "an_acc"
+        values:
+          name: "FAB 8 Analytic Account"
+      - step: "Setup - yearly range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "yr_type"
+        values:
+          name: "FAB 8 Yearly"
+      - step: "Setup - company yearly range type"
+        action: "write"
+        target: "company"
+        values:
+          financial_budget_yearly_range_type_id: "EVAL: registry['yr_type'].id"
+      - step: "Setup - yearly range"
+        action: "create"
+        model: "date.range"
+        save_as: "year"
+        values:
+          name: "FAB 8 Year"
+          type_id: "REC: yr_type"
+          date_start: "2048-01-01"
+          date_end: "2048-12-31"
+      - step: "Setup - analytic period range type"
+        action: "create"
+        model: "date.range.type"
+        save_as: "an_drt"
+        values:
+          name: "FAB 8 Analytic Periods"
+          allow_overlap: true
+      - step: "Setup - analytic period jan"
+        action: "create"
+        model: "date.range"
+        save_as: "jan"
+        values:
+          name: "FAB 8 jan"
+          type_id: "REC: an_drt"
+          date_start: "2048-01-01"
+          date_end: "2048-01-31"
+      - step: "Create analytic budget without opt-in context"
+        action: "create"
+        model: "analytic_budget.budget"
+        save_as: "an_1"
+        as_user: "base.user_admin"
+        values:
+          type_id: "REC: an_type.id"
+          analytic_account_id: "REC: an_acc.id"
+          detail_ids:
+            - - 0
+              - 0
+              - name: "Jan"
+                direction: "cost"
+                account_id: "REC: acc_x.id"
+                price_unit: 5000000.0
+                uom_quantity: 1.0
+                period_id: "REC: jan.id"
