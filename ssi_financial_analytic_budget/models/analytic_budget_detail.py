@@ -137,6 +137,13 @@ class AnalyticBudgetDetail(models.Model):
     def _raise_financial_ceiling_error(self, context_name, record_id):
         """Raise the error of an exceeded financial ceiling.
 
+        The environment is cleared first: the cache, the pending writes
+        and the pending recomputes are shared by every environment of
+        the thread, so another cursor of the same thread (e.g. a REST
+        request log) would otherwise flush them onto rows locked by
+        the failing transaction. The transaction is rolled back by the
+        raised error anyway.
+
         :param context_name: action shown in the context of the message
         :param record_id: database id shown in the message
         :raises ValidationError: always
@@ -153,6 +160,7 @@ financial budget for the same account, direction and period
             )
             % (context_name, record_id)
         )
+        self.env.clear()
         raise ValidationError(error_message)
 
     @api.model
