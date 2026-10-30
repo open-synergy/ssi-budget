@@ -29,6 +29,12 @@ parent budget. The *Create Monthly Budgets* button of an open yearly
 budget creates one draft monthly budget per fiscal month and divides
 the amounts equally.
 
+The Financial Budgets list can also be opened as a tree using the
+*Hierarchy* view: each yearly budget is a root row that can be expanded
+to show its monthly budgets, and a monthly budget without a parent is
+also a root row. The tree has no total row because a yearly budget is
+the ceiling of its monthly budgets.
+
 The budget header shows the planned, realized and difference amounts of
 revenue and cost separately. The plain *Planned Amount*, *Realized
 Amount* and *Diff Amount* are net: revenue minus cost.

@@ -2,6 +2,7 @@
 # Copyright 2024 PT. Simetri Sinergi Indonesia
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from lxml import etree
 from odoo_yaml_test import YamlTransactionCase
 
 from odoo.tests import tagged
@@ -26,6 +27,38 @@ class TestFinancialBudget(YamlTransactionCase):
         the Create Monthly Budgets action and the Settings form.
         """
         self.run_yaml_scenario("test_data_financial_budget_yearly.yaml")
+
+    def test_financial_budget_hierarchy(self):
+        """Run the hierarchy view, action and tree scenarios.
+
+        Covers the hierarchy view, the action view modes and the roots
+        and children of the year to month tree.
+        """
+        self.run_yaml_scenario("test_data_financial_budget_hierarchy.yaml")
+
+    def test_financial_budget_hierarchy_fields_view(self):
+        """Return the hierarchy arch with its attributes and fields.
+
+        Pure Python, trigger P1 (L-01): ``fields_view_get`` returns a
+        dict and ``action: call`` discards the returned value.
+        """
+        result = self.env["financial_budget.budget"].fields_view_get(
+            view_type="hierarchy"
+        )
+        arch = etree.fromstring(result["arch"])
+        self.assertEqual(arch.tag, "hierarchy")
+        self.assertEqual(arch.get("parent_field"), "parent_id")
+        self.assertEqual(arch.get("child_field"), "child_ids")
+        for name in (
+            "name",
+            "type_id",
+            "period_id",
+            "state",
+            "amount_planned",
+            "amount_realized",
+            "amount_diff",
+        ):
+            self.assertIn(name, result["fields"])
 
     def test_create_monthly_budgets_remainder(self):
         """Give the rounding remainder to the last monthly budget.
