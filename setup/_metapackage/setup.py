@@ -12,6 +12,7 @@ setuptools.setup(
         'odoo14-addon-ssi_analytic_budget_documenso_signing',
         'odoo14-addon-ssi_analytic_budget_operating_unit',
         'odoo14-addon-ssi_analytic_budget_work_log',
+        'odoo14-addon-ssi_financial_analytic_budget',
         'odoo14-addon-ssi_financial_budget',
         'odoo14-addon-ssi_financial_budget_documenso_signing',
         'odoo14-addon-ssi_financial_budget_operating_unit',
